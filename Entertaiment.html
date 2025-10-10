@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Food</title>
+    <title>Entertaiment</title>
   <style>
 * {
   margin: 0;
@@ -77,12 +77,39 @@ footer h5 {
             </div>
         </header>
     <main>
-        <h2>
-        <span><a href="" target="_blank">Movies</a></span>
-        <span><a href="" target="_blank">Parties</a></span>
-        <span><a href="" target="_blank">Family Gathering</a></span>
-        </h2>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>/* Same styling as above */</style>
+</head>
+<body>
+  <h1>Entertainment Expenses</h1>
+  <input type="number" id="movies" placeholder="Movies (₹)" />
+  <input type="number" id="parties" placeholder="Parties (₹)" />
+  <input type="number" id="gatherings" placeholder="Family Gatherings (₹)" />
+  <button onclick="showChart()">Show Chart</button>
+  <div id="summary"></div>
+  <canvas id="entChart"></canvas>
 
+  <script>
+    function showChart() {
+      const movies = parseInt(document.getElementById('movies').value) || 0;
+      const parties = parseInt(document.getElementById('parties').value) || 0;
+      const gatherings = parseInt(document.getElementById('gatherings').value) || 0;
+      const total = movies + parties + gatherings;
+      document.getElementById('summary').innerHTML = `<h3>Total Entertainment Expenses: ₹${total}</h3>`;
+
+      new Chart(document.getElementById('entChart').getContext('2d'), {
+        type: 'pie',
+        data: {
+          labels: ['Movies', 'Parties', 'Family Gatherings'],
+          datasets: [{
+            data: [movies, parties, gatherings],
+            backgroundColor: ['#FF6384', '#9966FF', '#FFCE56']
+          }]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+      });
+    }
+  </script>
     </main>
 
     <footer>
