@@ -77,14 +77,48 @@ footer h5 {
             </div>
         </header>
     <main>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>/* Same styling as above */</style>
         <h2>
-        <span><a href="" target="_blank">Groceries</a></span>
-        <span><a href="" target="_blank">Fast Food</a></span>
-        <span><a href="" target="_blank">Drinks</a></span>
-        </h2>
+         <style>
+    body { font-family: 'Segoe UI'; background: #f4f6f8; text-align: center; padding: 40px; }
+    h1 { color: #2c3e50; margin-bottom: 20px; }
+    input { margin: 10px; padding: 8px; width: 200px; border-radius: 5px; border: 1px solid #ccc; }
+    button { padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    canvas { margin-top: 30px; max-width: 500px; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+  </style>
+</head>
+<body>
+   <h1>Food Expenses</h1>
+  <input type="number" id="groceries" placeholder="Groceries (₹)" />
+  <input type="number" id="drinks" placeholder="Drinks (₹)" />
+  <input type="number" id="dining" placeholder="Dining Out (₹)" />
+  <button onclick="showChart()">Show Chart</button>
+  <div id="summary"></div>
+  <canvas id="foodChart"></canvas>
 
+  <script>
+    function showChart() {
+      const groceries = parseInt(document.getElementById('groceries').value) || 0;
+      const drinks = parseInt(document.getElementById('drinks').value) || 0;
+      const dining = parseInt(document.getElementById('dining').value) || 0;
+      const total = groceries + drinks + dining;
+      document.getElementById('summary').innerHTML = `<h3>Total Food Expenses: ₹${total}</h3>`;
+
+      new Chart(document.getElementById('foodChart').getContext('2d'), {
+        type: 'pie',
+        data: {
+          labels: ['Groceries', 'Drinks', 'Dining Out'],
+          datasets: [{
+            data: [groceries, drinks, dining],
+            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+          }]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+      });
+    }
+  </script>
     </main>
-
     <footer>
     Beware of little expenses. A small leak will sink a great ship.
     </footer>
