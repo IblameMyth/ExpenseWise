@@ -1,93 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Food</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vacation</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f4f6f8;
-  color: #333;
-  padding: 40px;
-  text-align: center;
-}
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f8;
+      color: #333;
+      padding: 40px;
+      text-align: center;
+    }
 
-header {
-  background-color: #2c3e50;
-  color: white;
-  padding: 20px 0;
-  margin-bottom: 30px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
+    header {
+      background-color: #2c3e50;
+      color: white;
+      padding: 20px 0;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
 
-header h1 {
-  font-size: 2rem;
-  letter-spacing: 1px;
-}
+    header h1 {
+      font-size: 2rem;
+      letter-spacing: 1px;
+    }
 
-main h2 {
-  margin-bottom: 20px;
-  font-size: 1.2rem;
-}
+    input[type="number"] {
+      padding: 10px;
+      margin: 10px;
+      width: 200px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
 
-main h2 span {
-  display: inline-block;
-  background-color: #3498db;
-  color: white;
-  padding: 8px 15px;
-  margin: 5px;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  transition: background-color 0.3s ease;
-}
+    button {
+      padding: 10px 20px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
 
-main h2 span:hover {
-  background-color: #2980b9;
-}
-footer {
-  margin-top: 60px;
-  padding: 20px 0;
-  background-color: #ecf0f1;
-  border-top: 1px solid #ccc;
-}
-
-footer h5 {
-  font-size: 1rem;
-  color: #7f8c8d;
-}
+    button:hover {
+      background-color: #2980b9;
+    }
 
     canvas {
       max-width: 500px;
-      margin: auto;
+      margin: 30px auto;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    #summary {
+      margin-top: 20px;
+      font-size: 1.2rem;
+      color: #2c3e50;
+    }
+
+    footer {
+      margin-top: 60px;
+      padding: 20px 0;
+      background-color: #ecf0f1;
+      border-top: 1px solid #ccc;
+      color: #7f8c8d;
     }
   </style>
-    </head>
-    <Body>
-        <header>
-            <h1>
-                <div> ExpenseWise </a>
-            </div>
-            </div>
-        </header>
-    <main>
-        <h2>
-        <span><a href="" target="_blank">Hotel</a></span>
-        <span><a href="" target="_blank">Traveling</a></span>
-        <span><a href="" target="_blank">Food</a></span>
-        <span><a href="" target="_blank">Entertaiment</a></span>
-        </h2>
+</head>
+<body>
+  <header>
+    <h1>ExpenseWise</h1>
+  </header>
 
-    </main>
+  <main>
+    <h2>Vacation Expenses</h2>
+    <input type="number" id="tickets" placeholder="Tickets (₹)" />
+    <input type="number" id="hostel" placeholder="Hostel (₹)" />
+    <input type="number" id="food" placeholder="Food (₹)" />
+    <input type="number" id="traveling" placeholder="Traveling (₹)" />
+    <br />
+    <button onclick="showVacationChart()">Show Chart</button>
+    <div id="summary"></div>
+    <canvas id="vacChart"></canvas>
+  </main>
 
-    <footer>
-    Beware of little expenses. A small leak will sink a great ship.
-    </footer>
-    </Body>
+  <footer>
+    Travel is the only thing you buy that makes you richer.
+  </footer>
+
+  <script>
+    function showVacationChart() {
+      const tickets = parseInt(document.getElementById('tickets').value) || 0;
+      const hostel = parseInt(document.getElementById('hostel').value) || 0;
+      const food = parseInt(document.getElementById('food').value) || 0;
+      const traveling = parseInt(document.getElementById('traveling').value) || 0;
+      const total = tickets + hostel + food + traveling;
+
+      document.getElementById('summary').innerHTML = `<h3>Total Vacation Expenses: ₹${total}</h3>`;
+
+      const ctx = document.getElementById('vacChart').getContext('2d');
+      if (window.vacationChart) {
+        window.vacationChart.destroy();
+      }
+
+      window.vacationChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['Tickets', 'Hostel', 'Food', 'Traveling'],
+          datasets: [{
+            data: [tickets, hostel, food, traveling],
+            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0']
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
+      });
+    }
+  </script>
+</body>
 </html>
