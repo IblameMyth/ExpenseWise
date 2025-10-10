@@ -6,7 +6,6 @@
     <title>Expense Manager System</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    /* Reset and base styles */
 * {
   margin: 0;
   padding: 0;
@@ -21,7 +20,6 @@ body {
   text-align: center;
 }
 
-/* Header */
 header {
   background-color: #2c3e50;
   color: white;
@@ -35,7 +33,6 @@ header h1 {
   letter-spacing: 1px;
 }
 
-/* Category Tags */
 main h2 {
   margin-bottom: 20px;
   font-size: 1.2rem;
@@ -55,8 +52,6 @@ main h2 span {
 main h2 span:hover {
   background-color: #2980b9;
 }
-
-/* Chart Section */
 canvas {
   max-width: 500px;
   margin: 30px auto;
@@ -64,15 +59,11 @@ canvas {
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
-
-/* Section Titles */
 main h3, main h4 {
   margin-top: 40px;
   font-size: 1.4rem;
   color: #2c3e50;
 }
-
-/* Footer */
 footer {
   margin-top: 60px;
   padding: 20px 0;
@@ -94,13 +85,13 @@ footer h5 {
     <Body>
         <header>
             <h1>
-                <div> Expense Manager System </a>
+                <div> ExpenseWise </a>
             </div>
             </div>
         </header>
     <main>
         <h2>
-        <span><a href="" target="_blank">Food</a></span>
+        <span><a href="food.html" target="_blank">Food</a></span>
         <span><a href="" target="_blank">Travel</a></span>
         <span><a href="" target="_blank">Entertaiment</a></span>
         <span><a href="" target="_blank">EMI</a></span>
@@ -116,7 +107,7 @@ footer h5 {
         labels: ['Food', 'Travel', 'Entertainment', 'Vacations', 'EMI'],
         datasets: [{
           label: 'Expenses',
-          data: [5000, 3000, 2000, 4000, 7000], // Example values in INR
+          data: [2500, 3000, 3000, 4000, 7000],
           backgroundColor: [
             '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'
           ],
@@ -147,6 +138,5 @@ footer h5 {
     <footer>
     Beware of little expenses. A small leak will sink a great ship.
     </footer>
-
     </Body>
 </html>
