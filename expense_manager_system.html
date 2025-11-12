@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ExpenseWise</title>
+  <!-- Revert to original styles -->
+  <link rel="stylesheet" href="styles.css">
+  <script src="user-data-manager.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
@@ -23,6 +26,99 @@
       --card-border: rgba(255, 255, 255, 0.2);
       /* background image (unsplash) — feel free to replace with your own image file */
       --bg-img: url('https://images.unsplash.com/photo-1542223616-1e7b2d2b02d9?auto=format&fit=crop&w=1500&q=80');
+    }
+
+    /* Dark mode variables */
+    body.dark-mode {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --muted: #94a3b8;
+      --text: #f1f5f9;
+      --shadow: 0 8px 26px rgba(0, 0, 0, 0.3);
+      --gradient-start: rgba(30, 41, 59, 0.95);
+      --gradient-end: rgba(15, 23, 42, 0.9);
+      --card-border: rgba(51, 65, 85, 0.5);
+    }
+
+    body.dark-mode {
+      background-image: linear-gradient(rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.95)), var(--bg-img);
+    }
+
+    body.dark-mode main {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.9));
+      border: 1px solid rgba(51, 65, 85, 0.5);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    }
+
+    body.dark-mode main > div {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(30, 41, 59, 0.85));
+      border: 1px solid rgba(51, 65, 85, 0.5);
+    }
+
+    body.dark-mode header {
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      border: 1px solid rgba(51, 65, 85, 0.3);
+    }
+
+    body.dark-mode input[type="date"],
+    body.dark-mode input[type="number"],
+    body.dark-mode input[type="text"] {
+      background: rgba(30, 41, 59, 0.9);
+      border: 1px solid rgba(71, 85, 105, 0.5);
+      color: var(--text);
+    }
+
+    body.dark-mode input:focus {
+      background: rgba(30, 41, 59, 0.95);
+      border-color: var(--accent);
+    }
+
+    body.dark-mode .expense-table {
+      background: var(--card);
+    }
+
+    body.dark-mode .expense-table tr:hover {
+      background-color: rgba(51, 65, 85, 0.3);
+    }
+
+    body.dark-mode .expense-table tfoot td {
+      background-color: rgba(51, 65, 85, 0.3);
+    }
+
+    body.dark-mode #dailySummary p,
+    body.dark-mode #futureList li {
+      background: var(--card);
+      border: 1px solid rgba(51, 65, 85, 0.3);
+    }
+
+    /* Dark mode toggle button */
+    .dark-mode-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      z-index: 1000;
+    }
+
+    .dark-mode-toggle:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .dark-mode-toggle svg {
+      width: 24px;
+      height: 24px;
+      fill: white;
     }
 
     /* reset (keeps header/main/footer in the same DOM order) */
@@ -78,12 +174,13 @@
       align-items: center;
       justify-content: center;
       gap: var(--gap);
-      background: linear-gradient(90deg, var(--accent), var(--primary));
-      color: #fff;
+      background: linear-gradient(135deg, #ffffff, #f8fafc);
+      color: #0f172a;
       padding: 18px 22px;
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       margin-bottom: 20px;
+      border: 1px solid rgba(2, 6, 23, 0.08);
     }
 
     header h1 {
@@ -91,7 +188,11 @@
       font-size: 1.6rem;
       font-family: 'Poppins', sans-serif;
       font-weight: 600;
-      letter-spacing: 0.5px
+      letter-spacing: 0.5px;
+      background: linear-gradient(90deg, var(--accent), var(--primary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
 
 
@@ -350,12 +451,103 @@
       overflow-x: auto;
       border-radius: var(--radius);
     }
+
+    /* Compact container for budget overview */
+    .container-compact {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-top: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .progress-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 12px;
+    }
+
+    .ring {
+      position: relative;
+      width: 60px;
+      height: 60px;
+    }
+
+    .ring .bg {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.3);
+      stroke-width: 10;
+    }
+
+    .ring .progress {
+      fill: none;
+      stroke: url(#grad);
+      stroke-width: 10;
+      transition: stroke-dashoffset 0.5s ease;
+    }
+
+    .label {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .btn {
+      padding: 10px 16px;
+      border-radius: var(--radius);
+      border: none;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .btn:hover {
+      background: linear-gradient(135deg, var(--accent), var(--primary));
+    }
+
+    /* Daily budget layout */
+    .daily-budget-area {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 12px;
+    }
+    .daily-budget-pane {
+      display: block;
+    }
+    @media (max-width: 860px) {
+      .daily-budget-area { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 
 <body>
+  <!-- Dark Mode Toggle Button -->
+  <button class="dark-mode-toggle" id="darkModeToggle" aria-label="Toggle dark mode">
+    <svg id="sunIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <path d="M12 18C8.68629 18 6 15.3137 6 12C6 8.68629 8.68629 6 12 6C15.3137 6 18 8.68629 18 12C18 15.3137 15.3137 18 12 18ZM12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16ZM11 1H13V4H11V1ZM11 20H13V23H11V20ZM3.51472 4.92893L4.92893 3.51472L7.05025 5.63604L5.63604 7.05025L3.51472 4.92893ZM16.9497 18.364L18.364 16.9497L20.4853 19.0711L19.0711 20.4853L16.9497 18.364ZM19.0711 3.51472L20.4853 4.92893L18.364 7.05025L16.9497 5.63604L19.0711 3.51472ZM5.63604 16.9497L7.05025 18.364L4.92893 20.4853L3.51472 19.0711L5.63604 16.9497ZM23 11V13H20V11H23ZM4 11V13H1V11H4Z"/>
+    </svg>
+    <svg id="moonIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: none;">
+      <path d="M10 7C10 10.866 13.134 14 17 14C18.9584 14 20.729 13.1957 21.9995 11.8995C22 11.933 22 11.9665 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C12.0335 2 12.067 2 12.1005 2.00049C10.8043 3.27098 10 5.04157 10 7ZM4 12C4 16.4183 7.58172 20 12 20C15.0583 20 17.7158 18.2839 19.062 15.7621C18.3945 15.9187 17.7035 16 17 16C12.0294 16 8 11.9706 8 7C8 6.29648 8.08133 5.60547 8.2379 4.938C5.71611 6.28423 4 8.9417 4 12Z"/>
+    </svg>
+  </button>
+
   <header>
+    <img src="images/logo.png" alt="ExpenseWise Logo" class="site-logo">
     <h1>ExpenseWise</h1>
+    <div style="margin-left: auto; display: flex; align-items: center; gap: 12px;">
+      <img id="userAvatar" src="" alt="User" style="width: 36px; height: 36px; border-radius: 50%; display: none; object-fit: cover; border: 2px solid var(--accent);">
+      <span id="userNameDisplay" style="color: var(--muted); font-size: 0.9rem;"></span>
+      <button id="logoutBtn" class="btn" style="padding: 8px 16px; font-size: 0.9rem; background: linear-gradient(90deg, #dc2626, #ef4444);">Logout</button>
+    </div>
   </header>
   <main>
     <h2>
@@ -367,13 +559,19 @@
     </h2>
 
     <h3>Daily Budget</h3>
-    <form id="dailyBudgetForm">
-      <input type="date" id="budgetDate" required />
-      <input type="number" id="food" placeholder="Food (₹)" oninput="autoCalculateAndSave()" />
-      <input type="number" id="travel" placeholder="Travel (₹)" oninput="autoCalculateAndSave()" />
-      <input type="number" id="misc" placeholder="Miscellaneous (₹)" oninput="autoCalculateAndSave()" />
-    </form>
-    <div id="dailySummary"></div>
+    <div class="daily-budget-area">
+      <div class="daily-budget-pane">
+        <form id="dailyBudgetForm">
+          <input type="date" id="budgetDate" required />
+          <input type="number" id="food" placeholder="Food (₹)" oninput="autoCalculateAndSave()" />
+          <input type="number" id="travel" placeholder="Travel (₹)" oninput="autoCalculateAndSave()" />
+          <input type="number" id="misc" placeholder="Miscellaneous (₹)" oninput="autoCalculateAndSave()" />
+          <button type="button" id="addDailyBudgetBtn" class="btn" style="margin-left:8px;">Add Budget</button>
+        </form>
+        <div id="dailySummary"></div>
+      </div>
+      <div id="daily-budget-table-container" class="table-container"></div>
+    </div>
     <div style="margin-top:10px; text-align:center;">
       <button onclick="clearAllData()" style="background: linear-gradient(90deg, #dc2626, #ef4444); padding:10px 14px; border-radius:10px; border:none; color:#fff; cursor:pointer;">Clear All Data</button>
     </div>
@@ -395,7 +593,7 @@ function autoCalculateAndSave() {
       misc: misc,
       total: total
     };
-    localStorage.setItem(`expense_${date}`, JSON.stringify(expenseData));
+    UserDataManager.setItem(`expense_${date}`, JSON.stringify(expenseData));
     
     // Show daily summary
     document.getElementById('dailySummary').innerHTML = `<p><strong>${date}</strong> - Total: ₹${total}</p>`;
@@ -417,7 +615,7 @@ window.addEventListener('load', function() {
   document.getElementById('budgetDate').value = todayStr;
 
   // Load saved data for today if exists
-  const savedData = localStorage.getItem(`expense_${todayStr}`);
+  const savedData = UserDataManager.getItem(`expense_${todayStr}`);
   if (savedData) {
     const data = JSON.parse(savedData);
     document.getElementById('food').value = data.food || '';
@@ -432,7 +630,7 @@ window.addEventListener('load', function() {
 
 // Update calculations when date changes
 document.getElementById('budgetDate').addEventListener('change', function() {
-  const savedData = localStorage.getItem(`expense_${this.value}`);
+  const savedData = UserDataManager.getItem(`expense_${this.value}`);
   if (savedData) {
     const data = JSON.parse(savedData);
     document.getElementById('food').value = data.food || '';
@@ -445,6 +643,16 @@ document.getElementById('budgetDate').addEventListener('change', function() {
   }
   autoCalculateAndSave();
 });
+
+// Add Budget button wiring
+document.addEventListener('DOMContentLoaded', function(){
+  const addBtn = document.getElementById('addDailyBudgetBtn');
+  if (addBtn) {
+    addBtn.addEventListener('click', function(){
+      autoCalculateAndSave();
+    });
+  }
+});
 </script>
 
 <h4>Future Expenses</h4>
@@ -456,7 +664,7 @@ document.getElementById('budgetDate').addEventListener('change', function() {
     </form>
     <ul id="futureList"></ul>
     <script>
-      // Function to load monthly data
+      // Function to load daily budget entries table near the form
       function loadMonthlyData() {
         const table = document.createElement('table');
         table.className = 'expense-table';
@@ -478,27 +686,25 @@ document.getElementById('budgetDate').addEventListener('change', function() {
         const tbody = document.createElement('tbody');
         let monthlyTotal = 0;
         
-        // Get all expenses from localStorage
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          if (key.startsWith('expense_')) {
-            try {
-              const data = JSON.parse(localStorage.getItem(key));
-              const row = document.createElement('tr');
-              row.innerHTML = `
-                <td>${data.date}</td>
-                <td>₹${data.food}</td>
-                <td>₹${data.travel}</td>
-                <td>₹${data.misc}</td>
-                <td>₹${data.total}</td>
-              `;
-              tbody.appendChild(row);
-              monthlyTotal += data.total;
-            } catch (err) {
-              console.error('Error parsing expense data:', err);
-            }
+        // Get all expenses from user-specific localStorage
+        const expenseKeys = UserDataManager.getKeys('expense_');
+        expenseKeys.forEach(key => {
+          try {
+            const data = JSON.parse(localStorage.getItem(key));
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${data.date}</td>
+              <td>₹${data.food}</td>
+              <td>₹${data.travel}</td>
+              <td>₹${data.misc}</td>
+              <td>₹${data.total}</td>
+            `;
+            tbody.appendChild(row);
+            monthlyTotal += data.total;
+          } catch (err) {
+            console.error('Error parsing expense data:', err);
           }
-        }
+        });
         
         table.appendChild(tbody);
         
@@ -512,12 +718,14 @@ document.getElementById('budgetDate').addEventListener('change', function() {
         `;
         table.appendChild(tfoot);
         
-        // Create or update table container
-        let container = document.querySelector('.table-container');
+        // Render into the dedicated daily budget table container near the form
+        let container = document.getElementById('daily-budget-table-container');
         if (!container) {
           container = document.createElement('div');
+          container.id = 'daily-budget-table-container';
           container.className = 'table-container';
-          document.querySelector('main').appendChild(container);
+          const anchor = document.querySelector('.daily-budget-area');
+          if (anchor) anchor.appendChild(container); else document.querySelector('main').appendChild(container);
         }
         container.innerHTML = '';
         container.appendChild(table);
@@ -563,33 +771,8 @@ document.getElementById('budgetDate').addEventListener('change', function() {
     function clearAllData() {
       if (!confirm('Are you sure you want to clear ALL saved expense data from this app? This cannot be undone.')) return;
 
-      const prefixes = [
-        'foodExpenses_',
-        'travelExpenses_',
-        'vacationExpenses_',
-        'entertainmentExpenses_',
-        'emiExpenses_',
-        'expense_' // daily budget entries
-      ];
-
-      let deletedCount = 0;
-
-      // Remove matching prefixed keys and the futureExpenses key
-      Object.keys(localStorage).forEach(key => {
-        if (key === 'futureExpenses') {
-          localStorage.removeItem(key);
-          deletedCount++;
-          return;
-        }
-
-        for (const p of prefixes) {
-          if (key.startsWith(p)) {
-            localStorage.removeItem(key);
-            deletedCount++;
-            break;
-          }
-        }
-      });
+      // Clear all user-specific data
+      UserDataManager.clearUserData();
 
       // Clear UI elements on the home page
       const ds = document.getElementById('dailySummary');
@@ -605,19 +788,403 @@ document.getElementById('budgetDate').addEventListener('change', function() {
       if (typeof updateTable === 'function') {
         try { updateTable(); } catch (e) { /* ignore */ }
       }
+      if (typeof buildCombinedTable === 'function') {
+        try { buildCombinedTable(); } catch (e) { /* ignore */ }
+      }
 
-      alert(`Successfully cleared ${deletedCount} saved records.`);
+      alert('Successfully cleared all saved records.');
     }
 
     // Expose globally for inline onclick
     window.clearAllData = clearAllData;
     </script>
 
+    <script>
+    // Ensure the All Expenses UI wrapper (heading + button + container) exists
+    function ensureAllExpensesWrapper() {
+      let wrapper = document.getElementById('all-expenses-wrapper');
+      if (!wrapper) {
+        wrapper = document.createElement('div');
+        wrapper.id = 'all-expenses-wrapper';
+
+        const headingBar = document.createElement('div');
+        headingBar.style.display = 'flex';
+        headingBar.style.justifyContent = 'space-between';
+        headingBar.style.alignItems = 'center';
+        headingBar.style.marginTop = '18px';
+
+        const heading = document.createElement('h3');
+        heading.id = 'all-expenses-heading';
+        heading.textContent = 'All Expenses (by Month)';
+
+        const btn = document.createElement('button');
+        btn.id = 'toggleAllExpenses';
+        btn.className = 'btn';
+        btn.type = 'button';
+        btn.textContent = 'Show All Expenses (by Month)';
+
+        headingBar.appendChild(heading);
+        headingBar.appendChild(btn);
+
+        const container = document.createElement('div');
+        container.id = 'all-expenses-container';
+        container.className = 'table-container';
+        container.style.display = 'none'; // hidden until shown
+
+        wrapper.appendChild(headingBar);
+        wrapper.appendChild(container);
+
+        const mainEl = document.querySelector('main');
+        mainEl.appendChild(wrapper);
+      }
+      return wrapper;
+    }
+
+    // Build a combined monthly expenses table across all categories (called on demand)
+  function buildCombinedTable() {
+      // Make sure UI exists
+      const wrapper = ensureAllExpensesWrapper();
+      let container = document.getElementById('all-expenses-container');
+
+      const categoryPrefixes = {
+        food: 'foodExpenses_',
+        travel: 'travelExpenses_',
+        emi: 'emiExpenses_',
+        entertainment: 'entertainmentExpenses_',
+        vacation: 'vacationExpenses_'
+      };
+
+      // Aggregate map: { 'YYYY-MM': {food:0,travel:0,emi:0,entertainment:0,vacation:0} }
+      const monthly = {};
+
+      const ensureMonth = (m) => {
+        if (!monthly[m]) {
+          monthly[m] = { food: 0, travel: 0, emi: 0, entertainment: 0, vacation: 0 };
+        }
+        return monthly[m];
+      };
+
+      const safeNum = (v) => {
+        const n = Number(v);
+        return isNaN(n) ? 0 : n;
+      };
+
+      // Scan user-specific localStorage for each category
+      for (const category in categoryPrefixes) {
+        const prefix = categoryPrefixes[category];
+        const keys = UserDataManager.getKeys(prefix);
+        
+        keys.forEach(key => {
+          // Parse data
+          let data;
+          try { data = JSON.parse(localStorage.getItem(key) || 'null'); } catch { data = null; }
+          if (!data) return;
+
+          // Determine month key (supports legacy daily keys and new monthly keys)
+          let monthKey = '';
+          if (typeof data.date === 'string' && data.date.length >= 7) {
+            monthKey = data.date.substring(0,7);
+          } else {
+            // fallback from key suffix - extract after user prefix
+            const userPrefix = UserDataManager.getUserKey('');
+            const cleanKey = key.replace(userPrefix, '');
+            monthKey = cleanKey.slice(prefix.length, prefix.length + 7);
+          }
+          if (!/^[0-9]{4}-[0-9]{2}$/.test(monthKey)) return;
+
+          const bucket = ensureMonth(monthKey);
+
+          // Sum category totals by their fields
+          switch (category) {
+            case 'food': {
+              const total = safeNum(data.groceries) + safeNum(data.drinks) + safeNum(data.dining);
+              bucket.food += total; break;
+            }
+            case 'travel': {
+              const total = safeNum(data.auto) + safeNum(data.bus) + safeNum(data.metro) + safeNum(data.petrol);
+              bucket.travel += total; break;
+            }
+            case 'emi': {
+              const total = safeNum(data.home) + safeNum(data.car) + safeNum(data.edu) + safeNum(data.personal);
+              bucket.emi += total; break;
+            }
+            case 'entertainment': {
+              const total = safeNum(data.movies) + safeNum(data.parties) + safeNum(data.gatherings);
+              bucket.entertainment += total; break;
+            }
+            case 'vacation': {
+              const total = safeNum(data.tickets) + safeNum(data.hostel) + safeNum(data.food) + safeNum(data.traveling);
+              bucket.vacation += total; break;
+            }
+          }
+        });
+      }
+
+      // Build table DOM into existing container
+
+      // Create table markup
+      const table = document.createElement('table');
+      table.className = 'expense-table';
+
+      const thead = document.createElement('thead');
+      thead.innerHTML = `
+        <tr>
+          <th>Month</th>
+          <th>Food</th>
+          <th>Travel</th>
+          <th>EMI</th>
+          <th>Entertainment</th>
+          <th>Vacation</th>
+          <th>Grand Total</th>
+        </tr>
+      `;
+      table.appendChild(thead);
+
+      const tbody = document.createElement('tbody');
+      const months = Object.keys(monthly).sort().reverse(); // newest first
+
+      let grandAll = { food:0, travel:0, emi:0, entertainment:0, vacation:0 };
+      const rupee = (n) => `₹${n}`;
+
+      for (const m of months) {
+        const row = document.createElement('tr');
+        const f = Math.round(monthly[m].food);
+        const t = Math.round(monthly[m].travel);
+        const e = Math.round(monthly[m].emi);
+        const en = Math.round(monthly[m].entertainment);
+        const v = Math.round(monthly[m].vacation);
+        const total = f + t + e + en + v;
+
+        grandAll.food += f; grandAll.travel += t; grandAll.emi += e; grandAll.entertainment += en; grandAll.vacation += v;
+
+        row.innerHTML = `
+          <td>${m}</td>
+          <td>${rupee(f)}</td>
+          <td>${rupee(t)}</td>
+          <td>${rupee(e)}</td>
+          <td>${rupee(en)}</td>
+          <td>${rupee(v)}</td>
+          <td>${rupee(total)}</td>
+        `;
+        tbody.appendChild(row);
+      }
+
+      table.appendChild(tbody);
+
+      // Footer totals across all months
+      const tfoot = document.createElement('tfoot');
+      const allTotal = grandAll.food + grandAll.travel + grandAll.emi + grandAll.entertainment + grandAll.vacation;
+      tfoot.innerHTML = `
+        <tr>
+          <td>All-time Total</td>
+          <td>${rupee(grandAll.food)}</td>
+          <td>${rupee(grandAll.travel)}</td>
+          <td>${rupee(grandAll.emi)}</td>
+          <td>${rupee(grandAll.entertainment)}</td>
+          <td>${rupee(grandAll.vacation)}</td>
+          <td>${rupee(allTotal)}</td>
+        </tr>
+      `;
+      table.appendChild(tfoot);
+
+      // Render
+      container.innerHTML = '';
+      container.appendChild(table);
+      container.style.display = '';
+    }
+
+    // Setup show/hide button just above the table
+    (function(){
+      // Ensure UI and then wire the button
+      ensureAllExpensesWrapper();
+      const btn = document.getElementById('toggleAllExpenses');
+      const container = document.getElementById('all-expenses-container');
+      if (!btn || !container) return;
+      btn.addEventListener('click', function(){
+        if (container.style.display === 'none' || container.style.display === '') {
+          // Build fresh and show
+          try { buildCombinedTable(); } catch (e) {}
+          container.style.display = '';
+          this.textContent = 'Hide All Expenses';
+        } else {
+          container.style.display = 'none';
+          this.textContent = 'Show All Expenses (by Month)';
+        }
+      });
+    })();
+    </script>
+
+    <div class="container-compact">
+  <h2>Budget Overview</h2>
+  <div class="progress-card">
+    <div class="ring" id="budgetRing">
+      <svg width="120" height="120">
+        <defs>
+          <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#825CFF"/>
+            <stop offset="100%" stop-color="#22d3ee"/>
+          </linearGradient>
+        </defs>
+        <circle class="bg" cx="60" cy="60" r="50"></circle>
+        <circle class="progress" cx="60" cy="60" r="50"
+                stroke-dasharray="314"
+                stroke-dashoffset="314"></circle>
+      </svg>
+      <div class="label" id="budgetPercent">0%</div>
+    </div>
+    <div>
+      <p style="margin:4px 0;font-weight:600;color:#825CFF">Monthly Budget: ₹<span id="budgetTotal">40000</span></p>
+      <p style="margin:4px 0;">Spent: ₹<span id="budgetSpent">0</span></p>
+    </div>
+  </div>
+  <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
+    <button class="btn" id="simulateSpend">Simulate Spend</button>
+    <button class="btn" id="setBudgetBtn" type="button">Set Monthly Budget</button>
+  </div>
+</div>
+<script>
+(function(){
+  const circumference = 2 * Math.PI * 50; // r=50
+  const progressCircle = document.querySelector('#budgetRing .progress');
+  const percentLabel = document.getElementById('budgetPercent');
+  const spentEl = document.getElementById('budgetSpent');
+  const totalEl = document.getElementById('budgetTotal');
+  let spent = 0;
+  let total = parseInt(UserDataManager.getItem('monthlyBudgetTotal') || totalEl.textContent,10) || 40000;
+  totalEl.textContent = total;
+
+  function updateRing(){
+    const pct = Math.min(spent / total, 1);
+    const offset = circumference * (1 - pct);
+    progressCircle.style.strokeDasharray = circumference;
+    progressCircle.style.strokeDashoffset = offset;
+    percentLabel.textContent = Math.round(pct * 100) + '%';
+  }
+
+  document.getElementById('simulateSpend').addEventListener('click', () => {
+    spent += Math.floor(Math.random()*3000)+1000;
+    if(spent > total) spent = total;
+    spentEl.textContent = spent;
+    updateRing();
+  });
+
+  // Set Monthly Budget handler
+  const setBtn = document.getElementById('setBudgetBtn');
+  setBtn.addEventListener('click', () => {
+    const current = total;
+    const input = prompt('Enter monthly budget (₹):', String(current));
+    if (input === null) return; // cancelled
+    const val = Math.floor(Number(input));
+    if (!isFinite(val) || val <= 0) {
+      alert('Please enter a valid positive number.');
+      return;
+    }
+    total = val;
+    UserDataManager.setItem('monthlyBudgetTotal', String(total));
+    totalEl.textContent = total;
+    // Clamp spent to new total
+    if (spent > total) {
+      spent = total;
+      spentEl.textContent = spent;
+    }
+    updateRing();
+  });
+
+  updateRing();
+})();
+</script>
+
   </main>
 
   <footer>
     Beware of little expenses. A small leak will sink a great ship.
   </footer>
+
+  <!-- Dark Mode Toggle Script -->
+  <script>
+    // Authentication Check - Must be logged in to access this page
+    (function() {
+      const currentUser = localStorage.getItem('currentUser');
+      if (!currentUser) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      // Display user name and avatar in header
+      try {
+        const user = JSON.parse(currentUser);
+        const userNameDisplay = document.getElementById('userNameDisplay');
+        const userAvatar = document.getElementById('userAvatar');
+        
+        if (userNameDisplay && user.name) {
+          userNameDisplay.textContent = `Welcome, ${user.name}`;
+        } else if (userNameDisplay && user.email) {
+          userNameDisplay.textContent = `Welcome, ${user.email.split('@')[0]}`;
+        }
+
+        // Display avatar if Google account
+        if (userAvatar && user.picture) {
+          userAvatar.src = user.picture;
+          userAvatar.style.display = 'block';
+        } else if (userAvatar && user.name) {
+          // Generate avatar for non-Google accounts
+          const name = user.name || user.email.split('@')[0];
+          userAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0ea5a4&color=fff&size=80`;
+          userAvatar.style.display = 'block';
+        }
+      } catch (e) {
+        console.error('Error parsing user data:', e);
+      }
+
+      // Logout functionality
+      const logoutBtn = document.getElementById('logoutBtn');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+          if (confirm('Are you sure you want to logout?')) {
+            // Clear current user session
+            localStorage.removeItem('currentUser');
+            
+            // Create logout event that other pages can listen to
+            localStorage.setItem('logoutEvent', Date.now().toString());
+            
+            // Redirect to login
+            window.location.href = 'login.html';
+          }
+        });
+      }
+    })();
+
+    // Dark mode toggle
+    (function() {
+      const darkModeToggle = document.getElementById('darkModeToggle');
+      const sunIcon = document.getElementById('sunIcon');
+      const moonIcon = document.getElementById('moonIcon');
+      const body = document.body;
+
+      // Check for saved dark mode preference
+      const darkMode = localStorage.getItem('darkMode');
+      if (darkMode === 'enabled') {
+        body.classList.add('dark-mode');
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'block';
+      }
+
+      // Toggle dark mode
+      darkModeToggle.addEventListener('click', () => {
+        body.classList.toggle('dark-mode');
+        
+        if (body.classList.contains('dark-mode')) {
+          localStorage.setItem('darkMode', 'enabled');
+          sunIcon.style.display = 'none';
+          moonIcon.style.display = 'block';
+        } else {
+          localStorage.setItem('darkMode', 'disabled');
+          sunIcon.style.display = 'block';
+          moonIcon.style.display = 'none';
+        }
+      });
+    })();
+  </script>
 </body>
 
 </html>

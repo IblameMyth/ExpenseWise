@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Food</title>
   <link rel="stylesheet" href="styles.css">
+  <script src="user-data-manager.js"></script>
   <style>
     :root{
       --bg:#f8fafc;
@@ -42,8 +43,8 @@
     }
 
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
-    header{display:flex;align-items:center;justify-content:center;background:linear-gradient(90deg,var(--accent),var(--primary));color:#fff;padding:16px 20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:18px}
-    header h1{margin:0;font-size:1.6rem;font-family:'Poppins',sans-serif;font-weight:600;letter-spacing:0.5px}
+    header{display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#ffffff,#f8fafc);color:#0f172a;padding:16px 20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:18px;border:1px solid rgba(2,6,23,0.08)}
+    header h1{margin:0;font-size:1.6rem;font-family:'Poppins',sans-serif;font-weight:600;letter-spacing:0.5px;background:linear-gradient(90deg,var(--accent),var(--primary));-webkit-background-clip:text;background-clip:text;color:transparent}
 
     form{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
     input{padding:10px;border-radius:10px;border:1px solid #e6eef8;background:#fff;min-width:150px}
@@ -58,16 +59,35 @@
       border: var(--glass-border);
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     }
-    canvas{
-      display:block;
-      margin:18px auto;
-      max-width:640px;
+    .charts-container{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin: 18px 0;
+    }
+    .chart-wrapper{
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
       border-radius: var(--radius);
       border: var(--glass-border);
       box-shadow: var(--glass-shadow);
       padding:16px;
       backdrop-filter: blur(5px);
+    }
+    .chart-wrapper h3{
+      margin: 0 0 12px 0;
+      text-align: center;
+      color: var(--text);
+      font-size: 1.1rem;
+    }
+    canvas{
+      display:block;
+      margin:0 auto;
+      max-width:100%;
+    }
+    @media (max-width: 768px) {
+      .charts-container {
+        grid-template-columns: 1fr;
+      }
     }
     .table-container {
       margin-top: 30px;
@@ -82,9 +102,10 @@
   </style>
     </head>
     <body>
-        <header>
-            <h1>ExpenseWise</h1>
-        </header>
+    <header>
+      <img src="images/logo.png" alt="ExpenseWise Logo" class="site-logo">
+      <h1>ExpenseWise</h1>
+    </header>
     <main>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
    <h1>Food Expenses</h1>
@@ -98,7 +119,11 @@
   <button onclick="showChart()">Show Chart</button>
   <button onclick="clearAllData()" style="background: linear-gradient(90deg, #dc2626, #ef4444); margin-left: 10px;">Clear All Data</button>
   <div id="summary"></div>
-  <canvas id="foodChart"></canvas>
+  
+  <div class="chart-wrapper" style="max-width: 900px; margin: 18px auto;">
+    <h3>Monthly Trends</h3>
+    <canvas id="monthlyChart"></canvas>
+  </div>
   
   <div class="table-container" style="margin-top: 20px;">
     <table class="expense-table" style="width: 100%; border-collapse: collapse;">
@@ -144,15 +169,13 @@
       
       let totalGroceries = 0, totalDrinks = 0, totalDining = 0;
       
-      // Get all food expenses from localStorage
+      // Get all food expenses from user-specific localStorage
       const expenses = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key.startsWith('foodExpenses_')) {
-          const data = JSON.parse(localStorage.getItem(key));
-          expenses.push(data);
-        }
-      }
+      const keys = UserDataManager.getKeys('foodExpenses_');
+      keys.forEach(key => {
+        const data = JSON.parse(localStorage.getItem(key));
+        expenses.push(data);
+      });
       
       // Sort by date, newest first
       expenses.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -185,8 +208,8 @@
     }
 
     function loadExpense(date) {
-      document.getElementById('expenseMonth').value = date.substring(0, 7);
-      const data = JSON.parse(localStorage.getItem(`foodExpenses_${date}`));
+        document.getElementById('expenseMonth').value = date;
+        const data = JSON.parse(UserDataManager.getItem(`foodExpenses_${date}`));
       if (data) {
         document.getElementById('groceries').value = data.groceries;
         document.getElementById('drinks').value = data.drinks;
@@ -200,14 +223,12 @@
       const dining = parseInt(document.getElementById('dining').value) || 0;
       const total = groceries + drinks + dining;
 
-      // Get the full date (YYYY-MM-DD)
-      const monthKey = document.getElementById('expenseMonth').value;
-      const today = new Date();
-      const date = `${monthKey}-${String(today.getDate()).padStart(2, '0')}`;
+        // Get the month (YYYY-MM)
+        const monthKey = document.getElementById('expenseMonth').value;
       
-      // Save data to localStorage with date key
-      localStorage.setItem('foodExpenses_' + date, JSON.stringify({ 
-        date: date,
+        // Save data to user-specific localStorage with month key
+        UserDataManager.setItem('foodExpenses_' + monthKey, JSON.stringify({ 
+          date: monthKey,
         groceries: groceries, 
         drinks: drinks, 
         dining: dining 
@@ -217,41 +238,145 @@
       updateTable();
       document.getElementById('summary').innerHTML = `<h3>Total Food Expenses: ₹${total}</h3>`;
 
-      // Destroy existing chart if it exists
-      const ctx = document.getElementById('foodChart').getContext('2d');
-      if (window.foodChart instanceof Chart) {
-        window.foodChart.destroy();
-      }
+      // Update monthly chart
+      updateMonthlyChart();
+    }
 
-      // Create new chart
-      window.foodChart = new Chart(ctx, {
-        type: 'pie',
+    function updateMonthlyChart() {
+      // Get all expenses and group by month
+      const monthlyData = {};
+      
+      const keys = UserDataManager.getKeys('foodExpenses_');
+      keys.forEach(key => {
+        const data = JSON.parse(localStorage.getItem(key));
+        const month = data.date.substring(0, 7); // Get YYYY-MM
+        
+        if (!monthlyData[month]) {
+          monthlyData[month] = { groceries: 0, drinks: 0, dining: 0 };
+        }
+          
+        monthlyData[month].groceries += data.groceries;
+        monthlyData[month].drinks += data.drinks;
+        monthlyData[month].dining += data.dining;
+      });
+      
+      // Sort months
+      const sortedMonths = Object.keys(monthlyData).sort();
+      const last6Months = sortedMonths.slice(-6); // Get last 6 months
+      
+      const groceriesData = last6Months.map(m => monthlyData[m].groceries);
+      const drinksData = last6Months.map(m => monthlyData[m].drinks);
+      const diningData = last6Months.map(m => monthlyData[m].dining);
+      
+      // Format month labels
+      const monthLabels = last6Months.map(m => {
+        const [year, month] = m.split('-');
+        const date = new Date(year, month - 1);
+        return date.toLocaleString('default', { month: 'short', year: '2-digit' });
+      });
+      
+      // Destroy existing monthly chart if it exists
+      const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+      if (window.monthlyChartInstance instanceof Chart) {
+        window.monthlyChartInstance.destroy();
+      }
+      
+      // Create monthly bar chart
+      window.monthlyChartInstance = new Chart(monthlyCtx, {
+        type: 'bar',
         data: {
-          labels: ['Groceries', 'Drinks', 'Dining Out'],
-          datasets: [{
-            data: [groceries, drinks, dining],
-            backgroundColor: [
-              'rgba(255, 99, 132, 0.8)',
-              'rgba(54, 162, 235, 0.8)',
-              'rgba(255, 206, 86, 0.8)'
-            ]
-          }]
+          labels: monthLabels,
+          datasets: [
+            {
+              label: 'Groceries',
+              data: groceriesData,
+              backgroundColor: 'rgba(255, 99, 132, 0.8)',
+              borderColor: 'rgba(255, 99, 132, 1)',
+              borderWidth: 2,
+              borderRadius: 8,
+              borderSkipped: false,
+            },
+            {
+              label: 'Drinks',
+              data: drinksData,
+              backgroundColor: 'rgba(54, 162, 235, 0.8)',
+              borderColor: 'rgba(54, 162, 235, 1)',
+              borderWidth: 2,
+              borderRadius: 8,
+              borderSkipped: false,
+            },
+            {
+              label: 'Dining Out',
+              data: diningData,
+              backgroundColor: 'rgba(255, 206, 86, 0.8)',
+              borderColor: 'rgba(255, 206, 86, 1)',
+              borderWidth: 2,
+              borderRadius: 8,
+              borderSkipped: false,
+            }
+          ]
         },
-        options: { 
-          responsive: true, 
-          plugins: { 
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
             tooltip: {
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              padding: 12,
+              titleColor: '#fff',
+              bodyColor: '#fff',
+              borderColor: 'rgba(255, 255, 255, 0.2)',
+              borderWidth: 1,
+              displayColors: true,
               callbacks: {
                 label: function(context) {
-                  const value = context.raw;
-                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                  const percentage = ((value / total) * 100).toFixed(1);
-                  return `${context.label}: ₹${value} (${percentage}%)`;
+                  return `${context.dataset.label}: ₹${context.raw}`;
                 }
               }
             },
-            legend: { position: 'bottom' } 
-          } 
+            legend: { 
+              position: 'top',
+              labels: {
+                padding: 15,
+                font: {
+                  size: 12,
+                  weight: '500'
+                },
+                usePointStyle: true,
+                pointStyle: 'circle'
+              }
+            }
+          },
+          scales: {
+            x: {
+              stacked: true,
+              grid: {
+                display: false
+              },
+              ticks: {
+                font: {
+                  size: 11,
+                  weight: '500'
+                }
+              }
+            },
+            y: {
+              stacked: true,
+              beginAtZero: true,
+              grid: {
+                color: 'rgba(0, 0, 0, 0.05)',
+                lineWidth: 1
+              },
+              ticks: {
+                callback: function(value) {
+                  return '₹' + value;
+                },
+                font: {
+                  size: 11
+                }
+              }
+            }
+          }
         }
       });
     }
@@ -276,6 +401,8 @@
           window.foodChart.destroy();
           window.foodChart = null;
         }
+        // Update monthly chart anyway
+        updateMonthlyChart();
       }
       updateTable();
     }
@@ -330,10 +457,10 @@
         document.getElementById('drinks').value = '';
         document.getElementById('dining').value = '';
         
-        // Clear chart
-        if (window.foodChartInstance) {
-          window.foodChartInstance.destroy();
-          window.foodChartInstance = null;
+        // Clear charts
+        if (window.monthlyChartInstance instanceof Chart) {
+          window.monthlyChartInstance.destroy();
+          window.monthlyChartInstance = null;
         }
         
         // Clear summary
@@ -348,9 +475,18 @@
 
     // Initialize table and expose functions
     updateTable();
+    updateMonthlyChart();
     window.showChart = showChart;
     window.loadExpense = loadExpense;
     window.clearAllData = clearAllData;
+
+    // Listen for logout events from other pages
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'logoutEvent' && e.newValue) {
+        // User logged out in another tab/page - redirect to login
+        window.location.href = 'login.html';
+      }
+    });
   </script>
 </main>
 

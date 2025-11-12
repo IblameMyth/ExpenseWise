@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add New Expense</title>
+    <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root{
@@ -35,8 +36,8 @@
             box-shadow: var(--glass-shadow);
         }
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
-        header{display:flex;align-items:center;justify-content:center;background:linear-gradient(90deg,var(--accent),var(--primary));color:#fff;padding:16px 20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:18px}
-        header h1{margin:0;font-size:1.6rem;font-family:'Poppins',sans-serif;font-weight:600;letter-spacing:0.5px}
+        header{display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#ffffff,#f8fafc);color:#0f172a;padding:16px 20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:18px;border:1px solid rgba(2,6,23,0.08)}
+        header h1{margin:0;font-size:1.6rem;font-family:'Poppins',sans-serif;font-weight:600;letter-spacing:0.5px;background:linear-gradient(90deg,var(--accent),var(--primary));-webkit-background-clip:text;background-clip:text;color:transparent}
         
         .expense-form {
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
@@ -103,6 +104,7 @@
 </head>
 <body>
     <header>
+        <img src="images/logo.png" alt="ExpenseWise Logo" class="site-logo">
         <h1>ExpenseWise</h1>
     </header>
     
