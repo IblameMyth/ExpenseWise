@@ -1,323 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome to ExpenseWise</title>
-  <link rel="stylesheet" href="styles.css">
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
-
-    :root {
-      --bg: #f8fafc;
-      --card: #ffffff;
-      --muted: #6b7280;
-      --text: #0f172a;
-      --primary: #2563eb;
-      --accent: #0ea5a4;
-      --radius: 12px;
-      --shadow: 0 8px 26px rgba(15, 23, 42, 0.06);
-      --bg-img: url('https://images.unsplash.com/photo-1542223616-1e7b2d2b02d9?auto=format&fit=crop&w=1500&q=80');
-    }
-
-    body.dark-mode {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --muted: #94a3b8;
-      --text: #f1f5f9;
-      --shadow: 0 8px 26px rgba(0, 0, 0, 0.3);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: Inter, 'Segoe UI', Roboto, system-ui;
-      background-image: linear-gradient(rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.86)), var(--bg-img);
-      background-size: cover;
-      background-position: center;
-      min-height: 100vh;
-      color: var(--text);
-      overflow-x: hidden;
-    }
-
-    body.dark-mode {
-      background-image: linear-gradient(rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.95)), var(--bg-img);
-    }
-
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      position: relative;
-    }
-
-    .hero-content {
-      text-align: center;
-      max-width: 800px;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      padding: 60px 40px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    body.dark-mode .hero-content {
-      background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.9));
-      border: 1px solid rgba(51, 65, 85, 0.5);
-    }
-
-    .logo {
-      font-size: 3.5rem;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 700;
-      background: linear-gradient(90deg, var(--accent), var(--primary));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      margin-bottom: 20px;
-      animation: fadeInUp 0.8s ease;
-    }
-
-    .tagline {
-      font-size: 1.4rem;
-      color: var(--muted);
-      margin-bottom: 40px;
-      animation: fadeInUp 0.8s ease 0.2s both;
-    }
-
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-      margin: 40px 0;
-      animation: fadeInUp 0.8s ease 0.4s both;
-    }
-
-    .feature {
-      padding: 20px;
-      background: rgba(255, 255, 255, 0.6);
-      border-radius: 12px;
-      border: 1px solid rgba(203, 213, 225, 0.5);
-    }
-
-    body.dark-mode .feature {
-      background: rgba(30, 41, 59, 0.6);
-      border: 1px solid rgba(71, 85, 105, 0.5);
-    }
-
-    .feature-icon {
-      font-size: 2.5rem;
-      margin-bottom: 10px;
-    }
-
-    .feature h3 {
-      font-size: 1.1rem;
-      margin-bottom: 8px;
-      color: var(--text);
-    }
-
-    .feature p {
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-
-    .cta-buttons {
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-      flex-wrap: wrap;
-      animation: fadeInUp 0.8s ease 0.6s both;
-    }
-
-    .btn {
-      padding: 16px 40px;
-      border-radius: 12px;
-      border: none;
-      font-weight: 600;
-      font-size: 1.1rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-decoration: none;
-      display: inline-block;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      color: white;
-      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 28px rgba(37, 99, 235, 0.35);
-    }
-
-    .btn-secondary {
-      background: transparent;
-      color: var(--primary);
-      border: 2px solid var(--primary);
-    }
-
-    .btn-secondary:hover {
-      background: var(--primary);
-      color: white;
-      transform: translateY(-3px);
-    }
-
-    .dark-mode-toggle {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-      transition: transform 0.3s ease;
-      z-index: 1000;
-    }
-
-    .dark-mode-toggle:hover {
-      transform: translateY(-2px) scale(1.05);
-    }
-
-    .dark-mode-toggle svg {
-      width: 24px;
-      height: 24px;
-      fill: white;
-    }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @media (max-width: 768px) {
-      .logo {
-        font-size: 2.5rem;
-      }
-      
-      .tagline {
-        font-size: 1.1rem;
-      }
-
-      .hero-content {
-        padding: 40px 20px;
-      }
-
-      .features {
-        grid-template-columns: 1fr;
-      }
-
-      .cta-buttons {
-        flex-direction: column;
-      }
-
-      .btn {
-        width: 100%;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExpenseWise - Welcome</title>
+    <script src="auth.js"></script>
+    <style>
+        body {
+            font-family: Inter, 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            color: white;
+            text-align: center;
+        }
+        
+        .loading {
+            font-size: 18px;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-  <!-- Dark Mode Toggle -->
-  <button class="dark-mode-toggle" id="darkModeToggle" aria-label="Toggle dark mode">
-    <svg id="sunIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-      <path d="M12 18C8.68629 18 6 15.3137 6 12C6 8.68629 8.68629 6 12 6C15.3137 6 18 8.68629 18 12C18 15.3137 15.3137 18 12 18ZM12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16ZM11 1H13V4H11V1ZM11 20H13V23H11V20ZM3.51472 4.92893L4.92893 3.51472L7.05025 5.63604L5.63604 7.05025L3.51472 4.92893ZM16.9497 18.364L18.364 16.9497L20.4853 19.0711L19.0711 20.4853L16.9497 18.364ZM19.0711 3.51472L20.4853 4.92893L18.364 7.05025L16.9497 5.63604L19.0711 3.51472ZM5.63604 16.9497L7.05025 18.364L4.92893 20.4853L3.51472 19.0711L5.63604 16.9497ZM23 11V13H20V11H23ZM4 11V13H1V11H4Z"/>
-    </svg>
-    <svg id="moonIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: none;">
-      <path d="M10 7C10 10.866 13.134 14 17 14C18.9584 14 20.729 13.1957 21.9995 11.8995C22 11.933 22 11.9665 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C12.0335 2 12.067 2 12.1005 2.00049C10.8043 3.27098 10 5.04157 10 7ZM4 12C4 16.4183 7.58172 20 12 20C15.0583 20 17.7158 18.2839 19.062 15.7621C18.3945 15.9187 17.7035 16 17 16C12.0294 16 8 11.9706 8 7C8 6.29648 8.08133 5.60547 8.2379 4.938C5.71611 6.28423 4 8.9417 4 12Z"/>
-    </svg>
-  </button>
-
-  <div class="hero">
-    <div class="hero-content">
-      <h1 class="logo">ExpenseWise</h1>
-      <p class="tagline">Track Your Expenses Smartly & Efficiently</p>
-
-      <div class="features">
-        <div class="feature">
-          <div class="feature-icon">💰</div>
-          <h3>Budget Tracking</h3>
-          <p>Monitor daily and monthly expenses</p>
-        </div>
-        <div class="feature">
-          <div class="feature-icon">📊</div>
-          <h3>Visual Analytics</h3>
-          <p>Beautiful charts and insights</p>
-        </div>
-        <div class="feature">
-          <div class="feature-icon">🔒</div>
-          <h3>Secure</h3>
-          <p>Your data is safe with us</p>
-        </div>
-        <div class="feature">
-          <div class="feature-icon">🌙</div>
-          <h3>Dark Mode</h3>
-          <p>Eye-friendly interface</p>
-        </div>
-      </div>
-
-      <div class="cta-buttons">
-        <a href="signup.html" class="btn btn-primary">Get Started Free</a>
-        <a href="login.html" class="btn btn-secondary">Sign In</a>
-      </div>
+    <div>
+        <div class="spinner"></div>
+        <div class="loading">Loading ExpenseWise...</div>
     </div>
-  </div>
 
-  <script>
-    // Check if user is already logged in
-    const currentUser = localStorage.getItem('currentUser');
-    if (currentUser) {
-      window.location.href = 'expense_manager_system.html';
-    }
-
-    // Dark mode toggle
-    (function() {
-      const darkModeToggle = document.getElementById('darkModeToggle');
-      const sunIcon = document.getElementById('sunIcon');
-      const moonIcon = document.getElementById('moonIcon');
-      const body = document.body;
-
-      const darkMode = localStorage.getItem('darkMode');
-      if (darkMode === 'enabled') {
-        body.classList.add('dark-mode');
-        sunIcon.style.display = 'none';
-        moonIcon.style.display = 'block';
-      }
-
-      darkModeToggle.addEventListener('click', () => {
-        body.classList.toggle('dark-mode');
-        
-        if (body.classList.contains('dark-mode')) {
-          localStorage.setItem('darkMode', 'enabled');
-          sunIcon.style.display = 'none';
-          moonIcon.style.display = 'block';
-        } else {
-          localStorage.setItem('darkMode', 'disabled');
-          sunIcon.style.display = 'block';
-          moonIcon.style.display = 'none';
-        }
-      });
-    })();
-  </script>
+    <script>
+        // Check authentication and redirect appropriately
+        window.addEventListener('load', function() {
+            const session = localStorage.getItem('expenseWiseSession');
+            
+            if (session) {
+                // User is logged in, redirect to main app
+                window.location.href = 'expense_manager_system.html';
+            } else {
+                // User not logged in, redirect to login page
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
 </body>
 </html>

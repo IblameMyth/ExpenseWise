@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Entertainment</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="auth.js"></script>
     <style>
         :root{
             --bg:#f8fafc;
@@ -21,8 +22,25 @@
             --glass-border: 1px solid rgba(255, 255, 255, 0.2);
             --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
+
+        /* Dark mode variables */
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --card: rgba(30, 41, 59, 0.9);
+            --muted: #94a3b8;
+            --text: #f1f5f9;
+            --glass-bg: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.8));
+            --glass-border: 1px solid rgba(100, 116, 139, 0.2);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
         *{box-sizing:border-box}html,body{height:100%}
-        body{margin:0;padding:28px;font-family:Inter,'Segoe UI',Roboto;background-image:linear-gradient(rgba(255,255,255,0.86),rgba(255,255,255,0.86)),var(--bg-img);background-size:cover;background-position:center;color:var(--text)}
+        html{background:var(--bg)}
+        [data-theme="dark"] html{background:#0f172a}
+        body{margin:0;padding:28px;font-family:Inter,'Segoe UI',Roboto;background:var(--bg);background-image:linear-gradient(rgba(255,255,255,0.86),rgba(255,255,255,0.86)),var(--bg-img);background-size:cover;background-position:center;color:var(--text)}
+
+        [data-theme="dark"] body {
+            background-image: linear-gradient(rgba(15,23,42,0.9), rgba(15,23,42,0.9)), var(--bg-img);
+        }
         main{
             max-width:var(--container);
             margin:0 auto;
@@ -35,10 +53,65 @@
             box-shadow: var(--glass-shadow);
         }
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
-        header{display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#ffffff,#f8fafc);color:#0f172a;padding:16px 20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:18px;border:1px solid rgba(2,6,23,0.08)}
+        header{display:flex;align-items:center;justify-content:space-between;background:var(--glass-bg);color:var(--text);padding:16px 20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:18px;border:1px solid rgba(2,6,23,0.08)}
         header h1{margin:0;font-size:1.6rem;font-family:'Poppins',sans-serif;font-weight:600;letter-spacing:0.5px;background:linear-gradient(90deg,var(--accent),var(--primary));-webkit-background-clip:text;background-clip:text;color:transparent}
-        input{padding:10px;border-radius:10px;border:1px solid #e6eef8;background:#fff;min-width:150px;margin:8px}
+
+        [data-theme="dark"] header {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.8));
+            border: 1px solid rgba(100, 116, 139, 0.2);
+            color: var(--text);
+        }
+
+        .theme-toggle {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--accent);
+        }
+        input{padding:10px;border-radius:10px;border:1px solid #e6eef8;background:var(--card);min-width:150px;margin:8px;color:var(--text)}
         button{padding:10px 14px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--primary),var(--accent));color:#fff;cursor:pointer}
+
+        [data-theme="dark"] input {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            color: var(--text);
+        }
+
+        [data-theme="dark"] input[type="month"] {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            color: var(--text);
+        }
+
+        [data-theme="dark"] header {
+            border: 1px solid rgba(100, 116, 139, 0.2);
+        }
+
+        [data-theme="dark"] table {
+            color: var(--text);
+        }
+
+        [data-theme="dark"] th {
+            border-bottom: 2px solid rgba(100, 116, 139, 0.3) !important;
+            color: var(--text);
+        }
+
+        [data-theme="dark"] td {
+            border-bottom: 1px solid rgba(100, 116, 139, 0.2);
+            color: var(--text);
+        }
+
+        [data-theme="dark"] tbody tr:hover {
+            background: rgba(100, 116, 139, 0.1);
+        }
         .charts-container{
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -46,7 +119,7 @@
             margin: 18px 0;
         }
         .chart-wrapper{
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+            background: var(--glass-bg);
             border-radius: var(--radius);
             border: var(--glass-border);
             box-shadow: var(--glass-shadow);
@@ -73,14 +146,14 @@
             margin-top:12px;
             font-weight:600;
             padding: 12px;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.8));
+            background: var(--glass-bg);
             border-radius: var(--radius);
             border: var(--glass-border);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         }
         .table-container {
             margin-top: 30px;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+            background: var(--glass-bg);
             border-radius: var(--radius);
             padding: 20px;
             border: var(--glass-border);
@@ -92,22 +165,32 @@
 </head>
 <body>
     <header>
-        <img src="images/logo.png" alt="ExpenseWise Logo" class="site-logo">
-        <h1>ExpenseWise</h1>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <img src="images/logo.png" alt="ExpenseWise Logo" class="site-logo">
+            <h1>ExpenseWise</h1>
+        </div>
+        <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
     </header>
     <main>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <h1>Entertainment Expenses</h1>
         <div style="margin-bottom: 20px;">
             <label for="expenseMonth">Select Month: </label>
-            <input type="month" id="expenseMonth" style="padding: 10px; border-radius: 10px; border: 1px solid #e6eef8;" />
+            <input type="month" id="expenseMonth" style="padding: 10px; border-radius: 10px; border: 1px solid #e6eef8; background: var(--card); color: var(--text);" />
         </div>
         <input type="number" id="movies" placeholder="Movies (₹)" />
         <input type="number" id="parties" placeholder="Parties (₹)" />
         <input type="number" id="gatherings" placeholder="Family Gatherings (₹)" />
         <button onclick="showChart()">Show Chart</button>
+        <button onclick="saveData()">Save Data</button>
+        <button onclick="showTable()">Show Table</button>
         <button onclick="clearAllData()" style="background: linear-gradient(90deg, #dc2626, #ef4444); margin-left: 10px;">Clear All Data</button>
         <div id="summary"></div>
+        
+        <div class="chart-wrapper" style="max-width: 500px; margin: 18px auto;">
+            <h3>Current Entertainment Breakdown</h3>
+            <canvas id="entertainmentChart"></canvas>
+        </div>
         
         <div class="chart-wrapper" style="max-width: 900px; margin: 18px auto;">
             <h3>Monthly Trends</h3>
@@ -216,23 +299,68 @@
                 const gatherings = parseInt(document.getElementById('gatherings').value) || 0;
                 const total = movies + parties + gatherings;
 
-                    // Get month (YYYY-MM) for storage
-                    const monthKey = document.getElementById('expenseMonth').value;
+                // Update UI
+                document.getElementById('summary').innerHTML = `<h3>Total Entertainment Expenses: ₹${total}</h3>`;
+
+                // Create pie chart for current data
+                const ctx = document.getElementById('entertainmentChart').getContext('2d');
                 
-                    // Save data
-                    localStorage.setItem('entertainmentExpenses_' + monthKey, JSON.stringify({ 
-                        date: monthKey,
+                // Destroy existing chart if it exists
+                if (window.entertainmentChartInstance) {
+                    window.entertainmentChartInstance.destroy();
+                }
+
+                window.entertainmentChartInstance = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Movies', 'Parties', 'Family Gatherings'],
+                        datasets: [{
+                            data: [movies, parties, gatherings],
+                            backgroundColor: ['#ff6b6b', '#4ecdc4', '#45b7d1'],
+                            borderWidth: 2,
+                            borderColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    color: '#f1f5f9',
+                                    padding: 20
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Update monthly chart
+                updateMonthlyChart();
+            }
+
+            function saveData() {
+                const movies = parseInt(document.getElementById('movies').value) || 0;
+                const parties = parseInt(document.getElementById('parties').value) || 0;
+                const gatherings = parseInt(document.getElementById('gatherings').value) || 0;
+
+                // Get month (YYYY-MM) for storage
+                const monthKey = document.getElementById('expenseMonth').value;
+            
+                // Save data
+                localStorage.setItem('entertainmentExpenses_' + monthKey, JSON.stringify({ 
+                    date: monthKey,
                     movies: movies, 
                     parties: parties, 
                     gatherings: gatherings
                 }));
 
+                alert('Data saved successfully!');
+            }
+
+            function showTable() {
                 // Update UI
                 updateTable();
-                document.getElementById('summary').innerHTML = `<h3>Total Entertainment Expenses: ₹${total}</h3>`;
-
-                // Update monthly chart
-                updateMonthlyChart();
             }
 
             function updateMonthlyChart() {
@@ -330,6 +458,26 @@
                         }
                     }
                 });
+            }
+
+            // Theme toggle functionality
+            function toggleTheme() {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                
+                const toggleBtn = document.querySelector('.theme-toggle');
+                toggleBtn.textContent = newTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+            }
+
+            // Load saved theme
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            const toggleBtn = document.querySelector('.theme-toggle');
+            if (toggleBtn) {
+                toggleBtn.textContent = savedTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
             }
 
             function clearAllData() {

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Food</title>
   <link rel="stylesheet" href="styles.css">
-  <script src="user-data-manager.js"></script>
+  <script src="auth.js"></script>
   <style>
     :root{
       --bg:#f8fafc;
@@ -23,11 +23,28 @@
       --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     }
 
+    /* Dark mode variables */
+    [data-theme="dark"] {
+      --bg: #0f172a;
+      --card: rgba(30, 41, 59, 0.9);
+      --muted: #94a3b8;
+      --text: #f1f5f9;
+      --glass-bg: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.8));
+      --glass-border: 1px solid rgba(100, 116, 139, 0.2);
+      --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
     *{box-sizing:border-box}
     html,body{height:100%}
+    html{background:var(--bg)}
+    [data-theme="dark"] html{background:#0f172a}
 
     body{
-      margin:0;padding:28px;font-family:Inter, 'Segoe UI', Roboto, system-ui;background-image:linear-gradient(rgba(255,255,255,0.86),rgba(255,255,255,0.86)),var(--bg-img);background-size:cover;background-position:center;color:var(--text);
+      margin:0;padding:28px;font-family:Inter, 'Segoe UI', Roboto, system-ui;background:var(--bg);background-image:linear-gradient(rgba(255,255,255,0.86),rgba(255,255,255,0.86)),var(--bg-img);background-size:cover;background-position:center;color:var(--text);
+    }
+
+    [data-theme="dark"] body {
+      background-image: linear-gradient(rgba(15,23,42,0.9), rgba(15,23,42,0.9)), var(--bg-img);
     }
 
     main{
@@ -43,18 +60,53 @@
     }
 
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
-    header{display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#ffffff,#f8fafc);color:#0f172a;padding:16px 20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:18px;border:1px solid rgba(2,6,23,0.08)}
+    header{display:flex;align-items:center;justify-content:space-between;background:var(--glass-bg);color:var(--text);padding:16px 20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:18px;border:1px solid rgba(2,6,23,0.08)}
     header h1{margin:0;font-size:1.6rem;font-family:'Poppins',sans-serif;font-weight:600;letter-spacing:0.5px;background:linear-gradient(90deg,var(--accent),var(--primary));-webkit-background-clip:text;background-clip:text;color:transparent}
 
+    [data-theme="dark"] header {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.8));
+      border: 1px solid rgba(100, 116, 139, 0.2);
+      color: var(--text);
+    }
+
+    .theme-toggle {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s ease;
+    }
+
+    .theme-toggle:hover {
+      background: var(--accent);
+    }
+
     form{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
-    input{padding:10px;border-radius:10px;border:1px solid #e6eef8;background:#fff;min-width:150px}
+    input{padding:10px;border-radius:10px;border:1px solid #e6eef8;background:var(--card);min-width:150px;color:var(--text)}
     button{padding:10px 14px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--primary),var(--accent));color:#fff;cursor:pointer}
 
-    #summary{
+    [data-theme="dark"] input {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(100, 116, 139, 0.3);
+      color: var(--text);
+    }
+
+    [data-theme="dark"] input[type="month"] {
+        background: rgba(30, 41, 59, 0.8);
+        border: 1px solid rgba(100, 116, 139, 0.3);
+        color: var(--text);
+    }
+
+    [data-theme="dark"] header {
+        border: 1px solid rgba(100, 116, 139, 0.2);
+    }    #summary{
       margin-top:12px;
       font-weight:600;
       padding: 12px;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.8));
+      background: var(--glass-bg);
       border-radius: var(--radius);
       border: var(--glass-border);
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
@@ -66,7 +118,7 @@
       margin: 18px 0;
     }
     .chart-wrapper{
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+      background: var(--glass-bg);
       border-radius: var(--radius);
       border: var(--glass-border);
       box-shadow: var(--glass-shadow);
@@ -91,7 +143,7 @@
     }
     .table-container {
       margin-top: 30px;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+      background: var(--glass-bg);
       border-radius: var(--radius);
       padding: 20px;
       border: var(--glass-border);
@@ -103,8 +155,11 @@
     </head>
     <body>
     <header>
-      <img src="images/logo.png" alt="ExpenseWise Logo" class="site-logo">
-      <h1>ExpenseWise</h1>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <img src="images/logo.png" alt="ExpenseWise Logo" class="site-logo">
+        <h1>ExpenseWise</h1>
+      </div>
+      <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
     </header>
     <main>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -117,8 +172,15 @@
   <input type="number" id="drinks" placeholder="Drinks (₹)" />
   <input type="number" id="dining" placeholder="Dining Out (₹)" />
   <button onclick="showChart()">Show Chart</button>
+  <button onclick="saveData()">Save Data</button>
+  <button onclick="showTable()">Show Table</button>
   <button onclick="clearAllData()" style="background: linear-gradient(90deg, #dc2626, #ef4444); margin-left: 10px;">Clear All Data</button>
   <div id="summary"></div>
+  
+  <div class="chart-wrapper" style="max-width: 500px; margin: 18px auto;">
+    <h3>Current Expense Breakdown</h3>
+    <canvas id="foodChart"></canvas>
+  </div>
   
   <div class="chart-wrapper" style="max-width: 900px; margin: 18px auto;">
     <h3>Monthly Trends</h3>
@@ -169,13 +231,15 @@
       
       let totalGroceries = 0, totalDrinks = 0, totalDining = 0;
       
-      // Get all food expenses from user-specific localStorage
+      // Get all food expenses from localStorage
       const expenses = [];
-      const keys = UserDataManager.getKeys('foodExpenses_');
-      keys.forEach(key => {
-        const data = JSON.parse(localStorage.getItem(key));
-        expenses.push(data);
-      });
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('foodExpenses_')) {
+          const data = JSON.parse(localStorage.getItem(key));
+          expenses.push(data);
+        }
+      }
       
       // Sort by date, newest first
       expenses.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -209,7 +273,7 @@
 
     function loadExpense(date) {
         document.getElementById('expenseMonth').value = date;
-        const data = JSON.parse(UserDataManager.getItem(`foodExpenses_${date}`));
+        const data = JSON.parse(localStorage.getItem(`foodExpenses_${date}`));
       if (data) {
         document.getElementById('groceries').value = data.groceries;
         document.getElementById('drinks').value = data.drinks;
@@ -223,42 +287,88 @@
       const dining = parseInt(document.getElementById('dining').value) || 0;
       const total = groceries + drinks + dining;
 
-        // Get the month (YYYY-MM)
-        const monthKey = document.getElementById('expenseMonth').value;
+      document.getElementById('summary').innerHTML = `<h3>Total Food Expenses: ₹${total}</h3>`;
+
+      // Create pie chart for current data
+      const ctx = document.getElementById('foodChart').getContext('2d');
       
-        // Save data to user-specific localStorage with month key
-        UserDataManager.setItem('foodExpenses_' + monthKey, JSON.stringify({ 
-          date: monthKey,
+      // Destroy existing chart if it exists
+      if (window.foodChartInstance) {
+        window.foodChartInstance.destroy();
+      }
+
+      window.foodChartInstance = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['Groceries', 'Drinks', 'Dining Out'],
+          datasets: [{
+            data: [groceries, drinks, dining],
+            backgroundColor: ['#ff6b6b', '#4ecdc4', '#45b7d1'],
+            borderWidth: 2,
+            borderColor: '#fff'
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                color: '#f1f5f9',
+                padding: 20
+              }
+            }
+          }
+        }
+      });
+
+      // Update monthly chart
+      updateMonthlyChart();
+    }
+
+    function saveData() {
+      const groceries = parseInt(document.getElementById('groceries').value) || 0;
+      const drinks = parseInt(document.getElementById('drinks').value) || 0;
+      const dining = parseInt(document.getElementById('dining').value) || 0;
+
+      // Get the month (YYYY-MM)
+      const monthKey = document.getElementById('expenseMonth').value;
+    
+      // Save data to localStorage with month key
+      localStorage.setItem('foodExpenses_' + monthKey, JSON.stringify({ 
+        date: monthKey,
         groceries: groceries, 
         drinks: drinks, 
         dining: dining 
       }));
-      
+
+      alert('Data saved successfully!');
+    }
+
+    function showTable() {
       // Update the table
       updateTable();
-      document.getElementById('summary').innerHTML = `<h3>Total Food Expenses: ₹${total}</h3>`;
-
-      // Update monthly chart
-      updateMonthlyChart();
     }
 
     function updateMonthlyChart() {
       // Get all expenses and group by month
       const monthlyData = {};
       
-      const keys = UserDataManager.getKeys('foodExpenses_');
-      keys.forEach(key => {
-        const data = JSON.parse(localStorage.getItem(key));
-        const month = data.date.substring(0, 7); // Get YYYY-MM
-        
-        if (!monthlyData[month]) {
-          monthlyData[month] = { groceries: 0, drinks: 0, dining: 0 };
-        }
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('foodExpenses_')) {
+          const data = JSON.parse(localStorage.getItem(key));
+          const month = data.date.substring(0, 7); // Get YYYY-MM
           
-        monthlyData[month].groceries += data.groceries;
-        monthlyData[month].drinks += data.drinks;
-        monthlyData[month].dining += data.dining;
-      });
+          if (!monthlyData[month]) {
+            monthlyData[month] = { groceries: 0, drinks: 0, dining: 0 };
+          }
+          
+          monthlyData[month].groceries += data.groceries;
+          monthlyData[month].drinks += data.drinks;
+          monthlyData[month].dining += data.dining;
+        }
+      }
       
       // Sort months
       const sortedMonths = Object.keys(monthlyData).sort();
@@ -437,6 +547,27 @@
     updateTable();
     window.showChart = showChart;
     window.loadExpense = loadExpense;
+
+    // Theme toggle functionality
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      
+      const toggleBtn = document.querySelector('.theme-toggle');
+      toggleBtn.textContent = newTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+    }
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    const toggleBtn = document.querySelector('.theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.textContent = savedTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+    }
+
     // Clear all food expense data
     function clearAllData() {
       if (confirm('Are you sure you want to clear all food expense data? This cannot be undone.')) {
@@ -479,14 +610,6 @@
     window.showChart = showChart;
     window.loadExpense = loadExpense;
     window.clearAllData = clearAllData;
-
-    // Listen for logout events from other pages
-    window.addEventListener('storage', (e) => {
-      if (e.key === 'logoutEvent' && e.newValue) {
-        // User logged out in another tab/page - redirect to login
-        window.location.href = 'login.html';
-      }
-    });
   </script>
 </main>
 

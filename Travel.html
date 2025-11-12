@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Travel</title>
   <link rel="stylesheet" href="styles.css">
-  <script src="user-data-manager.js"></script>
+  <script src="auth.js"></script>
   <style>
     :root{
       --bg:#f8fafc;
@@ -22,8 +22,25 @@
       --glass-border: 1px solid rgba(255, 255, 255, 0.2);
       --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     }
+
+    /* Dark mode variables */
+    [data-theme="dark"] {
+      --bg: #0f172a;
+      --card: rgba(30, 41, 59, 0.9);
+      --muted: #94a3b8;
+      --text: #f1f5f9;
+      --glass-bg: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.8));
+      --glass-border: 1px solid rgba(100, 116, 139, 0.2);
+      --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
     *{box-sizing:border-box}html,body{height:100%}
-    body{margin:0;padding:28px;font-family:Inter, 'Segoe UI', Roboto;background-image:linear-gradient(rgba(255,255,255,0.86),rgba(255,255,255,0.86)),var(--bg-img);background-size:cover;background-position:center;color:var(--text)}
+    html{background:var(--bg)}
+    [data-theme="dark"] html{background:#0f172a}
+    body{margin:0;padding:28px;font-family:Inter, 'Segoe UI', Roboto;background:var(--bg);background-image:linear-gradient(rgba(255,255,255,0.86),rgba(255,255,255,0.86)),var(--bg-img);background-size:cover;background-position:center;color:var(--text)}
+    
+    [data-theme="dark"] body {
+      background-image: linear-gradient(rgba(15,23,42,0.9), rgba(15,23,42,0.9)), var(--bg-img);
+    }
     main{
       max-width:var(--container);
       margin:0 auto;
@@ -36,12 +53,49 @@
       box-shadow: var(--glass-shadow);
     }
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
-    header{display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#ffffff,#f8fafc);color:#0f172a;padding:16px 20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:18px;border:1px solid rgba(2,6,23,0.08)}
+    header{display:flex;align-items:center;justify-content:space-between;background:var(--glass-bg);color:var(--text);padding:16px 20px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:18px;border:1px solid rgba(2,6,23,0.08)}
     header h1{margin:0;font-size:1.6rem;font-family:'Poppins',sans-serif;font-weight:600;letter-spacing:0.5px;background:linear-gradient(90deg,var(--accent),var(--primary));-webkit-background-clip:text;background-clip:text;color:transparent}
-    input{padding:10px;border-radius:10px;border:1px solid #e6eef8;background:#fff;min-width:150px;margin:8px}
+
+    [data-theme="dark"] header {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.8));
+      border: 1px solid rgba(100, 116, 139, 0.2);
+      color: var(--text);
+    }
+
+    .theme-toggle {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s ease;
+    }
+
+    .theme-toggle:hover {
+      background: var(--accent);
+    }
+    input{padding:10px;border-radius:10px;border:1px solid #e6eef8;background:var(--card);min-width:150px;margin:8px;color:var(--text)}
     button{padding:10px 14px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--primary),var(--accent));color:#fff;cursor:pointer}
+
+    [data-theme="dark"] input {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(100, 116, 139, 0.3);
+      color: var(--text);
+    }
+
+    [data-theme="dark"] input[type="month"] {
+        background: rgba(30, 41, 59, 0.8);
+        border: 1px solid rgba(100, 116, 139, 0.3);
+        color: var(--text);
+    }
+
+    [data-theme="dark"] header {
+        border: 1px solid rgba(100, 116, 139, 0.2);
+    }
     .charts-container{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:18px 0}
-    .chart-wrapper{background:#fff;border-radius:12px;box-shadow:0 8px 24px rgba(2,6,23,0.06);padding:16px}
+    .chart-wrapper{background:var(--card);border-radius:12px;box-shadow:0 8px 24px rgba(2,6,23,0.06);padding:16px}
     .chart-wrapper h3{margin:0 0 12px 0;text-align:center;color:var(--text);font-size:1.1rem}
     canvas{display:block;margin:0 auto;max-width:100%}
     @media (max-width:768px){.charts-container{grid-template-columns:1fr}}
@@ -50,8 +104,11 @@
     </head>
     <body>
     <header>
-      <img src="images/logo.png" alt="ExpenseWise Logo" class="site-logo">
-      <h1>ExpenseWise</h1>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <img src="images/logo.png" alt="ExpenseWise Logo" class="site-logo">
+        <h1>ExpenseWise</h1>
+      </div>
+      <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
     </header>
         
     <main>
@@ -66,8 +123,15 @@
   <input type="number" id="metro" placeholder="Metro (₹)" />
   <input type="number" id="petrol" placeholder="Petrol (₹)" />
   <button onclick="showChart()">Show Chart</button>
+  <button onclick="saveData()">Save Data</button>
+  <button onclick="showTable()">Show Table</button>
   <button onclick="clearAllData()" style="background: linear-gradient(90deg, #dc2626, #ef4444); margin-left: 10px;">Clear All Data</button>
   <div id="summary"></div>
+  
+  <div class="chart-wrapper" style="max-width: 500px; margin: 18px auto;">
+    <h3>Current Expense Breakdown</h3>
+    <canvas id="travelChart"></canvas>
+  </div>
   
   <div class="chart-wrapper" style="max-width: 900px; margin: 18px auto;">
     <h3>Monthly Trends</h3>
@@ -154,13 +218,15 @@
       tableBody.innerHTML = '';
 
       const expenses = [];
-      const keys = UserDataManager.getKeys('travelExpenses_');
-      keys.forEach(key => {
-        try {
-          const data = JSON.parse(localStorage.getItem(key));
-          if (data && data.date) { expenses.push(data); }
-        } catch (e) { /* ignore malformed */ }
-      });
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('travelExpenses_')) {
+          try {
+            const data = JSON.parse(localStorage.getItem(key));
+            if (data && data.date) { expenses.push(data); }
+          } catch (e) { /* ignore malformed */ }
+        }
+      }
 
       expenses.sort((a, b) => new Date(b.date) - new Date(a.date));
 
@@ -197,7 +263,7 @@
 
     function loadExpense(date) {
         document.getElementById('expenseMonth').value = date;
-        const data = JSON.parse(UserDataManager.getItem(`travelExpenses_${date}`));
+        const data = JSON.parse(localStorage.getItem(`travelExpenses_${date}`));
       if (data) {
         document.getElementById('auto').value = data.auto || '';
         document.getElementById('bus').value = data.bus || '';
@@ -214,46 +280,92 @@
       const petrol = parseInt(document.getElementById('petrol').value) || 0;
       const total = auto + bus + metro + petrol;
 
-        // Get the month (YYYY-MM)
-        const monthKey = document.getElementById('expenseMonth').value;
+      // Update summary
+      document.getElementById('summary').innerHTML = `<h3>Total Travel Expenses: ₹${total}</h3>`;
+
+      // Create pie chart for current data
+      const ctx = document.getElementById('travelChart').getContext('2d');
       
-        // Save data to user-specific localStorage with month key
-        UserDataManager.setItem('travelExpenses_' + monthKey, JSON.stringify({ 
-          date: monthKey,
+      // Destroy existing chart if it exists
+      if (window.travelChartInstance) {
+        window.travelChartInstance.destroy();
+      }
+
+      window.travelChartInstance = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['Auto', 'Bus', 'Metro', 'Petrol'],
+          datasets: [{
+            data: [auto, bus, metro, petrol],
+            backgroundColor: ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4'],
+            borderWidth: 2,
+            borderColor: '#fff'
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                color: '#f1f5f9',
+                padding: 20
+              }
+            }
+          }
+        }
+      });
+
+      // Update monthly chart
+      updateMonthlyChart();
+    }
+
+    function saveData() {
+      const auto = parseInt(document.getElementById('auto').value) || 0;
+      const bus = parseInt(document.getElementById('bus').value) || 0;
+      const metro = parseInt(document.getElementById('metro').value) || 0;
+      const petrol = parseInt(document.getElementById('petrol').value) || 0;
+
+      // Get the month (YYYY-MM)
+      const monthKey = document.getElementById('expenseMonth').value;
+    
+      // Save data to localStorage with month key
+      localStorage.setItem('travelExpenses_' + monthKey, JSON.stringify({ 
+        date: monthKey,
         auto: auto, 
         bus: bus, 
         metro: metro,
         petrol: petrol
       }));
 
+      alert('Data saved successfully!');
+    }
+
+    function showTable() {
       // Update the table
       updateTable();
-      
-      // Update summary
-      document.getElementById('summary').innerHTML = `<h3>Total Travel Expenses: ₹${total}</h3>`;
-
-      // Update monthly chart
-      updateMonthlyChart();
     }
 
     function updateMonthlyChart() {
       // Get all expenses and group by month
       const monthlyData = {};
       
-      const keys = UserDataManager.getKeys('travelExpenses_');
-      keys.forEach(key => {
-        const data = JSON.parse(localStorage.getItem(key));
-        const month = data.date.substring(0, 7); // Get YYYY-MM
-        
-        if (!monthlyData[month]) {
-          monthlyData[month] = { auto: 0, bus: 0, metro: 0, petrol: 0 };
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('travelExpenses_')) {
+          const data = JSON.parse(localStorage.getItem(key));
+          const month = data.date.substring(0, 7); // Get YYYY-MM
+          
+          if (!monthlyData[month]) {
+            monthlyData[month] = { auto: 0, bus: 0, metro: 0, petrol: 0 };
+          }
+          
+          monthlyData[month].auto += data.auto;
+          monthlyData[month].bus += data.bus;
+          monthlyData[month].metro += data.metro;
+          monthlyData[month].petrol += data.petrol;
         }
-        
-        monthlyData[month].auto += data.auto;
-        monthlyData[month].bus += data.bus;
-        monthlyData[month].metro += data.metro;
-        monthlyData[month].petrol += data.petrol;
-      });
+      }
       
       // Sort months
       const sortedMonths = Object.keys(monthlyData).sort();
@@ -386,6 +498,26 @@
       });
     }
 
+    // Theme toggle functionality
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      
+      const toggleBtn = document.querySelector('.theme-toggle');
+      toggleBtn.textContent = newTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+    }
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    const toggleBtn = document.querySelector('.theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.textContent = savedTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+    }
+
     // Clear all travel expense data
     function clearAllData() {
       if (confirm('Are you sure you want to clear all travel expense data? This cannot be undone.')) {
@@ -431,13 +563,6 @@
     // Initial load
     updateTable();
     updateMonthlyChart();
-
-    // Listen for logout events from other pages
-    window.addEventListener('storage', (e) => {
-      if (e.key === 'logoutEvent' && e.newValue) {
-        window.location.href = 'login.html';
-      }
-    });
   </script>
     </main>
 

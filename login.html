@@ -1,753 +1,726 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - ExpenseWise</title>
-  <link rel="stylesheet" href="styles.css">
-  
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  <script src="firebase-config.js"></script>
-  <style>
-    :root {
-      --bg: #f8fafc;
-      --card: #ffffff;
-      --muted: #6b7280;
-      --text: #0f172a;
-      --primary: #2563eb;
-      --accent: #0ea5a4;
-      --radius: 12px;
-      --shadow: 0 8px 26px rgba(15, 23, 42, 0.06);
-      --bg-img: url('https://images.unsplash.com/photo-1542223616-1e7b2d2b02d9?auto=format&fit=crop&w=1500&q=80');
-    }
-
-    body.dark-mode {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --muted: #94a3b8;
-      --text: #f1f5f9;
-      --shadow: 0 8px 26px rgba(0, 0, 0, 0.3);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: Inter, 'Segoe UI', Roboto, system-ui, -apple-system, 'Helvetica Neue', Arial;
-      background-image: linear-gradient(rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.86)), var(--bg-img);
-      background-size: cover;
-      background-position: center;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      color: var(--text);
-    }
-
-    body.dark-mode {
-      background-image: linear-gradient(rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.95)), var(--bg-img);
-    }
-
-    .auth-container {
-      width: 100%;
-      max-width: 420px;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
-      backdrop-filter: blur(10px);
-      border-radius: var(--radius);
-      padding: 40px 30px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    body.dark-mode .auth-container {
-      background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.9));
-      border: 1px solid rgba(51, 65, 85, 0.5);
-    }
-
-    .logo-section {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .logo-section h1 {
-      font-family: 'Poppins', sans-serif;
-      font-size: 2rem;
-      font-weight: 600;
-      background: linear-gradient(90deg, var(--accent), var(--primary));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      margin-bottom: 8px;
-    }
-
-    .logo-section p {
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 500;
-      color: var(--text);
-      font-size: 0.9rem;
-    }
-
-    .form-group input {
-      width: 100%;
-      padding: 12px 16px;
-      border-radius: 10px;
-      border: 1px solid rgba(203, 213, 225, 0.5);
-      background: rgba(255, 255, 255, 0.9);
-      font-size: 0.95rem;
-      color: var(--text);
-      transition: all 0.3s ease;
-    }
-
-    body.dark-mode .form-group input {
-      background: rgba(30, 41, 59, 0.9);
-      border: 1px solid rgba(71, 85, 105, 0.5);
-      color: var(--text);
-    }
-
-    .form-group input:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(14, 165, 164, 0.1);
-      background: rgba(255, 255, 255, 0.95);
-    }
-
-    body.dark-mode .form-group input:focus {
-      background: rgba(30, 41, 59, 0.95);
-    }
-
-    .btn {
-      width: 100%;
-      padding: 14px;
-      border-radius: 10px;
-      border: none;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      color: white;
-      font-weight: 600;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      margin-top: 10px;
-    }
-
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
-    }
-
-    .btn-google {
-      background: white;
-      color: #333;
-      border: 1px solid #ddd;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    body.dark-mode .btn-google {
-      background: rgba(30, 41, 59, 0.9);
-      color: var(--text);
-      border: 1px solid rgba(71, 85, 105, 0.5);
-    }
-
-    .btn-google:hover {
-      background: #f8f9fa;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-
-    body.dark-mode .btn-google:hover {
-      background: rgba(30, 41, 59, 0.95);
-    }
-
-    .divider {
-      text-align: center;
-      margin: 25px 0;
-      position: relative;
-    }
-
-    .divider::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 50%;
-      width: 100%;
-      height: 1px;
-      background: rgba(203, 213, 225, 0.5);
-    }
-
-    .divider span {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
-      padding: 0 15px;
-      position: relative;
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-
-    body.dark-mode .divider span {
-      background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.9));
-    }
-
-    .switch-auth {
-      text-align: center;
-      margin-top: 20px;
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-
-    .switch-auth a {
-      color: var(--primary);
-      text-decoration: none;
-      font-weight: 600;
-    }
-
-    .switch-auth a:hover {
-      text-decoration: underline;
-    }
-
-    .error-message {
-      background: rgba(239, 68, 68, 0.1);
-      color: #dc2626;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      font-size: 0.9rem;
-      display: none;
-    }
-
-    .success-message {
-      background: rgba(34, 197, 94, 0.1);
-      color: #16a34a;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      font-size: 0.9rem;
-      display: none;
-    }
-
-    .dark-mode-toggle {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-      transition: transform 0.3s ease;
-      z-index: 1000;
-    }
-
-    .dark-mode-toggle:hover {
-      transform: translateY(-2px);
-    }
-
-    .dark-mode-toggle svg {
-      width: 24px;
-      height: 24px;
-      fill: white;
-    }
-
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
-  </style>
-</head>
-<body>
-  <!-- Dark Mode Toggle -->
-  <button class="dark-mode-toggle" id="darkModeToggle" aria-label="Toggle dark mode">
-    <svg id="sunIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-      <path d="M12 18C8.68629 18 6 15.3137 6 12C6 8.68629 8.68629 6 12 6C15.3137 6 18 8.68629 18 12C18 15.3137 15.3137 18 12 18ZM12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16ZM11 1H13V4H11V1ZM11 20H13V23H11V20ZM3.51472 4.92893L4.92893 3.51472L7.05025 5.63604L5.63604 7.05025L3.51472 4.92893ZM16.9497 18.364L18.364 16.9497L20.4853 19.0711L19.0711 20.4853L16.9497 18.364ZM19.0711 3.51472L20.4853 4.92893L18.364 7.05025L16.9497 5.63604L19.0711 3.51472ZM5.63604 16.9497L7.05025 18.364L4.92893 20.4853L3.51472 19.0711L5.63604 16.9497ZM23 11V13H20V11H23ZM4 11V13H1V11H4Z"/>
-    </svg>
-    <svg id="moonIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: none;">
-      <path d="M10 7C10 10.866 13.134 14 17 14C18.9584 14 20.729 13.1957 21.9995 11.8995C22 11.933 22 11.9665 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C12.0335 2 12.067 2 12.1005 2.00049C10.8043 3.27098 10 5.04157 10 7ZM4 12C4 16.4183 7.58172 20 12 20C15.0583 20 17.7158 18.2839 19.062 15.7621C18.3945 15.9187 17.7035 16 17 16C12.0294 16 8 11.9706 8 7C8 6.29648 8.08133 5.60547 8.2379 4.938C5.71611 6.28423 4 8.9417 4 12Z"/>
-    </svg>
-  </button>
-
-  <div class="auth-container">
-    <div class="logo-section">
-      <h1>ExpenseWise</h1>
-      <p>Track your expenses smartly</p>
-    </div>
-
-    <div class="error-message" id="errorMessage"></div>
-    <div class="success-message" id="successMessage"></div>
-
-    <button class="btn btn-google" id="googleSignIn">
-      <svg width="20" height="20" viewBox="0 0 24 24">
-        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-      </svg>
-      Continue with Google
-    </button>
-
-    <div class="divider">
-      <span>OR</span>
-    </div>
-
-    <form id="loginForm">
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" placeholder="Enter your email" required>
-      </div>
-
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" placeholder="Enter your password" required>
-      </div>
-
-      <button type="submit" class="btn">Sign In</button>
-    </form>
-
-    <div class="switch-auth">
-      Don't have an account? <a href="signup.html">Sign Up</a>
-    </div>
-  </div>
-
-  <script>
-    // Dark mode toggle
-    (function() {
-      const darkModeToggle = document.getElementById('darkModeToggle');
-      const sunIcon = document.getElementById('sunIcon');
-      const moonIcon = document.getElementById('moonIcon');
-      const body = document.body;
-
-      const darkMode = localStorage.getItem('darkMode');
-      if (darkMode === 'enabled') {
-        body.classList.add('dark-mode');
-        sunIcon.style.display = 'none';
-        moonIcon.style.display = 'block';
-      }
-
-      darkModeToggle.addEventListener('click', () => {
-        body.classList.toggle('dark-mode');
-        
-        if (body.classList.contains('dark-mode')) {
-          localStorage.setItem('darkMode', 'enabled');
-          sunIcon.style.display = 'none';
-          moonIcon.style.display = 'block';
-        } else {
-          localStorage.setItem('darkMode', 'disabled');
-          sunIcon.style.display = 'block';
-          moonIcon.style.display = 'none';
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - ExpenseWise</title>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --accent: #1d4ed8;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #0f172a;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --error: #ef4444;
+            --success: #10b981;
+            --radius: 12px;
         }
-      });
-    })();
 
-    // Simple authentication system
-    const errorMessage = document.getElementById('errorMessage');
-    const successMessage = document.getElementById('successMessage');
-
-    function showError(message) {
-      errorMessage.textContent = message;
-      errorMessage.style.display = 'block';
-      successMessage.style.display = 'none';
-      setTimeout(() => {
-        errorMessage.style.display = 'none';
-      }, 5000);
-    }
-
-    function showSuccess(message) {
-      successMessage.textContent = message;
-      successMessage.style.display = 'block';
-      errorMessage.style.display = 'none';
-      setTimeout(() => {
-        successMessage.style.display = 'none';
-      }, 3000);
-    }
-
-    // Login form handler
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-
-      // Get stored users
-      const users = JSON.parse(localStorage.getItem('expenseWiseUsers') || '[]');
-      const user = users.find(u => u.email === email && u.password === password);
-
-      if (user) {
-        // Set current user session
-        localStorage.setItem('currentUser', JSON.stringify({
-          email: user.email,
-          name: user.name,
-          loginTime: new Date().toISOString()
-        }));
-        
-        showSuccess('Login successful! Redirecting...');
-        setTimeout(() => {
-          window.location.href = 'expense_manager_system.html';
-        }, 1500);
-      } else {
-        showError('Invalid email or password. Please try again.');
-      }
-    });
-
-    // Google Sign-In with Firebase (Real Google OAuth)
-    document.getElementById('googleSignIn').addEventListener('click', async function() {
-      // Check if Firebase is initialized
-      if (typeof initializeFirebase !== 'function') {
-        alert('Firebase SDK not loaded. Please check your internet connection.');
-        return;
-      }
-
-      // Initialize Firebase if not already done
-      if (!window.firebaseInitialized) {
-        const initialized = initializeFirebase();
-        if (!initialized) {
-          alert('Firebase initialization failed. Please check firebase-config.js');
-          return;
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --card: rgba(30, 41, 59, 0.9);
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+            --border: rgba(100, 116, 139, 0.3);
         }
-        window.firebaseInitialized = true;
-      }
 
-      try {
-        // Show loading state
-        this.disabled = true;
-        this.innerHTML = `
-          <svg width="20" height="20" viewBox="0 0 24 24" style="animation: spin 1s linear infinite;">
-            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" opacity="0.25"/>
-            <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="4" fill="none"/>
-          </svg>
-          <span style="margin-left: 8px;">Connecting to Google...</span>
-        `;
-
-        // Call Firebase Google Sign-In
-        const user = await signInWithGoogle();
-        
-        if (user) {
-          // Save user to localStorage for compatibility with existing system
-          const userData = {
-            email: user.email,
-            name: user.name,
-            photoURL: user.photoURL,
-            uid: user.uid,
-            provider: 'google',
-            loginTime: new Date().toISOString()
-          };
-
-          localStorage.setItem('currentUser', JSON.stringify(userData));
-
-          // Also save to users list if not exists
-          let users = JSON.parse(localStorage.getItem('expenseWiseUsers') || '[]');
-          const existingUser = users.find(u => u.email === user.email);
-          
-          if (!existingUser) {
-            users.push({
-              name: user.name,
-              email: user.email,
-              password: 'google-oauth', // Marker for Google accounts
-              provider: 'google'
-            });
-            localStorage.setItem('expenseWiseUsers', JSON.stringify(users));
-          }
-
-          // Redirect to dashboard
-          window.location.href = 'expense_manager_system.html';
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
-      } catch (error) {
-        console.error('Google Sign-In Error:', error);
-        
-        // Reset button
-        this.disabled = false;
-        this.innerHTML = `
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-          </svg>
-          <span style="margin-left: 8px;">Continue with Google</span>
-        `;
-        
-        // Show error message
-        let errorMessage = 'Failed to sign in with Google. ';
-        if (error.code === 'auth/popup-closed-by-user') {
-          errorMessage += 'Sign-in popup was closed.';
-        } else if (error.code === 'auth/popup-blocked') {
-          errorMessage += 'Please allow popups for this website.';
-        } else if (error.message.includes('YOUR_API_KEY')) {
-          errorMessage += 'Firebase is not configured. Please update firebase-config.js with your Firebase credentials.';
-        } else {
-          errorMessage += error.message;
+
+        html, body {
+            height: 100%;
+            background: var(--bg);
+            color: var(--text);
         }
-        
-        alert(errorMessage);
-      }
-    });
 
-    // Keep the old fake account picker function for backward compatibility (but not used)
-    function showGoogleAccountPicker_OLD() {
-      // Get saved Google accounts or create default ones
-      let googleAccounts = JSON.parse(localStorage.getItem('googleAccounts') || '[]');
-      
-      if (googleAccounts.length === 0) {
-        // Create some default Google accounts for demonstration
-        googleAccounts = [
-          {
-            id: 'google_1',
-            email: 'john.doe@gmail.com',
-            name: 'John Doe',
-            picture: 'https://ui-avatars.com/api/?name=John+Doe&background=4285F4&color=fff&size=80'
-          },
-          {
-            id: 'google_2',
-            email: 'sarah.smith@gmail.com',
-            name: 'Sarah Smith',
-            picture: 'https://ui-avatars.com/api/?name=Sarah+Smith&background=34A853&color=fff&size=80'
-          },
-          {
-            id: 'google_3',
-            email: 'mike.johnson@gmail.com',
-            name: 'Mike Johnson',
-            picture: 'https://ui-avatars.com/api/?name=Mike+Johnson&background=FBBC05&color=fff&size=80'
-          }
-        ];
-        localStorage.setItem('googleAccounts', JSON.stringify(googleAccounts));
-      }
-
-      // Create modal overlay
-      const overlay = document.createElement('div');
-      overlay.id = 'googlePickerOverlay';
-      overlay.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(4px);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 10000;
-        animation: fadeIn 0.2s ease;
-      `;
-
-      // Create picker modal
-      const modal = document.createElement('div');
-      modal.style.cssText = `
-        background: ${document.body.classList.contains('dark-mode') ? '#1e293b' : 'white'};
-        border-radius: 12px;
-        padding: 24px;
-        max-width: 400px;
-        width: 90%;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        animation: slideUp 0.3s ease;
-        color: ${document.body.classList.contains('dark-mode') ? '#f1f5f9' : '#0f172a'};
-      `;
-
-      modal.innerHTML = `
-        <style>
-          @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-          }
-          @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-          }
-          .google-account-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: 1px solid ${document.body.classList.contains('dark-mode') ? '#334155' : '#e2e8f0'};
-            margin-bottom: 8px;
-          }
-          .google-account-item:hover {
-            background: ${document.body.classList.contains('dark-mode') ? '#334155' : '#f8fafc'};
-            transform: translateX(4px);
-          }
-          .google-account-avatar {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            object-fit: cover;
-          }
-          .google-account-info {
-            flex: 1;
-          }
-          .google-account-name {
-            font-weight: 600;
-            font-size: 0.95rem;
-            margin-bottom: 2px;
-          }
-          .google-account-email {
-            font-size: 0.85rem;
-            color: #6b7280;
-          }
-          .picker-header {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-            text-align: center;
-          }
-          .picker-subheader {
-            font-size: 0.9rem;
-            color: #6b7280;
-            text-align: center;
-            margin-bottom: 20px;
-          }
-          .add-account-btn {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 2px dashed ${document.body.classList.contains('dark-mode') ? '#475569' : '#cbd5e1'};
-            background: transparent;
-            color: ${document.body.classList.contains('dark-mode') ? '#94a3b8' : '#64748b'};
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            margin-top: 12px;
-          }
-          .add-account-btn:hover {
-            border-color: #2563eb;
-            color: #2563eb;
-          }
-          .close-picker {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            background: transparent;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #6b7280;
-            width: 32px;
-            height: 32px;
+        body {
+            font-family: Inter, 'Segoe UI', Roboto, system-ui, sans-serif;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 50%;
-            transition: all 0.2s ease;
-          }
-          .close-picker:hover {
-            background: ${document.body.classList.contains('dark-mode') ? '#334155' : '#f1f5f9'};
-          }
-        </style>
-        <div style="position: relative;">
-          <button class="close-picker" onclick="document.getElementById('googlePickerOverlay').remove()">×</button>
-          <div class="picker-header">Choose an account</div>
-          <div class="picker-subheader">to continue to ExpenseWise</div>
-          <div id="accountsList"></div>
-          <button class="add-account-btn" onclick="addNewGoogleAccount()">
-            ➕ Use another account
-          </button>
-        </div>
-      `;
-
-      overlay.appendChild(modal);
-      document.body.appendChild(overlay);
-
-      // Populate accounts list
-      const accountsList = document.getElementById('accountsList');
-      googleAccounts.forEach(account => {
-        const accountItem = document.createElement('div');
-        accountItem.className = 'google-account-item';
-        accountItem.innerHTML = `
-          <img src="${account.picture}" alt="${account.name}" class="google-account-avatar">
-          <div class="google-account-info">
-            <div class="google-account-name">${account.name}</div>
-            <div class="google-account-email">${account.email}</div>
-          </div>
-        `;
-        accountItem.onclick = () => selectGoogleAccount(account);
-        accountsList.appendChild(accountItem);
-      });
-
-      // Close on overlay click
-      overlay.onclick = (e) => {
-        if (e.target === overlay) {
-          overlay.remove();
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
         }
-      };
-    }
 
-    function selectGoogleAccount(account) {
-      const user = {
-        email: account.email,
-        name: account.name,
-        picture: account.picture,
-        provider: 'google',
-        loginTime: new Date().toISOString()
-      };
+        .login-container {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            width: 100%;
+            max-width: 400px;
+            padding: 40px 30px;
+            position: relative;
+            overflow: hidden;
+        }
 
-      localStorage.setItem('currentUser', JSON.stringify(user));
-      document.getElementById('googlePickerOverlay').remove();
-      showSuccess('Google Sign-In successful! Redirecting...');
-      
-      setTimeout(() => {
-        window.location.href = 'expense_manager_system.html';
-      }, 1500);
-    }
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
 
-    function addNewGoogleAccount() {
-      const name = prompt('Enter your name:');
-      if (!name) return;
+        .logo-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
 
-      const email = prompt('Enter your Gmail address:');
-      if (!email || !email.includes('@')) {
-        alert('Please enter a valid email address');
-        return;
-      }
+        .logo {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 16px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+            font-weight: bold;
+        }
 
-      const googleAccounts = JSON.parse(localStorage.getItem('googleAccounts') || '[]');
-      
-      // Check if account already exists
-      if (googleAccounts.some(acc => acc.email === email)) {
-        alert('This account is already added');
-        return;
-      }
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
 
-      const newAccount = {
-        id: 'google_' + Date.now(),
-        email: email,
-        name: name,
-        picture: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=EA4335&color=fff&size=80`
-      };
+        .subtitle {
+            color: var(--muted);
+            font-size: 14px;
+        }
 
-      googleAccounts.push(newAccount);
-      localStorage.setItem('googleAccounts', JSON.stringify(googleAccounts));
+        .form-group {
+            margin-bottom: 20px;
+        }
 
-      // Refresh picker
-      document.getElementById('googlePickerOverlay').remove();
-      showGoogleAccountPicker();
-    }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: var(--text);
+            font-size: 14px;
+        }
 
-    // Make function global
-    window.addNewGoogleAccount = addNewGoogleAccount;
-  </script>
+        input[type="email"], 
+        input[type="password"], 
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--card);
+            color: var(--text);
+            transition: all 0.2s ease;
+        }
+
+        input[type="email"]:focus, 
+        input[type="password"]:focus, 
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary);
+        }
+
+        .checkbox-label {
+            font-size: 14px;
+            color: var(--muted);
+            margin: 0;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .toggle-form {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .toggle-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .toggle-link:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .success-message {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: background 0.2s ease;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(100, 116, 139, 0.1);
+        }
+
+        [data-theme="dark"] input[type="email"], 
+        [data-theme="dark"] input[type="password"], 
+        [data-theme="dark"] input[type="text"] {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            color: var(--text);
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+    
+    <div class="login-container">
+        <div class="logo-section">
+            <div class="logo">E</div>
+            <h1 id="form-title">Welcome Back</h1>
+            <p class="subtitle" id="form-subtitle">Sign in to your ExpenseWise account</p>
+        </div>
+
+        <div id="error-message" class="error-message" style="display: none;"></div>
+        <div id="success-message" class="success-message" style="display: none;"></div>
+
+        <form id="auth-form">
+            <div class="form-group" id="name-group" style="display: none;">
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName" name="fullName" placeholder="Enter your full name">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+
+            <div class="form-group" id="confirm-password-group" style="display: none;">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password">
+            </div>
+
+            <div class="checkbox-group" id="remember-group">
+                <input type="checkbox" id="rememberMe" name="rememberMe">
+                <label for="rememberMe" class="checkbox-label">Remember me</label>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submit-btn">Sign In</button>
+        </form>
+
+        <div class="toggle-form">
+            <span id="toggle-text">Don't have an account?</span>
+            <a href="#" class="toggle-link" id="toggle-link" onclick="toggleForm()">Sign Up</a>
+        </div>
+    </div>
+
+    <script>
+        // Debug: Check if script is loading
+        console.log('=== LOGIN PAGE SCRIPT LOADED ===');
+        console.log('Date:', new Date());
+        console.log('Page URL:', window.location.href);
+
+        let isSignUp = false;
+
+        // Add missing handleFormSubmit function for onclick
+        function handleFormSubmit() {
+            console.log('handleFormSubmit called directly');
+            document.getElementById('auth-form').dispatchEvent(new Event('submit'));
+        }
+
+        // Manual test function that can be called from console
+        window.testSignin = function(testEmail = '12345@gmail.com', testPassword = '123456') {
+            console.log('=== MANUAL SIGNIN TEST ===');
+            
+            // Get users from localStorage
+            const users = JSON.parse(localStorage.getItem('expenseWiseUsers') || '[]');
+            console.log('Total users in storage:', users.length);
+            console.log('Users:', users);
+            
+            // Find user
+            const user = users.find(u => u.email === testEmail && u.password === testPassword);
+            console.log('Looking for email:', testEmail);
+            console.log('Looking for password:', testPassword);
+            console.log('Found user:', user);
+            
+            if (user) {
+                console.log('User found! Creating session...');
+                
+                // Create session
+                const sessionData = {
+                    userId: user.id,
+                    email: user.email,
+                    fullName: user.fullName,
+                    loginTime: new Date().toISOString()
+                };
+                
+                localStorage.setItem('expenseWiseSession', JSON.stringify(sessionData));
+                console.log('Session created:', sessionData);
+                
+                // Direct redirect
+                console.log('Attempting redirect...');
+                window.location.href = 'expense_manager_system.html';
+            } else {
+                console.log('User not found!');
+                if (users.length === 0) {
+                    console.log('No users in storage. Create an account first.');
+                } else {
+                    console.log('Available emails:', users.map(u => u.email));
+                }
+            }
+        };
+
+        // Automatic signin function
+        function attemptAutoSignin(email, password) {
+            console.log('=== AUTOMATIC SIGNIN ATTEMPT ===');
+            
+            const users = JSON.parse(localStorage.getItem('expenseWiseUsers')) || [];
+            const user = users.find(u => u.email === email && u.password === password);
+            
+            if (user) {
+                console.log('Auto-login successful!');
+                
+                // Create session
+                const sessionData = {
+                    userId: user.id,
+                    email: user.email,
+                    fullName: user.fullName,
+                    loginTime: new Date().toISOString()
+                };
+                
+                localStorage.setItem('expenseWiseSession', JSON.stringify(sessionData));
+                
+                showSuccess('Auto-login successful! Welcome back, ' + user.fullName + '!');
+                
+                // Redirect to main app
+                setTimeout(() => {
+                    console.log('Auto-login redirect executing...');
+                    window.location.href = 'expense_manager_system.html';
+                }, 2000);
+                
+            } else {
+                console.log('Auto-login failed - credentials invalid');
+                showError('Auto-login failed. Please sign in manually.');
+                clearPasswordField();
+            }
+        }
+
+        // Helper function to clear password field
+        function clearPasswordField() {
+            const passwordField = document.getElementById('password');
+            if (passwordField) {
+                passwordField.value = '';
+            }
+        }
+
+        // Handle form submission (backup method)
+        function handleFormSubmit() {
+            console.log('Button clicked, form submission triggered');
+            document.getElementById('auth-form').dispatchEvent(new Event('submit'));
+        }
+
+        // Check for saved theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon();
+        }
+
+        // Check for remembered user
+        window.addEventListener('load', function() {
+            console.log('Page loaded, setting up form...');
+            
+            const rememberedUser = localStorage.getItem('rememberedUser');
+            if (rememberedUser) {
+                const userData = JSON.parse(rememberedUser);
+                document.getElementById('email').value = userData.email;
+                document.getElementById('rememberMe').checked = true;
+            }
+            
+            // Ensure form event listener is attached
+            const form = document.getElementById('auth-form');
+            if (form) {
+                console.log('Form found, event listener should be working');
+            } else {
+                console.error('Form not found!');
+            }
+        });
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon();
+        }
+
+        function updateThemeIcon() {
+            const themeToggle = document.querySelector('.theme-toggle');
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            themeToggle.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
+        }
+
+        function toggleForm() {
+            isSignUp = !isSignUp;
+            console.log('Toggling form, isSignUp now:', isSignUp);
+            
+            const formTitle = document.getElementById('form-title');
+            const formSubtitle = document.getElementById('form-subtitle');
+            const nameGroup = document.getElementById('name-group');
+            const confirmPasswordGroup = document.getElementById('confirm-password-group');
+            const rememberGroup = document.getElementById('remember-group');
+            const submitBtn = document.getElementById('submit-btn');
+            const toggleText = document.getElementById('toggle-text');
+            const toggleLink = document.getElementById('toggle-link');
+            const fullNameInput = document.getElementById('fullName');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+
+            if (isSignUp) {
+                formTitle.textContent = 'Create Account';
+                formSubtitle.textContent = 'Sign up for ExpenseWise';
+                nameGroup.style.display = 'block';
+                confirmPasswordGroup.style.display = 'block';
+                rememberGroup.style.display = 'none';
+                submitBtn.textContent = 'Sign Up';
+                toggleText.textContent = 'Already have an account?';
+                toggleLink.textContent = 'Sign In';
+                // Make fields required for signup
+                fullNameInput.required = true;
+                confirmPasswordInput.required = true;
+            } else {
+                formTitle.textContent = 'Welcome Back';
+                formSubtitle.textContent = 'Sign in to your ExpenseWise account';
+                nameGroup.style.display = 'none';
+                confirmPasswordGroup.style.display = 'none';
+                rememberGroup.style.display = 'flex';
+                submitBtn.textContent = 'Sign In';
+                toggleText.textContent = "Don't have an account?";
+                toggleLink.textContent = 'Sign Up';
+                // Remove required attributes for signin
+                fullNameInput.required = false;
+                confirmPasswordInput.required = false;
+            }
+
+            clearMessages();
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            const successDiv = document.getElementById('success-message');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            successDiv.style.display = 'none';
+        }
+
+        function showSuccess(message) {
+            const errorDiv = document.getElementById('error-message');
+            const successDiv = document.getElementById('success-message');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            errorDiv.style.display = 'none';
+        }
+
+        function clearMessages() {
+            document.getElementById('error-message').style.display = 'none';
+            document.getElementById('success-message').style.display = 'none';
+        }
+
+        document.getElementById('auth-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('=== FORM SUBMIT EVENT TRIGGERED ===');
+            
+            // IMMEDIATE FIX: Direct signin logic
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const rememberMe = document.getElementById('rememberMe').checked;
+
+            console.log('Email:', email, 'Password length:', password.length);
+
+            if (!email || !password) {
+                showError('Please fill in all required fields');
+                return;
+            }
+
+            if (isSignUp) {
+                // Signup logic (existing)
+                const fullName = document.getElementById('fullName').value.trim();
+                const confirmPassword = document.getElementById('confirmPassword').value.trim();
+
+                if (!fullName || password !== confirmPassword || password.length < 6) {
+                    showError('Please check all signup requirements');
+                    return;
+                }
+
+                // FIXED: Check if user already exists with safe array handling
+                let existingUsers = [];
+                const storedUsers = localStorage.getItem('expenseWiseUsers');
+                if (storedUsers) {
+                    try {
+                        const parsed = JSON.parse(storedUsers);
+                        if (Array.isArray(parsed)) {
+                            existingUsers = parsed;
+                        }
+                    } catch (error) {
+                        existingUsers = [];
+                    }
+                }
+                
+                // Check for existing user safely
+                let userExists = false;
+                for (let i = 0; i < existingUsers.length; i++) {
+                    if (existingUsers[i].email === email) {
+                        userExists = true;
+                        break;
+                    }
+                }
+                
+                if (userExists) {
+                    showError('Account already exists');
+                    return;
+                }
+
+                const newUser = {
+                    id: Date.now(),
+                    fullName: fullName,
+                    email: email,
+                    password: password,
+                    createdAt: new Date().toISOString()
+                };
+
+                // FIXED: Add user safely to array
+                existingUsers = existingUsers || [];
+                existingUsers[existingUsers.length] = newUser; // Safe array addition
+                localStorage.setItem('expenseWiseUsers', JSON.stringify(existingUsers));
+
+                showSuccess('Account created! Please sign in.');
+                setTimeout(() => {
+                    toggleForm();
+                    document.getElementById('email').value = email;
+                }, 2000);
+
+            } else {
+                // SIMPLIFIED SIGNIN - IMMEDIATE REDIRECT
+                console.log('=== SIGNIN ATTEMPT ===');
+                
+                // FIXED: Get users with proper array handling
+                let users = [];
+                const storedUsers = localStorage.getItem('expenseWiseUsers');
+                if (storedUsers) {
+                    try {
+                        const parsed = JSON.parse(storedUsers);
+                        if (Array.isArray(parsed)) {
+                            users = parsed;
+                        }
+                    } catch (error) {
+                        console.log('Error parsing users for signin');
+                        users = [];
+                    }
+                }
+                
+                // Find user safely
+                let user = null;
+                for (let i = 0; i < users.length; i++) {
+                    if (users[i].email === email && users[i].password === password) {
+                        user = users[i];
+                        break;
+                    }
+                }
+
+                if (!user) {
+                    showError('Invalid credentials');
+                    return;
+                }
+
+                // Create session immediately
+                const sessionData = {
+                    userId: user.id,
+                    email: user.email,
+                    fullName: user.fullName,
+                    loginTime: new Date().toISOString()
+                };
+
+                localStorage.setItem('expenseWiseSession', JSON.stringify(sessionData));
+
+                // Handle remember me
+                if (rememberMe) {
+                    localStorage.setItem('rememberedUser', JSON.stringify({email: email}));
+                    localStorage.setItem('savedCredentials_' + email, JSON.stringify({
+                        password: password,
+                        savedAt: new Date().toISOString()
+                    }));
+                }
+
+                // IMMEDIATE REDIRECT - NO DELAYS
+                console.log('SUCCESS - Redirecting immediately');
+                window.location.href = 'expense_manager_system.html';
+            }
+        });
+
+        // Additional debugging: Add direct button click listener
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, setting up additional listeners...');
+            
+            // SIMPLIFIED: Just check for remembered email, no auto-login
+            const rememberedUser = localStorage.getItem('rememberedUser');
+            if (rememberedUser) {
+                try {
+                    const userInfo = JSON.parse(rememberedUser);
+                    const emailField = document.getElementById('email');
+                    if (emailField) {
+                        emailField.value = userInfo.email;
+                        console.log('Pre-filled remembered email:', userInfo.email);
+                    }
+                    
+                    // Check remember me checkbox
+                    const rememberCheckbox = document.getElementById('rememberMe');
+                    if (rememberCheckbox) {
+                        rememberCheckbox.checked = true;
+                    }
+                } catch (error) {
+                    console.log('Error loading remembered user:', error);
+                }
+            }
+            
+            // FIXED: Check if we have any users with proper array handling
+            console.log('=== USER CHECK ON PAGE LOAD ===');
+            
+            // Initialize empty array
+            let existingUsers = [];
+            
+            // Try to get existing users
+            const storedUsers = localStorage.getItem('expenseWiseUsers');
+            if (storedUsers) {
+                try {
+                    const parsed = JSON.parse(storedUsers);
+                    if (Array.isArray(parsed)) {
+                        existingUsers = parsed;
+                    }
+                } catch (error) {
+                    console.log('Error parsing stored users, using empty array');
+                    existingUsers = [];
+                }
+            }
+            
+            console.log('Total users stored:', existingUsers.length);
+            
+            if (existingUsers.length > 0) {
+                console.log('Available users:');
+                existingUsers.forEach((user, index) => {
+                    console.log(`${index + 1}. Email: ${user.email}, Name: ${user.fullName}`);
+                });
+            } else {
+                console.log('No users found. Creating default test user...');
+                // Create default test user
+                const defaultUser = {
+                    id: Date.now(),
+                    fullName: 'Test User',
+                    email: '12345@gmail.com',
+                    password: '123456',
+                    createdAt: new Date().toISOString()
+                };
+                
+                // Initialize as array and add user
+                existingUsers = [defaultUser];
+                localStorage.setItem('expenseWiseUsers', JSON.stringify(existingUsers));
+                console.log('Default user created: 12345@gmail.com / 123456');
+            }
+            
+            const submitBtn = document.getElementById('submit-btn');
+            if (submitBtn) {
+                submitBtn.addEventListener('click', function(e) {
+                    console.log('=== DIRECT BUTTON CLICK DETECTED ===');
+                    console.log('Button clicked, isSignUp:', isSignUp);
+                    console.log('Event:', e);
+                });
+            }
+
+            // Test localStorage
+            try {
+                localStorage.setItem('test', 'working');
+                localStorage.removeItem('test');
+                console.log('localStorage is working');
+            } catch (error) {
+                console.error('localStorage error:', error);
+            }
+
+            console.log('All event listeners set up successfully');
+
+        });
+    </script>
 </body>
 </html>

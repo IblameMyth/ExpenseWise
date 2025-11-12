@@ -6,8 +6,8 @@
   <title>ExpenseWise</title>
   <!-- Revert to original styles -->
   <link rel="stylesheet" href="styles.css">
-  <script src="user-data-manager.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="auth.js"></script>
   <style>
     :root {
       --bg: #f8fafc;
@@ -29,96 +29,15 @@
     }
 
     /* Dark mode variables */
-    body.dark-mode {
+    [data-theme="dark"] {
       --bg: #0f172a;
-      --card: #1e293b;
+      --card: rgba(30, 41, 59, 0.9);
       --muted: #94a3b8;
       --text: #f1f5f9;
-      --shadow: 0 8px 26px rgba(0, 0, 0, 0.3);
-      --gradient-start: rgba(30, 41, 59, 0.95);
-      --gradient-end: rgba(15, 23, 42, 0.9);
-      --card-border: rgba(51, 65, 85, 0.5);
-    }
-
-    body.dark-mode {
-      background-image: linear-gradient(rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.95)), var(--bg-img);
-    }
-
-    body.dark-mode main {
-      background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.9));
-      border: 1px solid rgba(51, 65, 85, 0.5);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-    }
-
-    body.dark-mode main > div {
-      background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(30, 41, 59, 0.85));
-      border: 1px solid rgba(51, 65, 85, 0.5);
-    }
-
-    body.dark-mode header {
-      background: linear-gradient(135deg, #1e293b, #0f172a);
-      border: 1px solid rgba(51, 65, 85, 0.3);
-    }
-
-    body.dark-mode input[type="date"],
-    body.dark-mode input[type="number"],
-    body.dark-mode input[type="text"] {
-      background: rgba(30, 41, 59, 0.9);
-      border: 1px solid rgba(71, 85, 105, 0.5);
-      color: var(--text);
-    }
-
-    body.dark-mode input:focus {
-      background: rgba(30, 41, 59, 0.95);
-      border-color: var(--accent);
-    }
-
-    body.dark-mode .expense-table {
-      background: var(--card);
-    }
-
-    body.dark-mode .expense-table tr:hover {
-      background-color: rgba(51, 65, 85, 0.3);
-    }
-
-    body.dark-mode .expense-table tfoot td {
-      background-color: rgba(51, 65, 85, 0.3);
-    }
-
-    body.dark-mode #dailySummary p,
-    body.dark-mode #futureList li {
-      background: var(--card);
-      border: 1px solid rgba(51, 65, 85, 0.3);
-    }
-
-    /* Dark mode toggle button */
-    .dark-mode-toggle {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      z-index: 1000;
-    }
-
-    .dark-mode-toggle:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-    }
-
-    .dark-mode-toggle svg {
-      width: 24px;
-      height: 24px;
-      fill: white;
+      --gradient-start: rgba(30, 41, 59, 0.9);
+      --gradient-end: rgba(15, 23, 42, 0.8);
+      --card-border: rgba(100, 116, 139, 0.2);
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     }
 
     /* reset (keeps header/main/footer in the same DOM order) */
@@ -131,9 +50,18 @@
       height: 100%
     }
 
+    html {
+      background: var(--bg);
+    }
+
+    [data-theme="dark"] html {
+      background: #0f172a;
+    }
+
     body {
       margin: 0;
       font-family: Inter, 'Segoe UI', Roboto, system-ui, -apple-system, 'Helvetica Neue', Arial;
+      background: var(--bg);
       color: var(--text);
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
@@ -143,7 +71,10 @@
       background-position: center;
       background-repeat: no-repeat;
       display: block;
+    }
 
+    [data-theme="dark"] body {
+      background-image: linear-gradient(rgba(15,23,42,0.9), rgba(15,23,42,0.9)), var(--bg-img);
     }
 
     main {
@@ -151,28 +82,28 @@
       margin: 0 auto;
       min-height: 72vh;
       padding: 28px;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
       backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 1px solid var(--card-border);
       border-radius: var(--radius);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      box-shadow: var(--shadow);
     }
 
     /* Card styling for content sections */
     main > div {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
       border-radius: var(--radius);
       padding: 20px;
       margin-bottom: 20px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--card-border);
       backdrop-filter: blur(5px);
     }
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
     header {
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: space-between;
       gap: var(--gap);
       background: linear-gradient(135deg, #ffffff, #f8fafc);
       color: #0f172a;
@@ -181,6 +112,18 @@
       box-shadow: var(--shadow);
       margin-bottom: 20px;
       border: 1px solid rgba(2, 6, 23, 0.08);
+    }
+
+    [data-theme="dark"] header {
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      border: 1px solid var(--card-border);
+      color: var(--text);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: var(--gap);
     }
 
     header h1 {
@@ -193,6 +136,21 @@
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
+    }
+
+    .theme-toggle {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s ease;
+    }
+
+    .theme-toggle:hover {
+      background: var(--accent);
     }
 
 
@@ -279,12 +237,26 @@
       transition: all 0.3s ease;
     }
 
+    [data-theme="dark"] input[type="date"],
+    [data-theme="dark"] input[type="number"],
+    [data-theme="dark"] input[type="text"],
+    [data-theme="dark"] input[type="month"] {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(100, 116, 139, 0.3);
+      color: var(--text);
+    }
+
     input:focus {
       outline: none;
       border-color: var(--accent);
       background: rgba(255, 255, 255, 0.95);
       box-shadow: 0 8px 24px rgba(14, 165, 164, 0.12);
       transform: translateY(-2px);
+    }
+
+    [data-theme="dark"] input:focus {
+      background: rgba(30, 41, 59, 0.9);
+      border-color: var(--accent);
     }
 
     button {
@@ -328,7 +300,7 @@
       background: var(--card);
       padding: 12px;
       border-radius: 10px;
-      border: 1px solid rgba(2, 6, 23, 0.04);
+      border: 1px solid var(--card-border);
       box-shadow: var(--shadow);
       display: flex;
       justify-content: space-between;
@@ -348,8 +320,8 @@
       background: var(--card);
       padding: 12px;
       border-radius: 10px;
-      border: 1px solid rgba(2, 6, 23, 0.03);
-      box-shadow: 0 8px 24px rgba(2, 6, 23, 0.04);
+      border: 1px solid var(--card-border);
+      box-shadow: var(--shadow);
       display: flex;
       justify-content: space-between;
       align-items: center
@@ -428,7 +400,15 @@
     .expense-table td {
       padding: 12px;
       text-align: left;
-      border-bottom: 1px solid #e6eef8;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    [data-theme="dark"] .expense-table tr:hover {
+      background-color: rgba(100, 116, 139, 0.1);
+    }
+
+    [data-theme="dark"] .expense-table tfoot td {
+      background-color: rgba(100, 116, 139, 0.1);
     }
 
     .expense-table th {
@@ -454,11 +434,12 @@
 
     /* Compact container for budget overview */
     .container-compact {
-      background: rgba(255, 255, 255, 0.9);
+      background: var(--gradient-start);
       border-radius: var(--radius);
       padding: 20px;
       margin-top: 20px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--card-border);
     }
 
     .progress-card {
@@ -476,7 +457,7 @@
 
     .ring .bg {
       fill: none;
-      stroke: rgba(255, 255, 255, 0.3);
+      stroke: var(--card-border);
       stroke-width: 10;
     }
 
@@ -530,24 +511,12 @@
 </head>
 
 <body>
-  <!-- Dark Mode Toggle Button -->
-  <button class="dark-mode-toggle" id="darkModeToggle" aria-label="Toggle dark mode">
-    <svg id="sunIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-      <path d="M12 18C8.68629 18 6 15.3137 6 12C6 8.68629 8.68629 6 12 6C15.3137 6 18 8.68629 18 12C18 15.3137 15.3137 18 12 18ZM12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16ZM11 1H13V4H11V1ZM11 20H13V23H11V20ZM3.51472 4.92893L4.92893 3.51472L7.05025 5.63604L5.63604 7.05025L3.51472 4.92893ZM16.9497 18.364L18.364 16.9497L20.4853 19.0711L19.0711 20.4853L16.9497 18.364ZM19.0711 3.51472L20.4853 4.92893L18.364 7.05025L16.9497 5.63604L19.0711 3.51472ZM5.63604 16.9497L7.05025 18.364L4.92893 20.4853L3.51472 19.0711L5.63604 16.9497ZM23 11V13H20V11H23ZM4 11V13H1V11H4Z"/>
-    </svg>
-    <svg id="moonIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: none;">
-      <path d="M10 7C10 10.866 13.134 14 17 14C18.9584 14 20.729 13.1957 21.9995 11.8995C22 11.933 22 11.9665 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C12.0335 2 12.067 2 12.1005 2.00049C10.8043 3.27098 10 5.04157 10 7ZM4 12C4 16.4183 7.58172 20 12 20C15.0583 20 17.7158 18.2839 19.062 15.7621C18.3945 15.9187 17.7035 16 17 16C12.0294 16 8 11.9706 8 7C8 6.29648 8.08133 5.60547 8.2379 4.938C5.71611 6.28423 4 8.9417 4 12Z"/>
-    </svg>
-  </button>
-
   <header>
-    <img src="images/logo.png" alt="ExpenseWise Logo" class="site-logo">
-    <h1>ExpenseWise</h1>
-    <div style="margin-left: auto; display: flex; align-items: center; gap: 12px;">
-      <img id="userAvatar" src="" alt="User" style="width: 36px; height: 36px; border-radius: 50%; display: none; object-fit: cover; border: 2px solid var(--accent);">
-      <span id="userNameDisplay" style="color: var(--muted); font-size: 0.9rem;"></span>
-      <button id="logoutBtn" class="btn" style="padding: 8px 16px; font-size: 0.9rem; background: linear-gradient(90deg, #dc2626, #ef4444);">Logout</button>
+    <div class="header-left">
+      <img src="images/logo.png" alt="ExpenseWise Logo" class="site-logo">
+      <h1>ExpenseWise</h1>
     </div>
+    <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
   </header>
   <main>
     <h2>
@@ -593,7 +562,7 @@ function autoCalculateAndSave() {
       misc: misc,
       total: total
     };
-    UserDataManager.setItem(`expense_${date}`, JSON.stringify(expenseData));
+    localStorage.setItem(`expense_${date}`, JSON.stringify(expenseData));
     
     // Show daily summary
     document.getElementById('dailySummary').innerHTML = `<p><strong>${date}</strong> - Total: ₹${total}</p>`;
@@ -615,7 +584,7 @@ window.addEventListener('load', function() {
   document.getElementById('budgetDate').value = todayStr;
 
   // Load saved data for today if exists
-  const savedData = UserDataManager.getItem(`expense_${todayStr}`);
+  const savedData = localStorage.getItem(`expense_${todayStr}`);
   if (savedData) {
     const data = JSON.parse(savedData);
     document.getElementById('food').value = data.food || '';
@@ -630,7 +599,7 @@ window.addEventListener('load', function() {
 
 // Update calculations when date changes
 document.getElementById('budgetDate').addEventListener('change', function() {
-  const savedData = UserDataManager.getItem(`expense_${this.value}`);
+  const savedData = localStorage.getItem(`expense_${this.value}`);
   if (savedData) {
     const data = JSON.parse(savedData);
     document.getElementById('food').value = data.food || '';
@@ -686,25 +655,27 @@ document.addEventListener('DOMContentLoaded', function(){
         const tbody = document.createElement('tbody');
         let monthlyTotal = 0;
         
-        // Get all expenses from user-specific localStorage
-        const expenseKeys = UserDataManager.getKeys('expense_');
-        expenseKeys.forEach(key => {
-          try {
-            const data = JSON.parse(localStorage.getItem(key));
-            const row = document.createElement('tr');
-            row.innerHTML = `
-              <td>${data.date}</td>
-              <td>₹${data.food}</td>
-              <td>₹${data.travel}</td>
-              <td>₹${data.misc}</td>
-              <td>₹${data.total}</td>
-            `;
-            tbody.appendChild(row);
-            monthlyTotal += data.total;
-          } catch (err) {
-            console.error('Error parsing expense data:', err);
+        // Get all expenses from localStorage
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key.startsWith('expense_')) {
+            try {
+              const data = JSON.parse(localStorage.getItem(key));
+              const row = document.createElement('tr');
+              row.innerHTML = `
+                <td>${data.date}</td>
+                <td>₹${data.food}</td>
+                <td>₹${data.travel}</td>
+                <td>₹${data.misc}</td>
+                <td>₹${data.total}</td>
+              `;
+              tbody.appendChild(row);
+              monthlyTotal += data.total;
+            } catch (err) {
+              console.error('Error parsing expense data:', err);
+            }
           }
-        });
+        }
         
         table.appendChild(tbody);
         
@@ -771,8 +742,33 @@ document.addEventListener('DOMContentLoaded', function(){
     function clearAllData() {
       if (!confirm('Are you sure you want to clear ALL saved expense data from this app? This cannot be undone.')) return;
 
-      // Clear all user-specific data
-      UserDataManager.clearUserData();
+      const prefixes = [
+        'foodExpenses_',
+        'travelExpenses_',
+        'vacationExpenses_',
+        'entertainmentExpenses_',
+        'emiExpenses_',
+        'expense_' // daily budget entries
+      ];
+
+      let deletedCount = 0;
+
+      // Remove matching prefixed keys and the futureExpenses key
+      Object.keys(localStorage).forEach(key => {
+        if (key === 'futureExpenses') {
+          localStorage.removeItem(key);
+          deletedCount++;
+          return;
+        }
+
+        for (const p of prefixes) {
+          if (key.startsWith(p)) {
+            localStorage.removeItem(key);
+            deletedCount++;
+            break;
+          }
+        }
+      });
 
       // Clear UI elements on the home page
       const ds = document.getElementById('dailySummary');
@@ -792,7 +788,7 @@ document.addEventListener('DOMContentLoaded', function(){
         try { buildCombinedTable(); } catch (e) { /* ignore */ }
       }
 
-      alert('Successfully cleared all saved records.');
+      alert(`Successfully cleared ${deletedCount} saved records.`);
     }
 
     // Expose globally for inline onclick
@@ -869,55 +865,59 @@ document.addEventListener('DOMContentLoaded', function(){
         return isNaN(n) ? 0 : n;
       };
 
-      // Scan user-specific localStorage for each category
-      for (const category in categoryPrefixes) {
-        const prefix = categoryPrefixes[category];
-        const keys = UserDataManager.getKeys(prefix);
-        
-        keys.forEach(key => {
-          // Parse data
-          let data;
-          try { data = JSON.parse(localStorage.getItem(key) || 'null'); } catch { data = null; }
-          if (!data) return;
+      // Scan localStorage once
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key) continue;
 
-          // Determine month key (supports legacy daily keys and new monthly keys)
-          let monthKey = '';
-          if (typeof data.date === 'string' && data.date.length >= 7) {
-            monthKey = data.date.substring(0,7);
-          } else {
-            // fallback from key suffix - extract after user prefix
-            const userPrefix = UserDataManager.getUserKey('');
-            const cleanKey = key.replace(userPrefix, '');
-            monthKey = cleanKey.slice(prefix.length, prefix.length + 7);
+        // Identify category
+        let category = null;
+        for (const c in categoryPrefixes) {
+          if (key.startsWith(categoryPrefixes[c])) { category = c; break; }
+        }
+        if (!category) continue;
+
+        // Parse data
+        let data;
+        try { data = JSON.parse(localStorage.getItem(key) || 'null'); } catch { data = null; }
+        if (!data) continue;
+
+        // Determine month key (supports legacy daily keys and new monthly keys)
+        let monthKey = '';
+        if (typeof data.date === 'string' && data.date.length >= 7) {
+          monthKey = data.date.substring(0,7);
+        } else {
+          // fallback from key suffix
+          const prefix = categoryPrefixes[category];
+          monthKey = key.slice(prefix.length, prefix.length + 7);
+        }
+        if (!/^[0-9]{4}-[0-9]{2}$/.test(monthKey)) continue;
+
+        const bucket = ensureMonth(monthKey);
+
+        // Sum category totals by their fields
+        switch (category) {
+          case 'food': {
+            const total = safeNum(data.groceries) + safeNum(data.drinks) + safeNum(data.dining);
+            bucket.food += total; break;
           }
-          if (!/^[0-9]{4}-[0-9]{2}$/.test(monthKey)) return;
-
-          const bucket = ensureMonth(monthKey);
-
-          // Sum category totals by their fields
-          switch (category) {
-            case 'food': {
-              const total = safeNum(data.groceries) + safeNum(data.drinks) + safeNum(data.dining);
-              bucket.food += total; break;
-            }
-            case 'travel': {
-              const total = safeNum(data.auto) + safeNum(data.bus) + safeNum(data.metro) + safeNum(data.petrol);
-              bucket.travel += total; break;
-            }
-            case 'emi': {
-              const total = safeNum(data.home) + safeNum(data.car) + safeNum(data.edu) + safeNum(data.personal);
-              bucket.emi += total; break;
-            }
-            case 'entertainment': {
-              const total = safeNum(data.movies) + safeNum(data.parties) + safeNum(data.gatherings);
-              bucket.entertainment += total; break;
-            }
-            case 'vacation': {
-              const total = safeNum(data.tickets) + safeNum(data.hostel) + safeNum(data.food) + safeNum(data.traveling);
-              bucket.vacation += total; break;
-            }
+          case 'travel': {
+            const total = safeNum(data.auto) + safeNum(data.bus) + safeNum(data.metro) + safeNum(data.petrol);
+            bucket.travel += total; break;
           }
-        });
+          case 'emi': {
+            const total = safeNum(data.home) + safeNum(data.car) + safeNum(data.edu) + safeNum(data.personal);
+            bucket.emi += total; break;
+          }
+          case 'entertainment': {
+            const total = safeNum(data.movies) + safeNum(data.parties) + safeNum(data.gatherings);
+            bucket.entertainment += total; break;
+          }
+          case 'vacation': {
+            const total = safeNum(data.tickets) + safeNum(data.hostel) + safeNum(data.food) + safeNum(data.traveling);
+            bucket.vacation += total; break;
+          }
+        }
       }
 
       // Build table DOM into existing container
@@ -994,24 +994,27 @@ document.addEventListener('DOMContentLoaded', function(){
     }
 
     // Setup show/hide button just above the table
-    (function(){
+    window.addEventListener('load', function() {
       // Ensure UI and then wire the button
       ensureAllExpensesWrapper();
       const btn = document.getElementById('toggleAllExpenses');
       const container = document.getElementById('all-expenses-container');
-      if (!btn || !container) return;
+      if (!btn || !container) {
+        console.log('Button or container not found');
+        return;
+      }
       btn.addEventListener('click', function(){
         if (container.style.display === 'none' || container.style.display === '') {
           // Build fresh and show
-          try { buildCombinedTable(); } catch (e) {}
-          container.style.display = '';
+          try { buildCombinedTable(); } catch (e) { console.error(e); }
+          container.style.display = 'block';
           this.textContent = 'Hide All Expenses';
         } else {
           container.style.display = 'none';
           this.textContent = 'Show All Expenses (by Month)';
         }
       });
-    })();
+    });
     </script>
 
     <div class="container-compact">
@@ -1050,7 +1053,7 @@ document.addEventListener('DOMContentLoaded', function(){
   const spentEl = document.getElementById('budgetSpent');
   const totalEl = document.getElementById('budgetTotal');
   let spent = 0;
-  let total = parseInt(UserDataManager.getItem('monthlyBudgetTotal') || totalEl.textContent,10) || 40000;
+  let total = parseInt(localStorage.getItem('monthlyBudgetTotal') || totalEl.textContent,10) || 40000;
   totalEl.textContent = total;
 
   function updateRing(){
@@ -1080,7 +1083,7 @@ document.addEventListener('DOMContentLoaded', function(){
       return;
     }
     total = val;
-    UserDataManager.setItem('monthlyBudgetTotal', String(total));
+    localStorage.setItem('monthlyBudgetTotal', String(total));
     totalEl.textContent = total;
     // Clamp spent to new total
     if (spent > total) {
@@ -1092,6 +1095,206 @@ document.addEventListener('DOMContentLoaded', function(){
 
   updateRing();
 })();
+
+// Automatic Session Management and Enhanced Features
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('=== EXPENSE MANAGER INITIALIZATION ===');
+    
+    // Enhanced session validation
+    function validateAndRefreshSession() {
+        const session = localStorage.getItem('expenseWiseSession');
+        if (!session) {
+            console.log('No session found, redirecting to login...');
+            window.location.href = 'login.html';
+            return false;
+        }
+        
+        try {
+            const sessionData = JSON.parse(session);
+            const loginTime = new Date(sessionData.loginTime);
+            const now = new Date();
+            const hoursDiff = (now - loginTime) / (1000 * 60 * 60);
+            
+            console.log('Session age:', hoursDiff.toFixed(1), 'hours');
+            
+            // Auto-refresh session if less than 24 hours old
+            if (hoursDiff < 24) {
+                // Update login time to extend session
+                sessionData.loginTime = now.toISOString();
+                sessionData.lastActivity = now.toISOString();
+                localStorage.setItem('expenseWiseSession', JSON.stringify(sessionData));
+                console.log('Session refreshed automatically');
+                return true;
+            } else if (hoursDiff < 168) { // Less than 7 days
+                // Ask user if they want to continue
+                if (confirm('Your session has expired. Would you like to stay logged in?')) {
+                    sessionData.loginTime = now.toISOString();
+                    sessionData.lastActivity = now.toISOString();
+                    localStorage.setItem('expenseWiseSession', JSON.stringify(sessionData));
+                    console.log('Session extended by user choice');
+                    return true;
+                } else {
+                    localStorage.removeItem('expenseWiseSession');
+                    window.location.href = 'login.html';
+                    return false;
+                }
+            } else {
+                // Session too old, force re-login
+                console.log('Session expired, forcing re-login...');
+                localStorage.removeItem('expenseWiseSession');
+                window.location.href = 'login.html';
+                return false;
+            }
+        } catch (error) {
+            console.error('Session validation error:', error);
+            localStorage.removeItem('expenseWiseSession');
+            window.location.href = 'login.html';
+            return false;
+        }
+    }
+    
+    // Auto-save functionality for expense data
+    function setupAutoSave() {
+        console.log('Setting up auto-save functionality...');
+        
+        // Auto-save every 30 seconds if there are unsaved changes
+        let hasUnsavedChanges = false;
+        let autoSaveInterval;
+        
+        // Mark as having unsaved changes when user types in form fields
+        const formInputs = document.querySelectorAll('input[type="number"], input[type="text"], input[type="date"], select');
+        formInputs.forEach(input => {
+            input.addEventListener('input', function() {
+                hasUnsavedChanges = true;
+                console.log('Detected unsaved changes');
+            });
+        });
+        
+        // Auto-save function
+        function performAutoSave() {
+            if (hasUnsavedChanges) {
+                console.log('Auto-saving data...');
+                
+                // Get current form data
+                const formData = {};
+                formInputs.forEach(input => {
+                    if (input.value) {
+                        formData[input.id || input.name] = input.value;
+                    }
+                });
+                
+                // Save to localStorage with timestamp
+                localStorage.setItem('autoSavedData', JSON.stringify({
+                    data: formData,
+                    savedAt: new Date().toISOString()
+                }));
+                
+                hasUnsavedChanges = false;
+                
+                // Show subtle notification
+                showAutoSaveNotification();
+            }
+        }
+        
+        // Start auto-save interval
+        autoSaveInterval = setInterval(performAutoSave, 30000); // 30 seconds
+        
+        // Save before page unload
+        window.addEventListener('beforeunload', performAutoSave);
+        
+        return autoSaveInterval;
+    }
+    
+    // Show auto-save notification
+    function showAutoSaveNotification() {
+        // Remove existing notification
+        const existing = document.querySelector('.auto-save-notification');
+        if (existing) {
+            existing.remove();
+        }
+        
+        const notification = document.createElement('div');
+        notification.className = 'auto-save-notification';
+        notification.textContent = '💾 Auto-saved';
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(34, 197, 94, 0.9);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Animate in
+        setTimeout(() => {
+            notification.style.opacity = '1';
+            notification.style.transform = 'translateY(0)';
+        }, 100);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            notification.style.transform = 'translateY(-20px)';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+    
+    // Initialize everything
+    if (validateAndRefreshSession()) {
+        console.log('Session valid, initializing automatic features...');
+        
+        // Setup auto-save
+        setupAutoSave();
+        
+        // Add activity tracking
+        let activityTimer;
+        function updateActivity() {
+            const session = JSON.parse(localStorage.getItem('expenseWiseSession'));
+            if (session) {
+                session.lastActivity = new Date().toISOString();
+                localStorage.setItem('expenseWiseSession', JSON.stringify(session));
+            }
+        }
+        
+        // Track user activity
+        ['click', 'keypress', 'scroll', 'mousemove'].forEach(event => {
+            document.addEventListener(event, function() {
+                clearTimeout(activityTimer);
+                activityTimer = setTimeout(updateActivity, 5000); // Update after 5 seconds of activity
+            }, { passive: true });
+        });
+        
+        console.log('All automatic features initialized successfully');
+    }
+});
+
+// Theme toggle functionality
+function toggleTheme() {
+  const currentTheme = document.documentElement.getAttribute('data-theme');
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  
+  document.documentElement.setAttribute('data-theme', newTheme);
+  localStorage.setItem('theme', newTheme);
+  
+  const toggleBtn = document.querySelector('.theme-toggle');
+  toggleBtn.textContent = newTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+}
+
+// Load saved theme
+const savedTheme = localStorage.getItem('theme') || 'light';
+document.documentElement.setAttribute('data-theme', savedTheme);
+const toggleBtn = document.querySelector('.theme-toggle');
+if (toggleBtn) {
+  toggleBtn.textContent = savedTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+}
 </script>
 
   </main>
@@ -1099,92 +1302,6 @@ document.addEventListener('DOMContentLoaded', function(){
   <footer>
     Beware of little expenses. A small leak will sink a great ship.
   </footer>
-
-  <!-- Dark Mode Toggle Script -->
-  <script>
-    // Authentication Check - Must be logged in to access this page
-    (function() {
-      const currentUser = localStorage.getItem('currentUser');
-      if (!currentUser) {
-        window.location.href = 'login.html';
-        return;
-      }
-
-      // Display user name and avatar in header
-      try {
-        const user = JSON.parse(currentUser);
-        const userNameDisplay = document.getElementById('userNameDisplay');
-        const userAvatar = document.getElementById('userAvatar');
-        
-        if (userNameDisplay && user.name) {
-          userNameDisplay.textContent = `Welcome, ${user.name}`;
-        } else if (userNameDisplay && user.email) {
-          userNameDisplay.textContent = `Welcome, ${user.email.split('@')[0]}`;
-        }
-
-        // Display avatar if Google account
-        if (userAvatar && user.picture) {
-          userAvatar.src = user.picture;
-          userAvatar.style.display = 'block';
-        } else if (userAvatar && user.name) {
-          // Generate avatar for non-Google accounts
-          const name = user.name || user.email.split('@')[0];
-          userAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0ea5a4&color=fff&size=80`;
-          userAvatar.style.display = 'block';
-        }
-      } catch (e) {
-        console.error('Error parsing user data:', e);
-      }
-
-      // Logout functionality
-      const logoutBtn = document.getElementById('logoutBtn');
-      if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-          if (confirm('Are you sure you want to logout?')) {
-            // Clear current user session
-            localStorage.removeItem('currentUser');
-            
-            // Create logout event that other pages can listen to
-            localStorage.setItem('logoutEvent', Date.now().toString());
-            
-            // Redirect to login
-            window.location.href = 'login.html';
-          }
-        });
-      }
-    })();
-
-    // Dark mode toggle
-    (function() {
-      const darkModeToggle = document.getElementById('darkModeToggle');
-      const sunIcon = document.getElementById('sunIcon');
-      const moonIcon = document.getElementById('moonIcon');
-      const body = document.body;
-
-      // Check for saved dark mode preference
-      const darkMode = localStorage.getItem('darkMode');
-      if (darkMode === 'enabled') {
-        body.classList.add('dark-mode');
-        sunIcon.style.display = 'none';
-        moonIcon.style.display = 'block';
-      }
-
-      // Toggle dark mode
-      darkModeToggle.addEventListener('click', () => {
-        body.classList.toggle('dark-mode');
-        
-        if (body.classList.contains('dark-mode')) {
-          localStorage.setItem('darkMode', 'enabled');
-          sunIcon.style.display = 'none';
-          moonIcon.style.display = 'block';
-        } else {
-          localStorage.setItem('darkMode', 'disabled');
-          sunIcon.style.display = 'block';
-          moonIcon.style.display = 'none';
-        }
-      });
-    })();
-  </script>
 </body>
 
 </html>
