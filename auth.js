@@ -107,7 +107,7 @@ class AuthManager {
     showUserInfo() {
         const user = this.getCurrentUser();
         if (user) {
-            console.log('Logged in as:', user.fullName, '(' + user.email + ')');
+            console.log('Logged in as:', user.fullName, '(@' + (user.username || user.email) + ')');
             
             // Add welcome message to page if there's a suitable container
             const welcomeContainer = document.querySelector('.user-welcome') || document.querySelector('main');
@@ -125,7 +125,7 @@ class AuthManager {
                 `;
                 userInfo.innerHTML = `
                     <strong>Welcome back, ${user.fullName}!</strong>
-                    <span style="color: var(--muted); margin-left: 8px;">${user.email}</span>
+                    <span style="color: var(--muted); margin-left: 8px;">@${user.username || user.email}</span>
                 `;
                 welcomeContainer.insertBefore(userInfo, welcomeContainer.firstChild);
             }

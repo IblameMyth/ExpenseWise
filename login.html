@@ -194,6 +194,261 @@
             text-decoration: underline;
         }
 
+        /* Account Management Styles */
+        .account-management {
+            margin-top: 16px;
+            text-align: center;
+        }
+
+        .switch-btn {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
+        }
+
+        .switch-btn:hover {
+            background: linear-gradient(135deg, #4338ca, #6d28d9);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3);
+        }
+
+        .account-list {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        .account-modal {
+            background: var(--card);
+            border-radius: 8px;
+            padding: 20px;
+            width: 100%;
+            max-width: 360px;
+            max-height: 70vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: slideIn 0.2s ease;
+        }
+
+        @keyframes slideIn {
+            from { 
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes slideOut {
+            from { 
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            to { 
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+        }
+
+        .account-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 8px;
+        }
+
+        .account-list-header h3 {
+            margin: 0;
+            color: var(--text);
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--muted);
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .account-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .account-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #4f46e5;
+        }
+
+        .account-info {
+            flex: 1;
+            text-align: left;
+        }
+
+        .account-username {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 2px;
+            font-size: 14px;
+        }
+
+        .account-name {
+            color: var(--muted);
+            font-size: 11px;
+            opacity: 0.8;
+        }
+
+        .account-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .select-account-btn {
+            background: #059669;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .select-account-btn:hover {
+            background: #047857;
+            transform: translateY(-1px);
+        }
+
+        .delete-account-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .delete-account-btn:hover {
+            background: #b91c1c;
+            transform: translateY(-1px);
+        }
+
+        .delete-all-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 12px;
+            width: 100%;
+            transition: all 0.2s ease;
+        }
+
+        .delete-all-btn:hover {
+            background: #b91c1c;
+            transform: translateY(-1px);
+        }
+
+        .no-accounts {
+            text-align: center;
+            color: var(--muted);
+            padding: 24px 16px;
+            font-style: italic;
+            font-size: 13px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 6px;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .no-accounts::before {
+            content: '📭';
+            display: block;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 480px) {
+            .account-modal {
+                max-width: 320px;
+                padding: 16px;
+            }
+            
+            .account-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 8px;
+                padding: 10px;
+            }
+            
+            .account-actions {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
         .error-message {
             background: rgba(239, 68, 68, 0.1);
             color: var(--error);
@@ -260,8 +515,8 @@
             </div>
 
             <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Enter your username" required>
             </div>
 
             <div class="form-group">
@@ -285,6 +540,27 @@
         <div class="toggle-form">
             <span id="toggle-text">Don't have an account?</span>
             <a href="#" class="toggle-link" id="toggle-link" onclick="toggleForm()">Sign Up</a>
+        </div>
+
+        <!-- Switch Account Section -->
+        <div class="account-management">
+            <button type="button" id="switch-account-btn" class="switch-btn">
+                🔄 Switch Account
+            </button>
+            <div id="account-list" class="account-list" style="display: none;">
+                <div class="account-modal">
+                    <div class="account-list-header">
+                        <h3>Available Accounts</h3>
+                        <button type="button" id="close-account-list" class="close-btn">✕</button>
+                    </div>
+                    <div id="accounts-container" class="accounts-container">
+                        <!-- Accounts will be loaded here -->
+                    </div>
+                    <div class="account-actions">
+                        <button type="button" id="delete-all-accounts" class="delete-all-btn">🗑️ Delete All Accounts</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -505,13 +781,13 @@
             console.log('=== FORM SUBMIT EVENT TRIGGERED ===');
             
             // IMMEDIATE FIX: Direct signin logic
-            const email = document.getElementById('email').value.trim();
+            const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value.trim();
             const rememberMe = document.getElementById('rememberMe').checked;
 
-            console.log('Email:', email, 'Password length:', password.length);
+            console.log('Username:', username, 'Password length:', password.length);
 
-            if (!email || !password) {
+            if (!username || !password) {
                 showError('Please fill in all required fields');
                 return;
             }
@@ -543,21 +819,21 @@
                 // Check for existing user safely
                 let userExists = false;
                 for (let i = 0; i < existingUsers.length; i++) {
-                    if (existingUsers[i].email === email) {
+                    if (existingUsers[i].username === username) {
                         userExists = true;
                         break;
                     }
                 }
                 
                 if (userExists) {
-                    showError('Account already exists');
+                    showError('Username already exists');
                     return;
                 }
 
                 const newUser = {
                     id: Date.now(),
                     fullName: fullName,
-                    email: email,
+                    username: username,
                     password: password,
                     createdAt: new Date().toISOString()
                 };
@@ -570,7 +846,7 @@
                 showSuccess('Account created! Please sign in.');
                 setTimeout(() => {
                     toggleForm();
-                    document.getElementById('email').value = email;
+                    document.getElementById('username').value = username;
                 }, 2000);
 
             } else {
@@ -595,7 +871,7 @@
                 // Find user safely
                 let user = null;
                 for (let i = 0; i < users.length; i++) {
-                    if (users[i].email === email && users[i].password === password) {
+                    if (users[i].username === username && users[i].password === password) {
                         user = users[i];
                         break;
                     }
@@ -609,7 +885,7 @@
                 // Create session immediately
                 const sessionData = {
                     userId: user.id,
-                    email: user.email,
+                    username: user.username,
                     fullName: user.fullName,
                     loginTime: new Date().toISOString()
                 };
@@ -618,8 +894,8 @@
 
                 // Handle remember me
                 if (rememberMe) {
-                    localStorage.setItem('rememberedUser', JSON.stringify({email: email}));
-                    localStorage.setItem('savedCredentials_' + email, JSON.stringify({
+                    localStorage.setItem('rememberedUser', JSON.stringify({username: username}));
+                    localStorage.setItem('savedCredentials_' + username, JSON.stringify({
                         password: password,
                         savedAt: new Date().toISOString()
                     }));
@@ -635,15 +911,15 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, setting up additional listeners...');
             
-            // SIMPLIFIED: Just check for remembered email, no auto-login
+            // SIMPLIFIED: Just check for remembered username, no auto-login
             const rememberedUser = localStorage.getItem('rememberedUser');
             if (rememberedUser) {
                 try {
                     const userInfo = JSON.parse(rememberedUser);
-                    const emailField = document.getElementById('email');
-                    if (emailField) {
-                        emailField.value = userInfo.email;
-                        console.log('Pre-filled remembered email:', userInfo.email);
+                    const usernameField = document.getElementById('username');
+                    if (usernameField) {
+                        usernameField.value = userInfo.username;
+                        console.log('Pre-filled remembered username:', userInfo.username);
                     }
                     
                     // Check remember me checkbox
@@ -681,7 +957,7 @@
             if (existingUsers.length > 0) {
                 console.log('Available users:');
                 existingUsers.forEach((user, index) => {
-                    console.log(`${index + 1}. Email: ${user.email}, Name: ${user.fullName}`);
+                    console.log(`${index + 1}. Username: ${user.username}, Name: ${user.fullName}`);
                 });
             } else {
                 console.log('No users found. Creating default test user...');
@@ -689,7 +965,7 @@
                 const defaultUser = {
                     id: Date.now(),
                     fullName: 'Test User',
-                    email: '12345@gmail.com',
+                    username: 'testuser',
                     password: '123456',
                     createdAt: new Date().toISOString()
                 };
@@ -697,7 +973,7 @@
                 // Initialize as array and add user
                 existingUsers = [defaultUser];
                 localStorage.setItem('expenseWiseUsers', JSON.stringify(existingUsers));
-                console.log('Default user created: 12345@gmail.com / 123456');
+                console.log('Default user created: testuser / 123456');
             }
             
             const submitBtn = document.getElementById('submit-btn');
@@ -720,7 +996,225 @@
 
             console.log('All event listeners set up successfully');
 
+            // ACCOUNT MANAGEMENT FUNCTIONALITY
+            setupAccountManagement();
         });
+
+        // Account Management Functions
+        function setupAccountManagement() {
+            const switchBtn = document.getElementById('switch-account-btn');
+            const accountList = document.getElementById('account-list');
+            const closeBtn = document.getElementById('close-account-list');
+            const deleteAllBtn = document.getElementById('delete-all-accounts');
+
+            // Show account list
+            if (switchBtn) {
+                switchBtn.addEventListener('click', function() {
+                    showAccountList();
+                });
+            }
+
+            // Close account list
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function() {
+                    hideAccountList();
+                });
+            }
+
+            // Delete all accounts
+            if (deleteAllBtn) {
+                deleteAllBtn.addEventListener('click', function() {
+                    if (confirm('⚠️ Are you sure you want to delete ALL accounts?\n\nThis action cannot be undone and will:\n• Remove all user accounts\n• Clear all sessions\n• Delete all saved credentials\n\nProceed with deletion?')) {
+                        localStorage.removeItem('expenseWiseUsers');
+                        localStorage.removeItem('expenseWiseSession');
+                        localStorage.removeItem('rememberedUser');
+                        
+                        // Clear all saved credentials
+                        const keys = Object.keys(localStorage);
+                        keys.forEach(key => {
+                            if (key.startsWith('savedCredentials_')) {
+                                localStorage.removeItem(key);
+                            }
+                        });
+
+                        showSuccess('🗑️ All accounts deleted successfully!');
+                        setTimeout(() => {
+                            hideAccountList();
+                            setTimeout(() => location.reload(), 500);
+                        }, 1500);
+                    }
+                });
+            }
+
+            // Close on background click
+            if (accountList) {
+                accountList.addEventListener('click', function(e) {
+                    if (e.target === accountList) {
+                        hideAccountList();
+                    }
+                });
+            }
+
+            // Close on Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && accountList.style.display === 'flex') {
+                    hideAccountList();
+                }
+            });
+        }
+
+        function showAccountList() {
+            const accountList = document.getElementById('account-list');
+            const accountsContainer = document.getElementById('accounts-container');
+            
+            // Get all users
+            let users = [];
+            const storedUsers = localStorage.getItem('expenseWiseUsers');
+            if (storedUsers) {
+                try {
+                    const parsed = JSON.parse(storedUsers);
+                    if (Array.isArray(parsed)) {
+                        users = parsed;
+                    }
+                } catch (error) {
+                    users = [];
+                }
+            }
+
+            // Clear container
+            accountsContainer.innerHTML = '';
+
+            if (users.length === 0) {
+                accountsContainer.innerHTML = '<div class="no-accounts">No accounts found<br><small>Create an account to get started</small></div>';
+            } else {
+                users.forEach((user) => {
+                    const accountItem = document.createElement('div');
+                    accountItem.className = 'account-item';
+                    accountItem.innerHTML = `
+                        <div class="account-info">
+                            <div class="account-username">@${user.username}</div>
+                            <div class="account-name">${user.fullName}</div>
+                        </div>
+                        <div class="account-actions">
+                            <button class="select-account-btn" onclick="selectAccount('${user.username}')">
+                                Select
+                            </button>
+                            <button class="delete-account-btn" onclick="deleteAccount('${user.username}')">
+                                Delete
+                            </button>
+                        </div>
+                    `;
+                    accountsContainer.appendChild(accountItem);
+                });
+            }
+
+            accountList.style.display = 'flex';
+            // Prevent body scroll when modal is open
+            document.body.style.overflow = 'hidden';
+        }
+
+        function hideAccountList() {
+            const accountList = document.getElementById('account-list');
+            const modal = accountList.querySelector('.account-modal');
+            
+            // Quick exit animation
+            if (modal) {
+                modal.style.animation = 'slideOut 0.2s ease';
+            }
+            accountList.style.animation = 'fadeOut 0.2s ease';
+            
+            setTimeout(() => {
+                accountList.style.display = 'none';
+                accountList.style.animation = '';
+                if (modal) {
+                    modal.style.animation = '';
+                }
+                // Restore body scroll
+                document.body.style.overflow = '';
+            }, 200);
+        }
+
+        // Global functions for account actions
+        window.selectAccount = function(username) {
+            const usernameField = document.getElementById('username');
+            if (usernameField) {
+                usernameField.value = username;
+            }
+
+            // Close account list
+            hideAccountList();
+            
+            // Switch to signin mode if in signup
+            if (isSignUp) {
+                toggleForm();
+            }
+
+            showSuccess(`Switched to @${username}`);
+            
+            // Focus on password field for convenience
+            setTimeout(() => {
+                const passwordField = document.getElementById('password');
+                if (passwordField) {
+                    passwordField.focus();
+                }
+            }, 100);
+        };
+
+        window.deleteAccount = function(username) {
+            // Enhanced confirmation dialog
+            const confirmMessage = `🗑️ Delete Account Confirmation\n\n` +
+                `Username: @${username}\n\n` +
+                `This will permanently delete:\n` +
+                `• Account data\n` +
+                `• Saved credentials\n` +
+                `• All related information\n\n` +
+                `Are you sure you want to continue?`;
+                
+            if (confirm(confirmMessage)) {
+                let users = [];
+                const storedUsers = localStorage.getItem('expenseWiseUsers');
+                if (storedUsers) {
+                    try {
+                        const parsed = JSON.parse(storedUsers);
+                        if (Array.isArray(parsed)) {
+                            users = parsed;
+                        }
+                    } catch (error) {
+                        users = [];
+                    }
+                }
+
+                // Remove user from array
+                const updatedUsers = [];
+                for (let i = 0; i < users.length; i++) {
+                    if (users[i].username !== username) {
+                        updatedUsers[updatedUsers.length] = users[i];
+                    }
+                }
+
+                localStorage.setItem('expenseWiseUsers', JSON.stringify(updatedUsers));
+                
+                // Remove saved credentials for this user
+                localStorage.removeItem('savedCredentials_' + username);
+                
+                // If this was the remembered user, clear that too
+                const rememberedUser = localStorage.getItem('rememberedUser');
+                if (rememberedUser) {
+                    try {
+                        const userInfo = JSON.parse(rememberedUser);
+                        if (userInfo.username === username) {
+                            localStorage.removeItem('rememberedUser');
+                        }
+                    } catch (error) {
+                        // Ignore error
+                    }
+                }
+
+                showSuccess(`🗑️ Account "@${username}" deleted successfully!`);
+                showAccountList(); // Refresh the list
+            }
+        };
+
     </script>
 </body>
 </html>
