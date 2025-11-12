@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="auth.js"></script>
+  <script src="expense-utils.js"></script>
   <style>
     :root {
       --bg: #f8fafc;
@@ -516,7 +517,10 @@
       <img src="images/logo.png" alt="ExpenseWise Logo" class="site-logo">
       <h1>ExpenseWise</h1>
     </div>
-    <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <button onclick="window.location.href='welcome.html'" style="background: var(--accent); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px;">🏠 Home</button>
+      <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
+    </div>
   </header>
   <main>
     <h2>
@@ -554,7 +558,13 @@ function autoCalculateAndSave() {
   const date = document.getElementById('budgetDate').value;
 
   if (date) {  // Only save if date is selected
-    // Save to localStorage with unique key for each date
+    // Save to localStorage with user-specific key
+    const user = getCurrentUser();
+    if (!user) {
+      alert('Please log in to save expenses');
+      return;
+    }
+
     const expenseData = {
       date: date,
       food: food,
@@ -562,13 +572,17 @@ function autoCalculateAndSave() {
       misc: misc,
       total: total
     };
-    localStorage.setItem(`expense_${date}`, JSON.stringify(expenseData));
     
-    // Show daily summary
-    document.getElementById('dailySummary').innerHTML = `<p><strong>${date}</strong> - Total: ₹${total}</p>`;
-    
-    // Update the table
-    loadMonthlyData();
+    const userExpenseKey = getUserExpenseKey(date);
+    if (userExpenseKey) {
+      localStorage.setItem(userExpenseKey, JSON.stringify(expenseData));
+      
+      // Show daily summary
+      document.getElementById('dailySummary').innerHTML = `<p><strong>${date}</strong> - Total: ₹${total}</p>`;
+      
+      // Update the table
+      loadMonthlyData();
+    }
   }
 }
 
@@ -583,14 +597,20 @@ window.addEventListener('load', function() {
   // Set today's date in the date input
   document.getElementById('budgetDate').value = todayStr;
 
-  // Load saved data for today if exists
-  const savedData = localStorage.getItem(`expense_${todayStr}`);
-  if (savedData) {
-    const data = JSON.parse(savedData);
-    document.getElementById('food').value = data.food || '';
-    document.getElementById('travel').value = data.travel || '';
-    document.getElementById('misc').value = data.misc || '';
-    document.getElementById('dailySummary').innerHTML = `<p><strong>${data.date}</strong> - Total: ₹${data.total}</p>`;
+  // Load saved data for today if exists (user-specific)
+  const user = getCurrentUser();
+  if (user) {
+    const userExpenseKey = getUserExpenseKey(todayStr);
+    if (userExpenseKey) {
+      const savedData = localStorage.getItem(userExpenseKey);
+      if (savedData) {
+        const data = JSON.parse(savedData);
+        document.getElementById('food').value = data.food || '';
+        document.getElementById('travel').value = data.travel || '';
+        document.getElementById('misc').value = data.misc || '';
+        document.getElementById('dailySummary').innerHTML = `<p><strong>${data.date}</strong> - Total: ₹${data.total}</p>`;
+      }
+    }
   }
 
   // Load monthly data table
@@ -633,8 +653,31 @@ document.addEventListener('DOMContentLoaded', function(){
     </form>
     <ul id="futureList"></ul>
     <script>
+    // User-specific data management
+    function getCurrentUser() {
+      const session = localStorage.getItem('expenseWiseSession');
+      return session ? JSON.parse(session) : null;
+    }
+
+    function getUserDataKey(baseKey) {
+      const user = getCurrentUser();
+      if (!user) return null;
+      return `${baseKey}_${user.username || user.userId}`;
+    }
+
+    function getUserExpenseKey(date) {
+      const user = getCurrentUser();
+      if (!user) return null;
+      // Use enhanced isolation key format
+      const namespace = `USER_${user.username || 'user'}_${user.userId || Date.now()}_EXPENSES`;
+      return `${namespace}_DAILY_${date}`;
+    }
+
       // Function to load daily budget entries table near the form
       function loadMonthlyData() {
+        const currentUser = getCurrentUser();
+        if (!currentUser) return; // No user logged in
+
         const table = document.createElement('table');
         table.className = 'expense-table';
         
@@ -655,10 +698,11 @@ document.addEventListener('DOMContentLoaded', function(){
         const tbody = document.createElement('tbody');
         let monthlyTotal = 0;
         
-        // Get all expenses from localStorage
+        // Get user-specific expenses from localStorage
+        const userPrefix = `USER_${currentUser.username || 'user'}_${currentUser.userId || Date.now()}_EXPENSES_DAILY_`;
         for (let i = 0; i < localStorage.length; i++) {
           const key = localStorage.key(i);
-          if (key.startsWith('expense_')) {
+          if (key && key.startsWith(userPrefix)) {
             try {
               const data = JSON.parse(localStorage.getItem(key));
               const row = document.createElement('tr');
@@ -740,22 +784,30 @@ document.addEventListener('DOMContentLoaded', function(){
     <script>
     // Clear all application data from localStorage (used by "Clear All Data" button)
     function clearAllData() {
-      if (!confirm('Are you sure you want to clear ALL saved expense data from this app? This cannot be undone.')) return;
+      const currentUser = getCurrentUser();
+      if (!currentUser) {
+        alert('Please log in to clear data');
+        return;
+      }
 
+      if (!confirm('Are you sure you want to clear ALL your saved expense data? This cannot be undone.')) return;
+
+      const userNamespace = `USER_${currentUser.username || 'user'}_${currentUser.userId || Date.now()}_EXPENSES`;
       const prefixes = [
-        'foodExpenses_',
-        'travelExpenses_',
-        'vacationExpenses_',
-        'entertainmentExpenses_',
-        'emiExpenses_',
-        'expense_' // daily budget entries
+        `${userNamespace}_FOOD`,
+        `${userNamespace}_TRAVEL`,
+        `${userNamespace}_VACATION`,
+        `${userNamespace}_ENTERTAINMENT`,
+        `${userNamespace}_EMI`,
+        `${userNamespace}_DAILY` // daily budget entries
       ];
 
       let deletedCount = 0;
 
-      // Remove matching prefixed keys and the futureExpenses key
+      // Remove user-specific keys
       Object.keys(localStorage).forEach(key => {
-        if (key === 'futureExpenses') {
+        // Future expenses are user-specific too
+        if (key === `futureExpenses_${currentUser.username || currentUser.userId}`) {
           localStorage.removeItem(key);
           deletedCount++;
           return;

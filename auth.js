@@ -1,13 +1,148 @@
-// Authentication Manager for ExpenseWise
+// Authentication Manager for ExpenseWise with Device-Specific Security
 class AuthManager {
     constructor() {
+        this.deviceId = null;
         this.init();
     }
 
+    // Generate unique device fingerprint
+    generateDeviceFingerprint() {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.textBaseline = 'top';
+        ctx.font = '14px Arial';
+        ctx.fillText('Device fingerprint', 2, 2);
+        
+        const fingerprint = [
+            navigator.userAgent,
+            navigator.language,
+            screen.width + 'x' + screen.height,
+            screen.colorDepth,
+            new Date().getTimezoneOffset(),
+            navigator.hardwareConcurrency || 'unknown',
+            navigator.platform,
+            canvas.toDataURL()
+        ].join('|');
+        
+        // Create a simple hash
+        let hash = 0;
+        for (let i = 0; i < fingerprint.length; i++) {
+            const char = fingerprint.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash; // Convert to 32bit integer
+        }
+        return Math.abs(hash).toString(16);
+    }
+
+    // Get or create device ID
+    getDeviceId() {
+        if (this.deviceId) return this.deviceId;
+        
+        let deviceId = localStorage.getItem('deviceFingerprint');
+        if (!deviceId) {
+            deviceId = this.generateDeviceFingerprint();
+            localStorage.setItem('deviceFingerprint', deviceId);
+            console.log('New device detected, generated device ID:', deviceId);
+        }
+        
+        this.deviceId = deviceId;
+        return deviceId;
+    }
+
+    // Check if this is a new device
+    isNewDevice() {
+        const currentDeviceId = this.generateDeviceFingerprint();
+        const storedDeviceId = localStorage.getItem('deviceFingerprint');
+        
+        if (!storedDeviceId || currentDeviceId !== storedDeviceId) {
+            console.log('Device change detected!');
+            this.clearAllDeviceData();
+            return true;
+        }
+        return false;
+    }
+
+    // Clear all device-specific data when device changes
+    clearAllDeviceData() {
+        const keysToRemove = [];
+        
+        // Find all device-specific keys
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && (
+                key.startsWith('expenseWiseUsers_') ||
+                key.startsWith('rememberedUser') ||
+                key.startsWith('savedCredentials_') ||
+                key.includes('_DEVICE_') ||
+                key === 'expenseWiseSession'
+            )) {
+                keysToRemove.push(key);
+            }
+        }
+        
+        // Remove device-specific data
+        keysToRemove.forEach(key => {
+            localStorage.removeItem(key);
+        });
+        
+        console.log('Cleared device data for new device, removed', keysToRemove.length, 'items');
+    }
+
     init() {
+        // Check for device changes first
+        this.isNewDevice();
+        this.getDeviceId();
+        
         // Check authentication on page load
         this.checkAuth();
         this.setupLogout();
+        this.setupMultiTabLogout();
+    }
+
+    // Setup multi-tab logout functionality
+    setupMultiTabLogout() {
+        // Listen for storage changes (when session is removed from another tab)
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'expenseWiseSession' && e.newValue === null) {
+                // Session was removed from another tab - redirect to login
+                console.log('Session removed from another tab, redirecting to login...');
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Auto-logout when page/tab is closed or refreshed
+        window.addEventListener('beforeunload', () => {
+            console.log('Tab closing - clearing session for security');
+            localStorage.removeItem('expenseWiseSession');
+        });
+
+        // Also handle page hide (when tab becomes inactive)
+        window.addEventListener('pagehide', () => {
+            console.log('Page hidden - clearing session for security');
+            localStorage.removeItem('expenseWiseSession');
+        });
+
+        // Clear session on visibility change (tab switch)
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') {
+                console.log('Tab hidden - clearing session for security');
+                localStorage.removeItem('expenseWiseSession');
+            }
+        });
+
+        // Also check periodically if session still exists
+        setInterval(() => {
+            if (!this.isLoggedIn() && !this.isLoginPage()) {
+                console.log('Session expired, redirecting to login...');
+                window.location.href = 'login.html';
+            }
+        }, 1000); // Check every 1 second for immediate response
+    }
+
+    // Helper to check if current page is login page
+    isLoginPage() {
+        const currentPage = window.location.pathname.split('/').pop();
+        return currentPage === 'login.html' || currentPage === '';
     }
 
     // Check if user is logged in
@@ -22,21 +157,49 @@ class AuthManager {
         return session ? JSON.parse(session) : null;
     }
 
+    // Get user-specific data key
+    getUserDataKey(baseKey) {
+        const user = this.getCurrentUser();
+        if (!user) return null;
+        return `${baseKey}_${user.username || user.userId}`;
+    }
+
+    // Clear user-specific data when logging out
+    clearUserData() {
+        const user = this.getCurrentUser();
+        if (!user) return;
+
+        const userPrefix = `_${user.username || user.userId}`;
+        const keysToRemove = [];
+
+        // Find all localStorage keys that belong to this user
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.endsWith(userPrefix)) {
+                keysToRemove.push(key);
+            }
+        }
+
+        // Remove user-specific data (optional - only on explicit request)
+        return keysToRemove;
+    }
+
     // Check authentication and redirect if needed
     checkAuth() {
         const currentPage = window.location.pathname.split('/').pop();
-        const isLoginPage = currentPage === 'login.html' || currentPage === '';
+        const isLoginPage = currentPage === 'login.html' || currentPage === '' || currentPage === 'index.html';
         
-        if (!this.isLoggedIn() && !isLoginPage) {
-            // Not logged in and not on login page - redirect to login
+        // ALWAYS require fresh login - force start with login page
+        if (!isLoginPage) {
+            console.log('Forcing login - redirecting to login page');
             window.location.href = 'login.html';
             return false;
         }
 
-        if (this.isLoggedIn() && isLoginPage) {
-            // Logged in but on login page - redirect to main app
-            window.location.href = 'expense_manager_system.html';
-            return false;
+        // If on login page, clear any existing session to force fresh login
+        if (isLoginPage && this.isLoggedIn()) {
+            console.log('Clearing existing session for fresh login');
+            localStorage.removeItem('expenseWiseSession');
         }
 
         return true;
@@ -44,14 +207,23 @@ class AuthManager {
 
     // Logout function
     logout() {
+        // Remove session data - this will trigger storage event in other tabs
         localStorage.removeItem('expenseWiseSession');
         
         // Optionally clear remembered user if they want to logout completely
         if (confirm('Do you want to remove saved login credentials as well?')) {
-            localStorage.removeItem('rememberedUser');
+            const currentUser = this.getCurrentUser();
+            if (currentUser) {
+                const deviceId = this.getDeviceId();
+                localStorage.removeItem(`rememberedUser_DEVICE_${deviceId}`);
+                localStorage.removeItem(`savedCredentials_DEVICE_${deviceId}_${currentUser.username}`);
+            }
         }
         
-        window.location.href = 'login.html';
+        // Add a small delay to ensure storage event is fired
+        setTimeout(() => {
+            window.location.href = 'login.html';
+        }, 100);
     }
 
     // Setup logout button functionality

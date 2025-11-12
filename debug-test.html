@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Test - ExpenseWise</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .test-container {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .log {
+            background: #000;
+            color: #0f0;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 ExpenseWise Debug Test</h1>
+    
+    <div class="test-container">
+        <h2>Navigation Tests</h2>
+        <button onclick="testWelcome()">Test Welcome Page</button>
+        <button onclick="testLogin()">Test Login Page</button>
+        <button onclick="testHome()">Test Home Page</button>
+        <button onclick="testIndex()">Test Index Page</button>
+    </div>
+    
+    <div class="test-container">
+        <h2>Authentication Tests</h2>
+        <button onclick="checkSession()">Check Session</button>
+        <button onclick="createTestUser()">Create Test User</button>
+        <button onclick="testLogin()">Test Login</button>
+        <button onclick="clearStorage()">Clear All Data</button>
+    </div>
+    
+    <div class="test-container">
+        <h2>Debug Log</h2>
+        <div id="log" class="log"></div>
+        <button onclick="clearLog()">Clear Log</button>
+    </div>
+
+    <script>
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `[${timestamp}] ${message}<br>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(message);
+        }
+        
+        function testWelcome() {
+            log('Testing welcome page...');
+            try {
+                window.location.href = 'welcome.html';
+            } catch (e) {
+                log('Error: ' + e.message);
+            }
+        }
+        
+        function testLogin() {
+            log('Testing login page...');
+            try {
+                window.location.href = 'login.html';
+            } catch (e) {
+                log('Error: ' + e.message);
+            }
+        }
+        
+        function testHome() {
+            log('Testing home page...');
+            try {
+                window.location.href = 'expense_manager_system.html';
+            } catch (e) {
+                log('Error: ' + e.message);
+            }
+        }
+        
+        function testIndex() {
+            log('Testing index page...');
+            try {
+                window.location.href = 'index.html';
+            } catch (e) {
+                log('Error: ' + e.message);
+            }
+        }
+        
+        function checkSession() {
+            log('Checking session...');
+            const session = localStorage.getItem('expenseWiseSession');
+            if (session) {
+                try {
+                    const data = JSON.parse(session);
+                    log('Session found: ' + JSON.stringify(data));
+                } catch (e) {
+                    log('Session corrupted: ' + session);
+                }
+            } else {
+                log('No session found');
+            }
+        }
+        
+        function createTestUser() {
+            log('Creating test user...');
+            const users = JSON.parse(localStorage.getItem('expenseWiseUsers') || '[]');
+            const testUser = {
+                username: 'testuser',
+                email: 'test@example.com',
+                password: 'password123',
+                fullName: 'Test User'
+            };
+            
+            // Remove existing test user
+            const filteredUsers = users.filter(u => u.username !== 'testuser');
+            filteredUsers.push(testUser);
+            
+            localStorage.setItem('expenseWiseUsers', JSON.stringify(filteredUsers));
+            log('Test user created: testuser / password123');
+        }
+        
+        function clearStorage() {
+            log('Clearing storage...');
+            localStorage.clear();
+            log('Storage cleared');
+        }
+        
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+        
+        // Initial checks
+        log('=== ExpenseWise Debug Started ===');
+        log('Current URL: ' + window.location.href);
+        log('User Agent: ' + navigator.userAgent);
+        
+        // Check if files exist by trying to fetch them
+        const files = ['welcome.html', 'login.html', 'expense_manager_system.html', 'index.html'];
+        files.forEach(file => {
+            fetch(file)
+                .then(response => {
+                    if (response.ok) {
+                        log(`✓ ${file} accessible`);
+                    } else {
+                        log(`✗ ${file} not accessible (${response.status})`);
+                    }
+                })
+                .catch(error => {
+                    log(`✗ ${file} error: ${error.message}`);
+                });
+        });
+        
+        checkSession();
+    </script>
+</body>
+</html>

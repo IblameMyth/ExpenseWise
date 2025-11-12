@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to ExpenseWise</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --primary: #3b82f6;
+            --accent: #10b981;
+            --text: #ffffff;
+            --muted: #e2e8f0;
+            --card: rgba(30, 41, 59, 0.9);
+            --glass-bg: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.3));
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        .welcome-container {
+            max-width: 1200px;
+            width: 90%;
+            padding: 40px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            animation: slideIn 0.8s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff, #f0f9ff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            animation: glow 2s ease-in-out infinite alternate;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .logo-img {
+            width: 46px;
+            height: 46px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+            animation: logoGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes logoGlow {
+            from {
+                filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 10px rgba(59, 130, 246, 0.3));
+            }
+            to {
+                filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 20px rgba(59, 130, 246, 0.5)) drop-shadow(0 0 30px rgba(16, 185, 129, 0.3));
+            }
+        }
+
+        @keyframes glow {
+            from {
+                filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+            }
+            to {
+                filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 20px rgba(255, 255, 255, 0.5)) drop-shadow(0 0 30px rgba(59, 130, 246, 0.3));
+            }
+        }
+
+        .tagline {
+            font-size: 1.5rem;
+            color: var(--muted);
+            margin-bottom: 3rem;
+            font-weight: 300;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        h1, h2, h3 {
+            color: var(--text) !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+            font-weight: 600;
+        }
+
+        p {
+            color: var(--muted) !important;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .feature-card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text) !important;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+        }
+
+        .feature-desc {
+            color: var(--muted) !important;
+            line-height: 1.6;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .cta-section {
+            margin: 4rem 0 2rem;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--text) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 0, 0, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+            padding: 2rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff, #f0f9ff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+        }
+
+        .stat-label {
+            color: var(--muted) !important;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .footer-text {
+            margin-top: 3rem;
+            color: var(--muted) !important;
+            font-size: 0.9rem;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .welcome-container {
+                width: 95%;
+                padding: 2rem;
+            }
+
+            .logo {
+                font-size: 2.5rem;
+                gap: 0.5rem;
+            }
+
+            .logo-img {
+                width: 23px;
+                height: 23px;
+            }
+
+            .tagline {
+                font-size: 1.2rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(16, 185, 129, 0.1));
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .floating-circle:nth-child(1) {
+            width: 100px;
+            height: 100px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .floating-circle:nth-child(2) {
+            width: 150px;
+            height: 150px;
+            top: 60%;
+            right: 10%;
+            animation-delay: 2s;
+        }
+
+        .floating-circle:nth-child(3) {
+            width: 80px;
+            height: 80px;
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+                opacity: 0.7;
+            }
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-elements">
+        <div class="floating-circle"></div>
+        <div class="floating-circle"></div>
+        <div class="floating-circle"></div>
+    </div>
+
+    <div class="welcome-container">
+        <div class="logo">
+            <img src="images/new-logo.svg" alt="ExpenseWise Logo" class="logo-img">
+            ExpenseWise
+        </div>
+        <div class="tagline">Smart Expense Management for Modern Life</div>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <div class="feature-title">Smart Analytics</div>
+                <div class="feature-desc">Get detailed insights into your spending patterns with beautiful charts and reports</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <div class="feature-title">Secure & Private</div>
+                <div class="feature-desc">Your data stays safe with device-specific encryption and advanced security features</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <div class="feature-title">Multi-Category Tracking</div>
+                <div class="feature-desc">Track expenses across Food, Travel, Entertainment, EMI, Vacation and more</div>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Secure</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">∞</div>
+                <div class="stat-label">Accounts</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">6</div>
+                <div class="stat-label">Categories</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Available</div>
+            </div>
+        </div>
+
+        <div class="cta-section">
+            <h2 style="margin-bottom: 1rem; color: var(--text);">Ready to Take Control of Your Finances?</h2>
+            <p style="color: var(--muted); margin-bottom: 2rem;">Join thousands of users who trust ExpenseWise to manage their expenses</p>
+            
+            <div class="cta-buttons">
+                <a href="login-simple.html" class="btn btn-primary">
+                    🚀 Get Started Now
+                </a>
+                <a href="#features" class="btn btn-secondary" onclick="scrollToFeatures()">
+                    💡 Learn More
+                </a>
+            </div>
+        </div>
+
+        <div class="footer-text">
+            <p>✨ Start managing your expenses smartly today!</p>
+            <p style="margin-top: 1rem; font-size: 0.8rem;">Secure • Fast • Reliable • Free</p>
+        </div>
+    </div>
+
+    <script>
+        // Add smooth scrolling and animations
+        function scrollToFeatures() {
+            document.querySelector('.features').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        }
+
+        // Add some interactive animations
+        document.addEventListener('DOMContentLoaded', function() {
+            const featureCards = document.querySelectorAll('.feature-card');
+            
+            featureCards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.2}s`;
+                card.style.animation = 'slideIn 0.8s ease-out';
+            });
+
+            // Add click effect to buttons
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                });
+            });
+
+            // Add particle effect on mouse move
+            document.addEventListener('mousemove', function(e) {
+                if (Math.random() > 0.98) {
+                    createParticle(e.clientX, e.clientY);
+                }
+            });
+        });
+
+        function createParticle(x, y) {
+            const particle = document.createElement('div');
+            particle.style.cssText = `
+                position: fixed;
+                left: ${x}px;
+                top: ${y}px;
+                width: 4px;
+                height: 4px;
+                background: linear-gradient(135deg, #3b82f6, #10b981);
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 1000;
+                animation: particleFloat 2s ease-out forwards;
+            `;
+            
+            document.body.appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 2000);
+        }
+
+        // Add CSS for particle animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes particleFloat {
+                0% {
+                    opacity: 1;
+                    transform: translate(0, 0) scale(1);
+                }
+                100% {
+                    opacity: 0;
+                    transform: translate(${Math.random() * 100 - 50}px, -50px) scale(0);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Redirect to login after 30 seconds of inactivity (optional)
+        let inactivityTimer;
+        function resetInactivityTimer() {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(() => {
+                // Uncomment below to auto-redirect after 30 seconds
+                // window.location.href = 'login.html';
+            }, 30000);
+        }
+
+        document.addEventListener('mousemove', resetInactivityTimer);
+        document.addEventListener('keypress', resetInactivityTimer);
+        resetInactivityTimer();
+    </script>
+</body>
+</html>

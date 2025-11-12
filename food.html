@@ -6,6 +6,7 @@
     <title>Food</title>
   <link rel="stylesheet" href="styles.css">
   <script src="auth.js"></script>
+  <script src="expense-utils.js"></script>
   <style>
     :root{
       --bg:#f8fafc;
@@ -159,7 +160,11 @@
         <img src="images/logo.png" alt="ExpenseWise Logo" class="site-logo">
         <h1>ExpenseWise</h1>
       </div>
-      <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <button onclick="window.location.href='welcome.html'" style="background: var(--accent); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px;">🏠 Home</button>
+        <button onclick="window.location.href='expense_manager_system.html'" style="background: var(--primary); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px;">📊 Dashboard</button>
+        <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
+      </div>
     </header>
     <main>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -212,8 +217,40 @@
   </div>
 
   <script>
+    // User-specific data management for food expenses
+    function getCurrentUser() {
+      const session = localStorage.getItem('expenseWiseSession');
+      return session ? JSON.parse(session) : null;
+    }
+
+    function getUserFoodKey(monthKey) {
+      const user = getCurrentUser();
+      if (!user) return null;
+      const namespace = `USER_${user.username || 'user'}_${user.userId || Date.now()}_EXPENSES`;
+      return `${namespace}_FOOD_${monthKey}`;
+    }
+
+    function getUserFoodPrefix() {
+      const user = getCurrentUser();
+      if (!user) return null;
+      const namespace = `USER_${user.username || 'user'}_${user.userId || Date.now()}_EXPENSES`;
+      return `${namespace}_FOOD_`;
+    }
+
+    function checkUserAuth() {
+      const user = getCurrentUser();
+      if (!user) {
+        alert('Please log in to access food expenses');
+        window.location.href = 'login.html';
+        return false;
+      }
+      return true;
+    }
+
     // Set current month as default
     window.addEventListener('load', function() {
+      if (!checkUserAuth()) return;
+      
       const today = new Date();
       const month = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
       document.getElementById('expenseMonth').value = month;
@@ -226,16 +263,21 @@
     });
 
     function updateTable() {
+      if (!checkUserAuth()) return;
+      
       const tableBody = document.getElementById('expenseTableBody');
       tableBody.innerHTML = '';
       
       let totalGroceries = 0, totalDrinks = 0, totalDining = 0;
       
-      // Get all food expenses from localStorage
+      // Get user-specific food expenses from localStorage
+      const userPrefix = getUserFoodPrefix();
+      if (!userPrefix) return;
       const expenses = [];
+      
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key.startsWith('foodExpenses_')) {
+        if (key && key.startsWith(userPrefix)) {
           const data = JSON.parse(localStorage.getItem(key));
           expenses.push(data);
         }
@@ -272,13 +314,18 @@
     }
 
     function loadExpense(date) {
+        if (!checkUserAuth()) return;
+        
         document.getElementById('expenseMonth').value = date;
-        const data = JSON.parse(localStorage.getItem(`foodExpenses_${date}`));
-      if (data) {
-        document.getElementById('groceries').value = data.groceries;
-        document.getElementById('drinks').value = data.drinks;
-        document.getElementById('dining').value = data.dining;
-      }
+        const userFoodKey = getUserFoodKey(date);
+        if (userFoodKey) {
+          const data = JSON.parse(localStorage.getItem(userFoodKey));
+          if (data) {
+            document.getElementById('groceries').value = data.groceries;
+            document.getElementById('drinks').value = data.drinks;
+            document.getElementById('dining').value = data.dining;
+          }
+        }
     }
 
     function showChart() {
@@ -327,22 +374,27 @@
     }
 
     function saveData() {
+      if (!checkUserAuth()) return;
+      
       const groceries = parseInt(document.getElementById('groceries').value) || 0;
       const drinks = parseInt(document.getElementById('drinks').value) || 0;
       const dining = parseInt(document.getElementById('dining').value) || 0;
 
       // Get the month (YYYY-MM)
       const monthKey = document.getElementById('expenseMonth').value;
-    
-      // Save data to localStorage with month key
-      localStorage.setItem('foodExpenses_' + monthKey, JSON.stringify({ 
-        date: monthKey,
-        groceries: groceries, 
-        drinks: drinks, 
-        dining: dining 
-      }));
+      
+      // Save data to localStorage with user-specific key
+      const userFoodKey = getUserFoodKey(monthKey);
+      if (userFoodKey) {
+        localStorage.setItem(userFoodKey, JSON.stringify({ 
+          date: monthKey,
+          groceries: groceries, 
+          drinks: drinks, 
+          dining: dining 
+        }));
 
-      alert('Data saved successfully!');
+        alert('Data saved successfully!');
+      }
     }
 
     function showTable() {
@@ -351,12 +403,16 @@
     }
 
     function updateMonthlyChart() {
-      // Get all expenses and group by month
+      if (!checkUserAuth()) return;
+      
+      // Get user-specific expenses and group by month
+      const user = getCurrentUser();
+      const userPrefix = `foodExpenses_${user.username || user.userId}_`;
       const monthlyData = {};
       
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key.startsWith('foodExpenses_')) {
+        if (key && key.startsWith(userPrefix)) {
           const data = JSON.parse(localStorage.getItem(key));
           const month = data.date.substring(0, 7); // Get YYYY-MM
           
@@ -492,39 +548,49 @@
     }
 
     function loadMonthlyData(month) {
-      // Try to load data for the selected month
-      const savedData = localStorage.getItem('foodExpenses_' + month);
-      if (savedData) {
-        const data = JSON.parse(savedData);
-        document.getElementById('groceries').value = data.groceries || '';
-        document.getElementById('drinks').value = data.drinks || '';
-        document.getElementById('dining').value = data.dining || '';
-        showChart(); // Show chart with saved data
-      } else {
-        // Clear form if no data exists
-        document.getElementById('groceries').value = '';
-        document.getElementById('drinks').value = '';
-        document.getElementById('dining').value = '';
-        document.getElementById('summary').innerHTML = '';
-        // Clear chart if it exists
-        if (window.foodChart instanceof Chart) {
-          window.foodChart.destroy();
-          window.foodChart = null;
+      if (!checkUserAuth()) return;
+      
+      // Try to load user-specific data for the selected month
+      const userFoodKey = getUserFoodKey(month);
+      if (userFoodKey) {
+        const savedData = localStorage.getItem(userFoodKey);
+        if (savedData) {
+          const data = JSON.parse(savedData);
+          document.getElementById('groceries').value = data.groceries || '';
+          document.getElementById('drinks').value = data.drinks || '';
+          document.getElementById('dining').value = data.dining || '';
+          showChart(); // Show chart with saved data
+        } else {
+          // Clear form if no data exists
+          document.getElementById('groceries').value = '';
+          document.getElementById('drinks').value = '';
+          document.getElementById('dining').value = '';
+          document.getElementById('summary').innerHTML = '';
+          // Clear chart if it exists
+          if (window.foodChart instanceof Chart) {
+            window.foodChart.destroy();
+            window.foodChart = null;
+          }
+          // Update monthly chart anyway
+          updateMonthlyChart();
         }
-        // Update monthly chart anyway
-        updateMonthlyChart();
       }
       updateTable();
     }
 
     function clearAllData() {
-      if (confirm('Are you sure you want to clear all food expense data? This cannot be undone.')) {
+      if (!checkUserAuth()) return;
+      
+      if (confirm('Are you sure you want to clear all your food expense data? This cannot be undone.')) {
+        const userPrefix = getUserFoodPrefix();
+        if (!userPrefix) return;
+        
         // Get all keys from localStorage
         const keys = Object.keys(localStorage);
         
-        // Remove only food-related data
+        // Remove only current user's food-related data
         keys.forEach(key => {
-          if (key.startsWith('foodExpenses_') || key.startsWith('foodDay_')) {
+          if (key.startsWith(userPrefix)) {
             localStorage.removeItem(key);
           }
         });
@@ -539,7 +605,7 @@
         showChart();
         document.getElementById('summary').innerHTML = '';
         
-        alert('All food expense data has been cleared.');
+        alert('All your food expense data has been cleared.');
       }
     }
 

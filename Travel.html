@@ -6,6 +6,7 @@
     <title>Travel</title>
   <link rel="stylesheet" href="styles.css">
   <script src="auth.js"></script>
+  <script src="expense-utils.js"></script>
   <style>
     :root{
       --bg:#f8fafc;
@@ -108,7 +109,11 @@
         <img src="images/logo.png" alt="ExpenseWise Logo" class="site-logo">
         <h1>ExpenseWise</h1>
       </div>
-      <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <button onclick="window.location.href='welcome.html'" style="background: var(--accent); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px;">🏠 Home</button>
+        <button onclick="window.location.href='expense_manager_system.html'" style="background: var(--primary); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px;">📊 Dashboard</button>
+        <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
+      </div>
     </header>
         
     <main>
@@ -165,12 +170,57 @@
   </div>
 
   <script>
+    // Enhanced user-specific data management for travel expenses
+    function getCurrentUser() {
+      const session = localStorage.getItem('expenseWiseSession');
+      return session ? JSON.parse(session) : null;
+    }
+
+    function getDeviceFingerprint() {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      ctx.textBaseline = 'top';
+      ctx.font = '14px Arial';
+      ctx.fillText('Device fingerprint', 2, 2);
+      
+      const fingerprint = {
+        canvas: canvas.toDataURL(),
+        screen: screen.width + 'x' + screen.height,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        language: navigator.language,
+        platform: navigator.platform,
+        cores: navigator.hardwareConcurrency || 'unknown',
+        userAgent: navigator.userAgent.substring(0, 100)
+      };
+      
+      return btoa(JSON.stringify(fingerprint)).substring(0, 32);
+    }
+
+    function getUserTravelKey(monthKey) {
+      const user = getCurrentUser();
+      if (!user) return null;
+      const deviceId = getDeviceFingerprint();
+      return `travelExpenses_${deviceId}_${user.username || user.userId}_${monthKey}`;
+    }
+
+    function checkUserAuth() {
+      const user = getCurrentUser();
+      if (!user) {
+        alert('Please log in to access travel expenses');
+        window.location.href = 'login.html';
+        return false;
+      }
+      return true;
+    }
+
     // Initialize when document is ready
     document.addEventListener('DOMContentLoaded', function() {
       initializeTravel();
     });
 
     function initializeTravel() {
+      if (!checkUserAuth()) return;
+      
       const today = new Date();
       const month = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
       document.getElementById('expenseMonth').value = month;
@@ -185,46 +235,61 @@
     }
 
     function loadMonthlyData(month) {
-      const savedData = localStorage.getItem('travelExpenses_' + month);
-      if (savedData) {
-        try {
-          const data = JSON.parse(savedData);
-          document.getElementById('auto').value = data.auto || '';
-          document.getElementById('bus').value = data.bus || '';
-          document.getElementById('metro').value = data.metro || '';
-          document.getElementById('petrol').value = data.petrol || '';
-          showChart();
-        } catch (e) {
-          console.error('Error loading data:', e);
-        }
-      } else {
-        // Clear form if no data exists
-        document.getElementById('auto').value = '';
-        document.getElementById('bus').value = '';
-        document.getElementById('metro').value = '';
-        document.getElementById('petrol').value = '';
-        document.getElementById('summary').innerHTML = '';
-        if (window.travelChartInstance) {
-          window.travelChartInstance.destroy();
-          window.travelChartInstance = null;
+      if (!checkUserAuth()) return;
+      
+      const userTravelKey = getUserTravelKey(month);
+      if (userTravelKey) {
+        const savedData = localStorage.getItem(userTravelKey);
+        if (savedData) {
+          try {
+            const data = JSON.parse(savedData);
+            document.getElementById('auto').value = data.auto || '';
+            document.getElementById('bus').value = data.bus || '';
+            document.getElementById('metro').value = data.metro || '';
+            document.getElementById('petrol').value = data.petrol || '';
+            showChart();
+          } catch (e) {
+            console.error('Error loading data:', e);
+          }
+        } else {
+          // Clear form if no data exists
+          document.getElementById('auto').value = '';
+          document.getElementById('bus').value = '';
+          document.getElementById('metro').value = '';
+          document.getElementById('petrol').value = '';
+          document.getElementById('summary').innerHTML = '';
+          if (window.travelChartInstance) {
+            window.travelChartInstance.destroy();
+            window.travelChartInstance = null;
+          }
         }
       }
       updateTable();
     }
 
     function updateTable() {
+      if (!checkUserAuth()) return;
+      
       const tableBody = document.getElementById('expenseTableBody');
       if (!tableBody) return;
       tableBody.innerHTML = '';
 
+      const user = getCurrentUser();
+      const deviceId = getDeviceFingerprint();
+      const userPrefix = `travelExpenses_${deviceId}_${user.username || user.userId}_`;
+
       const expenses = [];
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key && key.startsWith('travelExpenses_')) {
+        if (key && key.startsWith(userPrefix)) {
           try {
             const data = JSON.parse(localStorage.getItem(key));
-            if (data && data.date) { expenses.push(data); }
-          } catch (e) { /* ignore malformed */ }
+            if (data && data.date) { 
+              expenses.push(data); 
+            }
+          } catch (e) { 
+            console.error('Error parsing expense data:', e);
+          }
         }
       }
 
@@ -262,14 +327,24 @@
     }
 
     function loadExpense(date) {
-        document.getElementById('expenseMonth').value = date;
-        const data = JSON.parse(localStorage.getItem(`travelExpenses_${date}`));
-      if (data) {
-        document.getElementById('auto').value = data.auto || '';
-        document.getElementById('bus').value = data.bus || '';
-        document.getElementById('metro').value = data.metro || '';
-        document.getElementById('petrol').value = data.petrol || '';
-        showChart();
+      if (!checkUserAuth()) return;
+      
+      document.getElementById('expenseMonth').value = date;
+      const userTravelKey = getUserTravelKey(date);
+      if (userTravelKey) {
+        const savedData = localStorage.getItem(userTravelKey);
+        if (savedData) {
+          try {
+            const data = JSON.parse(savedData);
+            document.getElementById('auto').value = data.auto || '';
+            document.getElementById('bus').value = data.bus || '';
+            document.getElementById('metro').value = data.metro || '';
+            document.getElementById('petrol').value = data.petrol || '';
+            showChart();
+          } catch (e) {
+            console.error('Error loading expense data:', e);
+          }
+        }
       }
     }
 
@@ -321,6 +396,8 @@
     }
 
     function saveData() {
+      if (!checkUserAuth()) return;
+      
       const auto = parseInt(document.getElementById('auto').value) || 0;
       const bus = parseInt(document.getElementById('bus').value) || 0;
       const metro = parseInt(document.getElementById('metro').value) || 0;
@@ -328,17 +405,21 @@
 
       // Get the month (YYYY-MM)
       const monthKey = document.getElementById('expenseMonth').value;
-    
-      // Save data to localStorage with month key
-      localStorage.setItem('travelExpenses_' + monthKey, JSON.stringify({ 
-        date: monthKey,
-        auto: auto, 
-        bus: bus, 
-        metro: metro,
-        petrol: petrol
-      }));
+      
+      // Save data to localStorage with user-specific key
+      const userTravelKey = getUserTravelKey(monthKey);
+      if (userTravelKey) {
+        localStorage.setItem(userTravelKey, JSON.stringify({ 
+          date: monthKey,
+          auto: auto, 
+          bus: bus, 
+          metro: metro,
+          petrol: petrol
+        }));
 
-      alert('Data saved successfully!');
+        alert('Data saved successfully!');
+        updateTable();
+      }
     }
 
     function showTable() {
@@ -347,23 +428,35 @@
     }
 
     function updateMonthlyChart() {
-      // Get all expenses and group by month
+      if (!checkUserAuth()) return;
+      
+      const user = getCurrentUser();
+      const deviceId = getDeviceFingerprint();
+      const userPrefix = `travelExpenses_${deviceId}_${user.username || user.userId}_`;
+      
+      // Get all user-specific expenses and group by month
       const monthlyData = {};
       
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key.startsWith('travelExpenses_')) {
-          const data = JSON.parse(localStorage.getItem(key));
-          const month = data.date.substring(0, 7); // Get YYYY-MM
-          
-          if (!monthlyData[month]) {
-            monthlyData[month] = { auto: 0, bus: 0, metro: 0, petrol: 0 };
+        if (key && key.startsWith(userPrefix)) {
+          try {
+            const data = JSON.parse(localStorage.getItem(key));
+            if (data && data.date) {
+              const month = data.date.substring(0, 7); // Get YYYY-MM
+              
+              if (!monthlyData[month]) {
+                monthlyData[month] = { auto: 0, bus: 0, metro: 0, petrol: 0 };
+              }
+              
+              monthlyData[month].auto += data.auto || 0;
+              monthlyData[month].bus += data.bus || 0;
+              monthlyData[month].metro += data.metro || 0;
+              monthlyData[month].petrol += data.petrol || 0;
+            }
+          } catch (e) {
+            console.error('Error parsing monthly data:', e);
           }
-          
-          monthlyData[month].auto += data.auto;
-          monthlyData[month].bus += data.bus;
-          monthlyData[month].metro += data.metro;
-          monthlyData[month].petrol += data.petrol;
         }
       }
       
@@ -518,16 +611,22 @@
       toggleBtn.textContent = savedTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
     }
 
-    // Clear all travel expense data
+    // Clear all travel expense data for current user
     function clearAllData() {
+      if (!checkUserAuth()) return;
+      
       if (confirm('Are you sure you want to clear all travel expense data? This cannot be undone.')) {
+        const user = getCurrentUser();
+        const deviceId = getDeviceFingerprint();
+        const userPrefix = `travelExpenses_${deviceId}_${user.username || user.userId}_`;
+        
         // Get all keys from localStorage
         const keys = Object.keys(localStorage);
         
-        // Remove only travel-related data
+        // Remove only current user's travel-related data
         let deletedCount = 0;
         keys.forEach(key => {
-          if (key.startsWith('travelExpenses_')) {
+          if (key.startsWith(userPrefix)) {
             localStorage.removeItem(key);
             deletedCount++;
           }
@@ -540,6 +639,10 @@
         document.getElementById('petrol').value = '';
         
         // Clear charts
+        if (window.travelChartInstance) {
+          window.travelChartInstance.destroy();
+          window.travelChartInstance = null;
+        }
         if (window.monthlyChartInstance) {
           window.monthlyChartInstance.destroy();
           window.monthlyChartInstance = null;

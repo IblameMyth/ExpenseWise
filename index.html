@@ -44,18 +44,28 @@
     </div>
 
     <script>
-        // Check authentication and redirect appropriately
+        // Redirect to welcome page after brief loading
+        console.log('Index.html loaded');
+        
         window.addEventListener('load', function() {
-            const session = localStorage.getItem('expenseWiseSession');
+            console.log('Window load event triggered');
+            console.log('Current URL:', window.location.href);
             
-            if (session) {
-                // User is logged in, redirect to main app
-                window.location.href = 'expense_manager_system.html';
-            } else {
-                // User not logged in, redirect to login page
-                window.location.href = 'login.html';
-            }
+            setTimeout(() => {
+                console.log('Redirecting to welcome.html...');
+                try {
+                    window.location.href = 'welcome.html';
+                } catch (error) {
+                    console.error('Redirect failed:', error);
+                    // Fallback: try relative path
+                    window.location = './welcome.html';
+                }
+            }, 1500);
         });
+        
+        // Alternative immediate redirect for testing
+        // Uncomment if you want instant redirect
+        // window.location.href = 'welcome.html';
     </script>
 </body>
 </html>
