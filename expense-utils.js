@@ -3,17 +3,16 @@
 
 // User authentication and data management
 function getCurrentUser() {
-    const session = localStorage.getItem('expenseWiseSession');
-    return session ? JSON.parse(session) : null;
+    // Return a default user since authentication is removed
+    return {
+        username: 'user',
+        userId: 'default_user',
+        fullName: 'ExpenseWise User'
+    };
 }
 
 function checkUserAuth() {
-    const user = getCurrentUser();
-    if (!user) {
-        alert('Please log in to access this expense page');
-        window.location.href = 'login.html';
-        return false;
-    }
+    // Always return true since authentication is removed
     return true;
 }
 
@@ -184,12 +183,7 @@ function clearAllUserExpenses(expenseType) {
 
 // Enhanced security functions
 function validateUserAccess() {
-    const user = getCurrentUser();
-    if (!user || !user.username || !user.userId) {
-        console.error('Invalid user session - redirecting to login');
-        window.location.href = 'login.html';
-        return false;
-    }
+    // Always return true since authentication is removed
     return true;
 }
 
@@ -227,48 +221,8 @@ function enforceDataIsolation() {
 
 // Initialize multi-tab logout listener for expense pages with enhanced security
 function initExpenseAuth() {
-    // FORCE login check - redirect immediately if no valid session
-    if (!checkUserAuth()) {
-        console.log('No valid session - forcing login');
-        window.location.href = 'login.html';
-        return;
-    }
-    
-    // Validate user access and enforce data isolation
-    if (!validateUserAccess()) return;
-    
-    // Sanitize storage to ensure data isolation
-    sanitizeStorageOnLogin();
-    
-    // Setup multi-tab logout listener
-    window.addEventListener('storage', (e) => {
-        if (e.key === 'expenseWiseSession' && e.newValue === null) {
-            console.log('Session removed from another tab, redirecting to login...');
-            window.location.href = 'login.html';
-        }
-    });
-    
-    // Enhanced session monitoring - very frequent checks
-    setInterval(() => {
-        if (!getCurrentUser() || !validateUserAccess()) {
-            console.log('Session invalid - redirecting to login...');
-            window.location.href = 'login.html';
-        }
-    }, 500); // Check every 0.5 seconds for immediate security
-    
-    // Clear session on any navigation away
-    window.addEventListener('beforeunload', () => {
-        localStorage.removeItem('expenseWiseSession');
-    });
-    
-    // Force logout on tab focus loss for maximum security
-    window.addEventListener('blur', () => {
-        console.log('Tab lost focus - clearing session for security');
-        localStorage.removeItem('expenseWiseSession');
-        setTimeout(() => {
-            window.location.href = 'login.html';
-        }, 100);
-    });
+    // Authentication removed - no login checks needed
+    console.log('ExpenseWise loaded without authentication');
 }
 
 // Auto-initialize when script loads

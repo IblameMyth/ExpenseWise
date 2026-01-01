@@ -1,11 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>EMI</title>
   <link rel="stylesheet" href="styles.css">
-  <script src="auth.js"></script>
   <script src="expense-utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
@@ -153,7 +152,7 @@
       <img src="images/logo.png" alt="ExpenseWise Logo" class="site-logo">
       <h1>ExpenseWise</h1>
     </div>
-    <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
+    <button class="theme-toggle" onclick="toggleTheme()">ðŸŒ™ Dark Mode</button>
   </header>
 
   <main>
@@ -162,10 +161,10 @@
       <label for="expenseMonth">Select Month: </label>
       <input type="month" id="expenseMonth" style="padding: 10px; border-radius: 10px; border: 1px solid #e6eef8;" />
     </div>
-    <input type="number" id="homeLoan" placeholder="Home Loan EMI (₹)" />
-    <input type="number" id="carLoan" placeholder="Car Loan EMI (₹)" />
-    <input type="number" id="educationLoan" placeholder="Education Loan EMI (₹)" />
-    <input type="number" id="personalLoan" placeholder="Personal Loan EMI (₹)" />
+    <input type="number" id="homeLoan" placeholder="Home Loan EMI (₹‚¹)" />
+    <input type="number" id="carLoan" placeholder="Car Loan EMI (₹‚¹)" />
+    <input type="number" id="educationLoan" placeholder="Education Loan EMI (₹‚¹)" />
+    <input type="number" id="personalLoan" placeholder="Personal Loan EMI (₹‚¹)" />
     <br />
     <button onclick="showEmiChart()">Show Chart</button>
     <button onclick="saveData()">Save Data</button>
@@ -189,11 +188,11 @@
         <thead>
           <tr>
             <th style="padding: 12px; background: linear-gradient(90deg, var(--accent), var(--primary)); color: white;">Date</th>
-            <th style="padding: 12px; background: linear-gradient(90deg, var(--accent), var(--primary)); color: white;">Home Loan (₹)</th>
-            <th style="padding: 12px; background: linear-gradient(90deg, var(--accent), var(--primary)); color: white;">Car Loan (₹)</th>
-            <th style="padding: 12px; background: linear-gradient(90deg, var(--accent), var(--primary)); color: white;">Education Loan (₹)</th>
-            <th style="padding: 12px; background: linear-gradient(90deg, var(--accent), var(--primary)); color: white;">Personal Loan (₹)</th>
-            <th style="padding: 12px; background: linear-gradient(90deg, var(--accent), var(--primary)); color: white;">Total (₹)</th>
+            <th style="padding: 12px; background: linear-gradient(90deg, var(--accent), var(--primary)); color: white;">Home Loan (₹‚¹)</th>
+            <th style="padding: 12px; background: linear-gradient(90deg, var(--accent), var(--primary)); color: white;">Car Loan (₹‚¹)</th>
+            <th style="padding: 12px; background: linear-gradient(90deg, var(--accent), var(--primary)); color: white;">Education Loan (₹‚¹)</th>
+            <th style="padding: 12px; background: linear-gradient(90deg, var(--accent), var(--primary)); color: white;">Personal Loan (₹‚¹)</th>
+            <th style="padding: 12px; background: linear-gradient(90deg, var(--accent), var(--primary)); color: white;">Total (₹‚¹)</th>
           </tr>
         </thead>
         <tbody id="expenseTableBody">
@@ -201,11 +200,11 @@
         <tfoot>
           <tr>
             <td style="padding: 12px; font-weight: bold;">Monthly Total</td>
-            <td id="totalHome" style="padding: 12px;">₹0</td>
-            <td id="totalCar" style="padding: 12px;">₹0</td>
-            <td id="totalEdu" style="padding: 12px;">₹0</td>
-            <td id="totalPersonal" style="padding: 12px;">₹0</td>
-            <td id="grandTotal" style="padding: 12px; font-weight: bold;">₹0</td>
+            <td id="totalHome" style="padding: 12px;">₹‚¹0</td>
+            <td id="totalCar" style="padding: 12px;">₹‚¹0</td>
+            <td id="totalEdu" style="padding: 12px;">₹‚¹0</td>
+            <td id="totalPersonal" style="padding: 12px;">₹‚¹0</td>
+            <td id="grandTotal" style="padding: 12px; font-weight: bold;">₹‚¹0</td>
           </tr>
         </tfoot>
       </table>
@@ -222,6 +221,13 @@
       const today = new Date();
       const month = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
       document.getElementById('expenseMonth').value = month;
+      
+      // Hide table initially
+      const tableContainer = document.querySelector('.table-container');
+      if (tableContainer) {
+        tableContainer.style.display = 'none';
+      }
+      
       loadMonthlyData(month);
     });
 
@@ -271,6 +277,23 @@
       // Sort by date, newest first
       expenses.sort((a, b) => new Date(b.date) - new Date(a.date));
       
+      // Check if there's no data
+      if (expenses.length === 0) {
+        const noDataRow = document.createElement('tr');
+        noDataRow.innerHTML = `
+          <td colspan="6" style="padding: 20px; text-align: center; color: var(--muted); font-style: italic;">No data available. Add expenses and click "Show Table" to see them here.</td>
+        `;
+        tableBody.appendChild(noDataRow);
+        
+        // Reset totals
+        document.getElementById('totalHome').textContent = '₹‚¹0';
+        document.getElementById('totalCar').textContent = '₹‚¹0';
+        document.getElementById('totalEdu').textContent = '₹‚¹0';
+        document.getElementById('totalPersonal').textContent = '₹‚¹0';
+        document.getElementById('grandTotal').textContent = '₹‚¹0';
+        return;
+      }
+      
       // Create table rows
       expenses.forEach(expense => {
         const row = document.createElement('tr');
@@ -278,11 +301,11 @@
         
         row.innerHTML = `
           <td style="padding: 12px; border-bottom: 1px solid #e6eef8; cursor: pointer;" onclick="loadExpense('${expense.date}')">${expense.date}</td>
-          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹${expense.home}</td>
-          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹${expense.car}</td>
-          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹${expense.edu}</td>
-          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹${expense.personal}</td>
-          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹${total}</td>
+          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹‚¹${expense.home}</td>
+          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹‚¹${expense.car}</td>
+          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹‚¹${expense.edu}</td>
+          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹‚¹${expense.personal}</td>
+          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹‚¹${total}</td>
         `;
         
         tableBody.appendChild(row);
@@ -294,11 +317,11 @@
       });
       
       // Update totals
-      document.getElementById('totalHome').textContent = `₹${totalHome}`;
-      document.getElementById('totalCar').textContent = `₹${totalCar}`;
-      document.getElementById('totalEdu').textContent = `₹${totalEdu}`;
-      document.getElementById('totalPersonal').textContent = `₹${totalPersonal}`;
-      document.getElementById('grandTotal').textContent = `₹${totalHome + totalCar + totalEdu + totalPersonal}`;
+      document.getElementById('totalHome').textContent = `₹‚¹${totalHome}`;
+      document.getElementById('totalCar').textContent = `₹‚¹${totalCar}`;
+      document.getElementById('totalEdu').textContent = `₹‚¹${totalEdu}`;
+      document.getElementById('totalPersonal').textContent = `₹‚¹${totalPersonal}`;
+      document.getElementById('grandTotal').textContent = `₹‚¹${totalHome + totalCar + totalEdu + totalPersonal}`;
     }
 
     function loadExpense(date) {
@@ -320,7 +343,7 @@
       const personal = parseInt(document.getElementById('personalLoan').value) || 0;
       const total = home + car + edu + personal;
 
-      document.getElementById('summary').innerHTML = `<h3>Total EMI Expenses: ₹${total}</h3>`;
+      document.getElementById('summary').innerHTML = `<h3>Total EMI Expenses: ₹‚¹${total}</h3>`;
 
       // Create pie chart for current data
       const ctx = document.getElementById('emiChart').getContext('2d');
@@ -381,6 +404,13 @@
     }
 
     function showTable() {
+      // Get the table container
+      const tableContainer = document.querySelector('.table-container');
+      if (!tableContainer) return;
+      
+      // Make table visible
+      tableContainer.style.display = 'block';
+      
       // Update the table
       updateTable();
     }
@@ -486,7 +516,7 @@
               displayColors: true,
               callbacks: {
                 label: function(context) {
-                  return `${context.dataset.label}: ₹${context.raw}`;
+                  return `${context.dataset.label}: ₹‚¹${context.raw}`;
                 }
               }
             },
@@ -525,7 +555,7 @@
               },
               ticks: {
                 callback: function(value) {
-                  return '₹' + value;
+                  return '₹‚¹' + value;
                 },
                 font: {
                   size: 11
@@ -546,7 +576,7 @@
       localStorage.setItem('theme', newTheme);
       
       const toggleBtn = document.querySelector('.theme-toggle');
-      toggleBtn.textContent = newTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+      toggleBtn.textContent = newTheme === 'dark' ? '₹˜€ï¸ Light Mode' : 'ðŸŒ™ Dark Mode';
     }
 
     // Load saved theme
@@ -554,7 +584,7 @@
     document.documentElement.setAttribute('data-theme', savedTheme);
     const toggleBtn = document.querySelector('.theme-toggle');
     if (toggleBtn) {
-      toggleBtn.textContent = savedTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+      toggleBtn.textContent = savedTheme === 'dark' ? '₹˜€ï¸ Light Mode' : 'ðŸŒ™ Dark Mode';
     }
 
     function clearAllData() {
@@ -602,3 +632,4 @@
   </script>
 </body>
 </html>
+

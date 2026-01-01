@@ -1,11 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Vacation</title>
   <link rel="stylesheet" href="styles.css">
-  <script src="auth.js"></script>
   <script src="expense-utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
@@ -105,7 +104,7 @@
       <img src="images/logo.png" alt="ExpenseWise Logo" class="site-logo">
       <h1>ExpenseWise</h1>
     </div>
-    <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
+    <button class="theme-toggle" onclick="toggleTheme()">ðŸŒ™ Dark Mode</button>
   </header>
 
   <main>
@@ -114,10 +113,10 @@
       <label for="expenseMonth">Select Month: </label>
       <input type="month" id="expenseMonth" style="padding: 10px; border-radius: 10px; border: 1px solid #e6eef8;" />
     </div>
-    <input type="number" id="tickets" placeholder="Tickets (₹)" />
-    <input type="number" id="hostel" placeholder="Hostel (₹)" />
-    <input type="number" id="food" placeholder="Food (₹)" />
-    <input type="number" id="traveling" placeholder="Traveling (₹)" />
+    <input type="number" id="tickets" placeholder="Tickets (₹‚¹)" />
+    <input type="number" id="hostel" placeholder="Hostel (₹‚¹)" />
+    <input type="number" id="food" placeholder="Food (₹‚¹)" />
+    <input type="number" id="traveling" placeholder="Traveling (₹‚¹)" />
     <br />
     <button onclick="showVacationChart()">Show Chart</button>
     <button onclick="saveData()">Save Data</button>
@@ -151,11 +150,11 @@
         <tfoot>
           <tr>
             <td style="padding: 12px; font-weight: bold;">Total</td>
-            <td id="totalTickets" style="padding: 12px;">₹0</td>
-            <td id="totalHostel" style="padding: 12px;">₹0</td>
-            <td id="totalFood" style="padding: 12px;">₹0</td>
-            <td id="totalTraveling" style="padding: 12px;">₹0</td>
-            <td id="grandTotal" style="padding: 12px; font-weight: bold;">₹0</td>
+            <td id="totalTickets" style="padding: 12px;">₹‚¹0</td>
+            <td id="totalHostel" style="padding: 12px;">₹‚¹0</td>
+            <td id="totalFood" style="padding: 12px;">₹‚¹0</td>
+            <td id="totalTraveling" style="padding: 12px;">₹‚¹0</td>
+            <td id="grandTotal" style="padding: 12px; font-weight: bold;">₹‚¹0</td>
           </tr>
         </tfoot>
       </table>
@@ -172,6 +171,12 @@
       const today = new Date();
       const month = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
       document.getElementById('expenseMonth').value = month;
+      
+      // Hide table initially
+      const tableContainer = document.querySelector('.table-container');
+      if (tableContainer) {
+        tableContainer.style.display = 'none';
+      }
 
       // Load saved data from XML and populate localStorage
       fetch('expenses.xml')
@@ -230,6 +235,23 @@
 
       expenses.sort((a, b) => new Date(b.date) - new Date(a.date));
 
+      // Check if there's no data
+      if (expenses.length === 0) {
+        const noDataRow = document.createElement('tr');
+        noDataRow.innerHTML = `
+          <td colspan="6" style="padding: 20px; text-align: center; color: var(--muted); font-style: italic;">No data available. Add expenses and click "Show Table" to see them here.</td>
+        `;
+        tableBody.appendChild(noDataRow);
+        
+        // Reset totals
+        document.getElementById('totalTickets').textContent = '₹‚¹0';
+        document.getElementById('totalHostel').textContent = '₹‚¹0';
+        document.getElementById('totalFood').textContent = '₹‚¹0';
+        document.getElementById('totalTraveling').textContent = '₹‚¹0';
+        document.getElementById('grandTotal').textContent = '₹‚¹0';
+        return;
+      }
+
       let totalTickets = 0, totalHostel = 0, totalFood = 0, totalTraveling = 0;
 
       expenses.forEach(expense => {
@@ -240,11 +262,11 @@
           <td style="padding: 12px; border-bottom: 1px solid #e6eef8; cursor: pointer;" onclick="loadExpense('${expense.date}')">
             ${expense.date}
           </td>
-          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹${expense.tickets || 0}</td>
-          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹${expense.hostel || 0}</td>
-          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹${expense.food || 0}</td>
-          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹${expense.traveling || 0}</td>
-          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹${total}</td>
+          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹‚¹${expense.tickets || 0}</td>
+          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹‚¹${expense.hostel || 0}</td>
+          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹‚¹${expense.food || 0}</td>
+          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹‚¹${expense.traveling || 0}</td>
+          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹‚¹${total}</td>
         `;
 
         tableBody.appendChild(row);
@@ -255,12 +277,12 @@
         totalTraveling += expense.traveling || 0;
       });
 
-      document.getElementById('totalTickets').textContent = `₹${totalTickets}`;
-      document.getElementById('totalHostel').textContent = `₹${totalHostel}`;
-      document.getElementById('totalFood').textContent = `₹${totalFood}`;
-      document.getElementById('totalTraveling').textContent = `₹${totalTraveling}`;
+      document.getElementById('totalTickets').textContent = `₹‚¹${totalTickets}`;
+      document.getElementById('totalHostel').textContent = `₹‚¹${totalHostel}`;
+      document.getElementById('totalFood').textContent = `₹‚¹${totalFood}`;
+      document.getElementById('totalTraveling').textContent = `₹‚¹${totalTraveling}`;
       document.getElementById('grandTotal').textContent = 
-        `₹${totalTickets + totalHostel + totalFood + totalTraveling}`;
+        `₹‚¹${totalTickets + totalHostel + totalFood + totalTraveling}`;
     }
 
     function loadMonthlyData(monthKey) {
@@ -314,7 +336,7 @@
             clearForm();
           });
       }
-      updateTable();
+      // Removed updateTable() call - table only shows when user clicks "Show Table" button
     }
 
     function clearForm() {
@@ -348,7 +370,7 @@
       const total = tickets + hostel + food + traveling;
 
       // Update summary
-      document.getElementById('summary').innerHTML = `<h3>Total Vacation Expenses: ₹${total}</h3>`;
+      document.getElementById('summary').innerHTML = `<h3>Total Vacation Expenses: ₹‚¹${total}</h3>`;
 
       // Create pie chart for current data
       const ctx = document.getElementById('vacationChart').getContext('2d');
@@ -429,6 +451,13 @@
     }
 
     function showTable() {
+      // Get the table container
+      const tableContainer = document.querySelector('.table-container');
+      if (!tableContainer) return;
+      
+      // Make table visible
+      tableContainer.style.display = 'block';
+      
       // Update table
       updateTable();
     }
@@ -534,7 +563,7 @@
               displayColors: true,
               callbacks: {
                 label: function(context) {
-                  return `${context.dataset.label}: ₹${context.raw}`;
+                  return `${context.dataset.label}: ₹‚¹${context.raw}`;
                 }
               }
             },
@@ -573,7 +602,7 @@
               },
               ticks: {
                 callback: function(value) {
-                  return '₹' + value;
+                  return '₹‚¹' + value;
                 },
                 font: {
                   size: 11
@@ -598,7 +627,7 @@
       localStorage.setItem('theme', newTheme);
       
       const toggleBtn = document.querySelector('.theme-toggle');
-      toggleBtn.textContent = newTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+      toggleBtn.textContent = newTheme === 'dark' ? '₹˜€ï¸ Light Mode' : 'ðŸŒ™ Dark Mode';
     }
 
     // Load saved theme
@@ -606,7 +635,7 @@
     document.documentElement.setAttribute('data-theme', savedTheme);
     const toggleBtn = document.querySelector('.theme-toggle');
     if (toggleBtn) {
-      toggleBtn.textContent = savedTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+      toggleBtn.textContent = savedTheme === 'dark' ? '₹˜€ï¸ Light Mode' : 'ðŸŒ™ Dark Mode';
     }
 
     // Clear all vacation expense data
@@ -642,3 +671,4 @@
   </script>
 </body>
 </html>
+

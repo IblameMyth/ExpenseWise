@@ -1,11 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Travel</title>
   <link rel="stylesheet" href="styles.css">
-  <script src="auth.js"></script>
   <script src="expense-utils.js"></script>
   <style>
     :root{
@@ -123,10 +122,10 @@
     <label for="expenseMonth">Select Month: </label>
     <input type="month" id="expenseMonth" style="padding: 10px; border-radius: 10px; border: 1px solid #e6eef8;" />
   </div>
-  <input type="number" id="auto" placeholder="Auto (₹)" />
-  <input type="number" id="bus" placeholder="Bus (₹)" />
-  <input type="number" id="metro" placeholder="Metro (₹)" />
-  <input type="number" id="petrol" placeholder="Petrol (₹)" />
+  <input type="number" id="auto" placeholder="Auto (₹‚¹)" />
+  <input type="number" id="bus" placeholder="Bus (₹‚¹)" />
+  <input type="number" id="metro" placeholder="Metro (₹‚¹)" />
+  <input type="number" id="petrol" placeholder="Petrol (₹‚¹)" />
   <button onclick="showChart()">Show Chart</button>
   <button onclick="saveData()">Save Data</button>
   <button onclick="showTable()">Show Table</button>
@@ -159,21 +158,25 @@
       <tfoot>
         <tr>
           <td style="padding: 12px; font-weight: bold;">Total</td>
-          <td id="totalAuto" style="padding: 12px;">₹0</td>
-          <td id="totalBus" style="padding: 12px;">₹0</td>
-          <td id="totalMetro" style="padding: 12px;">₹0</td>
-          <td id="totalPetrol" style="padding: 12px;">₹0</td>
-          <td id="grandTotal" style="padding: 12px; font-weight: bold;">₹0</td>
+          <td id="totalAuto" style="padding: 12px;">₹‚¹0</td>
+          <td id="totalBus" style="padding: 12px;">₹‚¹0</td>
+          <td id="totalMetro" style="padding: 12px;">₹‚¹0</td>
+          <td id="totalPetrol" style="padding: 12px;">₹‚¹0</td>
+          <td id="grandTotal" style="padding: 12px; font-weight: bold;">₹‚¹0</td>
         </tr>
       </tfoot>
     </table>
   </div>
 
   <script>
-    // Enhanced user-specific data management for travel expenses
+    // Enhanced user-specific data management for travel expenses (simplified)
     function getCurrentUser() {
-      const session = localStorage.getItem('expenseWiseSession');
-      return session ? JSON.parse(session) : null;
+      // Return a default user since authentication is removed
+      return {
+        username: 'user',
+        userId: 'default_user',
+        fullName: 'ExpenseWise User'
+      };
     }
 
     function getDeviceFingerprint() {
@@ -203,15 +206,7 @@
       return `travelExpenses_${deviceId}_${user.username || user.userId}_${monthKey}`;
     }
 
-    function checkUserAuth() {
-      const user = getCurrentUser();
-      if (!user) {
-        alert('Please log in to access travel expenses');
-        window.location.href = 'login.html';
-        return false;
-      }
-      return true;
-    }
+    // Authentication function removed - direct access enabled
 
     // Initialize when document is ready
     document.addEventListener('DOMContentLoaded', function() {
@@ -219,11 +214,17 @@
     });
 
     function initializeTravel() {
-      if (!checkUserAuth()) return;
+      // Auth check removed for direct access
       
       const today = new Date();
       const month = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
       document.getElementById('expenseMonth').value = month;
+      
+      // Hide table initially
+      const tableContainer = document.querySelector('.table-container');
+      if (tableContainer) {
+        tableContainer.style.display = 'none';
+      }
       
       // Set up event listeners
       document.getElementById('expenseMonth').addEventListener('change', function() {
@@ -235,7 +236,7 @@
     }
 
     function loadMonthlyData(month) {
-      if (!checkUserAuth()) return;
+      // Auth check removed for direct access
       
       const userTravelKey = getUserTravelKey(month);
       if (userTravelKey) {
@@ -264,11 +265,11 @@
           }
         }
       }
-      updateTable();
+      // Removed updateTable() call - table only shows when user clicks "Show Table" button
     }
 
     function updateTable() {
-      if (!checkUserAuth()) return;
+      // Auth check removed for direct access
       
       const tableBody = document.getElementById('expenseTableBody');
       if (!tableBody) return;
@@ -295,6 +296,23 @@
 
       expenses.sort((a, b) => new Date(b.date) - new Date(a.date));
 
+      // Check if there's no data
+      if (expenses.length === 0) {
+        const noDataRow = document.createElement('tr');
+        noDataRow.innerHTML = `
+          <td colspan="6" style="padding: 20px; text-align: center; color: var(--muted); font-style: italic;">No data available. Add expenses and click "Show Table" to see them here.</td>
+        `;
+        tableBody.appendChild(noDataRow);
+        
+        // Reset totals
+        document.getElementById('totalAuto').textContent = '₹‚¹0';
+        document.getElementById('totalBus').textContent = '₹‚¹0';
+        document.getElementById('totalMetro').textContent = '₹‚¹0';
+        document.getElementById('totalPetrol').textContent = '₹‚¹0';
+        document.getElementById('grandTotal').textContent = '₹‚¹0';
+        return;
+      }
+
       let totalAuto = 0, totalBus = 0, totalMetro = 0, totalPetrol = 0;
 
       expenses.forEach(expense => {
@@ -304,11 +322,11 @@
           <td style="padding: 12px; border-bottom: 1px solid #e6eef8; cursor: pointer;" onclick="loadExpense('${expense.date}')">
             ${expense.date}
           </td>
-          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹${expense.auto || 0}</td>
-          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹${expense.bus || 0}</td>
-          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹${expense.metro || 0}</td>
-          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹${expense.petrol || 0}</td>
-          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹${total}</td>
+          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹‚¹${expense.auto || 0}</td>
+          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹‚¹${expense.bus || 0}</td>
+          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹‚¹${expense.metro || 0}</td>
+          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹‚¹${expense.petrol || 0}</td>
+          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹‚¹${total}</td>
         `;
 
         tableBody.appendChild(row);
@@ -319,15 +337,15 @@
         totalPetrol += expense.petrol || 0;
       });
 
-      document.getElementById('totalAuto').textContent = `₹${totalAuto}`;
-      document.getElementById('totalBus').textContent = `₹${totalBus}`;
-      document.getElementById('totalMetro').textContent = `₹${totalMetro}`;
-      document.getElementById('totalPetrol').textContent = `₹${totalPetrol}`;
-      document.getElementById('grandTotal').textContent = `₹${totalAuto + totalBus + totalMetro + totalPetrol}`;
+      document.getElementById('totalAuto').textContent = `₹‚¹${totalAuto}`;
+      document.getElementById('totalBus').textContent = `₹‚¹${totalBus}`;
+      document.getElementById('totalMetro').textContent = `₹‚¹${totalMetro}`;
+      document.getElementById('totalPetrol').textContent = `₹‚¹${totalPetrol}`;
+      document.getElementById('grandTotal').textContent = `₹‚¹${totalAuto + totalBus + totalMetro + totalPetrol}`;
     }
 
     function loadExpense(date) {
-      if (!checkUserAuth()) return;
+      // Auth check removed for direct access
       
       document.getElementById('expenseMonth').value = date;
       const userTravelKey = getUserTravelKey(date);
@@ -356,7 +374,7 @@
       const total = auto + bus + metro + petrol;
 
       // Update summary
-      document.getElementById('summary').innerHTML = `<h3>Total Travel Expenses: ₹${total}</h3>`;
+      document.getElementById('summary').innerHTML = `<h3>Total Travel Expenses: ₹‚¹${total}</h3>`;
 
       // Create pie chart for current data
       const ctx = document.getElementById('travelChart').getContext('2d');
@@ -396,7 +414,7 @@
     }
 
     function saveData() {
-      if (!checkUserAuth()) return;
+      // Auth check removed for direct access
       
       const auto = parseInt(document.getElementById('auto').value) || 0;
       const bus = parseInt(document.getElementById('bus').value) || 0;
@@ -423,12 +441,19 @@
     }
 
     function showTable() {
+      // Get the table container
+      const tableContainer = document.querySelector('.table-container');
+      if (!tableContainer) return;
+      
+      // Make table visible
+      tableContainer.style.display = 'block';
+      
       // Update the table
       updateTable();
     }
 
     function updateMonthlyChart() {
-      if (!checkUserAuth()) return;
+      // Auth check removed for direct access
       
       const user = getCurrentUser();
       const deviceId = getDeviceFingerprint();
@@ -540,7 +565,7 @@
               displayColors: true,
               callbacks: {
                 label: function(context) {
-                  return `${context.dataset.label}: ₹${context.raw}`;
+                  return `${context.dataset.label}: ₹‚¹${context.raw}`;
                 }
               }
             },
@@ -579,7 +604,7 @@
               },
               ticks: {
                 callback: function(value) {
-                  return '₹' + value;
+                  return '₹‚¹' + value;
                 },
                 font: {
                   size: 11
@@ -613,7 +638,7 @@
 
     // Clear all travel expense data for current user
     function clearAllData() {
-      if (!checkUserAuth()) return;
+      // Auth check removed for direct access
       
       if (confirm('Are you sure you want to clear all travel expense data? This cannot be undone.')) {
         const user = getCurrentUser();
@@ -674,3 +699,4 @@
     </footer>
     </Body>
 </html>
+

@@ -1,11 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Food</title>
   <link rel="stylesheet" href="styles.css">
-  <script src="auth.js"></script>
   <script src="expense-utils.js"></script>
   <style>
     :root{
@@ -173,9 +172,9 @@
     <label for="expenseMonth">Select Month: </label>
     <input type="month" id="expenseMonth" style="padding: 10px; border-radius: 10px; border: 1px solid #e6eef8;" />
   </div>
-  <input type="number" id="groceries" placeholder="Groceries (₹)" />
-  <input type="number" id="drinks" placeholder="Drinks (₹)" />
-  <input type="number" id="dining" placeholder="Dining Out (₹)" />
+  <input type="number" id="groceries" placeholder="Groceries (₹‚¹)" />
+  <input type="number" id="drinks" placeholder="Drinks (₹‚¹)" />
+  <input type="number" id="dining" placeholder="Dining Out (₹‚¹)" />
   <button onclick="showChart()">Show Chart</button>
   <button onclick="saveData()">Save Data</button>
   <button onclick="showTable()">Show Table</button>
@@ -207,20 +206,24 @@
       <tfoot>
         <tr>
           <td style="padding: 12px; font-weight: bold;">Total</td>
-          <td id="totalGroceries" style="padding: 12px;">₹0</td>
-          <td id="totalDrinks" style="padding: 12px;">₹0</td>
-          <td id="totalDining" style="padding: 12px;">₹0</td>
-          <td id="grandTotal" style="padding: 12px; font-weight: bold;">₹0</td>
+          <td id="totalGroceries" style="padding: 12px;">₹‚¹0</td>
+          <td id="totalDrinks" style="padding: 12px;">₹‚¹0</td>
+          <td id="totalDining" style="padding: 12px;">₹‚¹0</td>
+          <td id="grandTotal" style="padding: 12px; font-weight: bold;">₹‚¹0</td>
         </tr>
       </tfoot>
     </table>
   </div>
 
   <script>
-    // User-specific data management for food expenses
+    // User-specific data management for food expenses (simplified)
     function getCurrentUser() {
-      const session = localStorage.getItem('expenseWiseSession');
-      return session ? JSON.parse(session) : null;
+      // Return a default user since authentication is removed
+      return {
+        username: 'user',
+        userId: 'default_user',
+        fullName: 'ExpenseWise User'
+      };
     }
 
     function getUserFoodKey(monthKey) {
@@ -237,24 +240,18 @@
       return `${namespace}_FOOD_`;
     }
 
-    function checkUserAuth() {
-      const user = getCurrentUser();
-      if (!user) {
-        alert('Please log in to access food expenses');
-        window.location.href = 'login.html';
-        return false;
-      }
-      return true;
-    }
-
     // Set current month as default
     window.addEventListener('load', function() {
-      if (!checkUserAuth()) return;
-      
       const today = new Date();
       const month = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
       document.getElementById('expenseMonth').value = month;
       loadMonthlyData(month);
+      
+      // Hide table initially
+      const tableContainer = document.querySelector('.table-container');
+      if (tableContainer) {
+        tableContainer.style.display = 'none';
+      }
     });
 
     // Load data for selected month
@@ -263,8 +260,6 @@
     });
 
     function updateTable() {
-      if (!checkUserAuth()) return;
-      
       const tableBody = document.getElementById('expenseTableBody');
       tableBody.innerHTML = '';
       
@@ -286,6 +281,22 @@
       // Sort by date, newest first
       expenses.sort((a, b) => new Date(b.date) - new Date(a.date));
       
+      // Check if there's no data
+      if (expenses.length === 0) {
+        const noDataRow = document.createElement('tr');
+        noDataRow.innerHTML = `
+          <td colspan="5" style="padding: 20px; text-align: center; color: var(--muted); font-style: italic;">No data available. Add expenses and click "Show Table" to see them here.</td>
+        `;
+        tableBody.appendChild(noDataRow);
+        
+        // Reset totals to 0
+        document.getElementById('totalGroceries').textContent = '₹‚¹0';
+        document.getElementById('totalDrinks').textContent = '₹‚¹0';
+        document.getElementById('totalDining').textContent = '₹‚¹0';
+        document.getElementById('grandTotal').textContent = '₹‚¹0';
+        return;
+      }
+      
       // Create table rows
       expenses.forEach(expense => {
         const row = document.createElement('tr');
@@ -293,10 +304,10 @@
         
         row.innerHTML = `
           <td style="padding: 12px; border-bottom: 1px solid #e6eef8; cursor: pointer;" onclick="loadExpense('${expense.date}')">${expense.date}</td>
-          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹${expense.groceries}</td>
-          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹${expense.drinks}</td>
-          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹${expense.dining}</td>
-          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹${total}</td>
+          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹‚¹${expense.groceries}</td>
+          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹‚¹${expense.drinks}</td>
+          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹‚¹${expense.dining}</td>
+          <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹‚¹${total}</td>
         `;
         
         tableBody.appendChild(row);
@@ -307,14 +318,14 @@
       });
       
       // Update totals
-      document.getElementById('totalGroceries').textContent = `₹${totalGroceries}`;
-      document.getElementById('totalDrinks').textContent = `₹${totalDrinks}`;
-      document.getElementById('totalDining').textContent = `₹${totalDining}`;
-      document.getElementById('grandTotal').textContent = `₹${totalGroceries + totalDrinks + totalDining}`;
+      document.getElementById('totalGroceries').textContent = `₹‚¹${totalGroceries}`;
+      document.getElementById('totalDrinks').textContent = `₹‚¹${totalDrinks}`;
+      document.getElementById('totalDining').textContent = `₹‚¹${totalDining}`;
+      document.getElementById('grandTotal').textContent = `₹‚¹${totalGroceries + totalDrinks + totalDining}`;
     }
 
     function loadExpense(date) {
-        if (!checkUserAuth()) return;
+        // Auth check removed for direct access
         
         document.getElementById('expenseMonth').value = date;
         const userFoodKey = getUserFoodKey(date);
@@ -334,7 +345,7 @@
       const dining = parseInt(document.getElementById('dining').value) || 0;
       const total = groceries + drinks + dining;
 
-      document.getElementById('summary').innerHTML = `<h3>Total Food Expenses: ₹${total}</h3>`;
+      document.getElementById('summary').innerHTML = `<h3>Total Food Expenses: ₹‚¹${total}</h3>`;
 
       // Create pie chart for current data
       const ctx = document.getElementById('foodChart').getContext('2d');
@@ -374,7 +385,7 @@
     }
 
     function saveData() {
-      if (!checkUserAuth()) return;
+      // Auth check removed for direct access
       
       const groceries = parseInt(document.getElementById('groceries').value) || 0;
       const drinks = parseInt(document.getElementById('drinks').value) || 0;
@@ -398,12 +409,19 @@
     }
 
     function showTable() {
+      // Get the table container
+      const tableContainer = document.querySelector('.table-container');
+      if (!tableContainer) return;
+      
+      // Make table visible
+      tableContainer.style.display = 'block';
+      
       // Update the table
       updateTable();
     }
 
     function updateMonthlyChart() {
-      if (!checkUserAuth()) return;
+      // Auth check removed for direct access
       
       // Get user-specific expenses and group by month
       const user = getCurrentUser();
@@ -496,7 +514,7 @@
               displayColors: true,
               callbacks: {
                 label: function(context) {
-                  return `${context.dataset.label}: ₹${context.raw}`;
+                  return `${context.dataset.label}: ₹‚¹${context.raw}`;
                 }
               }
             },
@@ -535,7 +553,7 @@
               },
               ticks: {
                 callback: function(value) {
-                  return '₹' + value;
+                  return '₹‚¹' + value;
                 },
                 font: {
                   size: 11
@@ -548,7 +566,7 @@
     }
 
     function loadMonthlyData(month) {
-      if (!checkUserAuth()) return;
+      // Auth check removed for direct access
       
       // Try to load user-specific data for the selected month
       const userFoodKey = getUserFoodKey(month);
@@ -579,7 +597,7 @@
     }
 
     function clearAllData() {
-      if (!checkUserAuth()) return;
+      // Auth check removed for direct access
       
       if (confirm('Are you sure you want to clear all your food expense data? This cannot be undone.')) {
         const userPrefix = getUserFoodPrefix();
@@ -684,3 +702,4 @@
 </footer>
 </body>
 </html>
+

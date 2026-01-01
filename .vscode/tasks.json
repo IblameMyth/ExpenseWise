@@ -1,0 +1,49 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Start ExpenseWise",
+            "type": "shell",
+            "command": "echo",
+            "args": ["Starting ExpenseWise - Right-click on index.html or welcome.html and select 'Open with Live Server'"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Open Welcome Page",
+            "type": "shell", 
+            "command": "start",
+            "args": ["http://127.0.0.1:5500/welcome.html"],
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "silent",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Open Dashboard",
+            "type": "shell",
+            "command": "start", 
+            "args": ["http://127.0.0.1:5500/expense_manager_system.html"],
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "silent",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        }
+    ]
+}

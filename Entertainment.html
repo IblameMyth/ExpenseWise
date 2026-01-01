@@ -1,12 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Entertainment</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="auth.js"></script>
-    <script src="expense-utils.js"></script>
+  <link rel="stylesheet" href="styles.css">
+  <script src="expense-utils.js"></script>
     <style>
         :root{
             --bg:#f8fafc;
@@ -170,7 +169,7 @@
             <img src="images/logo.png" alt="ExpenseWise Logo" class="site-logo">
             <h1>ExpenseWise</h1>
         </div>
-        <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
+        <button class="theme-toggle" onclick="toggleTheme()">ðŸŒ™ Dark Mode</button>
     </header>
     <main>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -179,9 +178,9 @@
             <label for="expenseMonth">Select Month: </label>
             <input type="month" id="expenseMonth" style="padding: 10px; border-radius: 10px; border: 1px solid #e6eef8; background: var(--card); color: var(--text);" />
         </div>
-        <input type="number" id="movies" placeholder="Movies (₹)" />
-        <input type="number" id="parties" placeholder="Parties (₹)" />
-        <input type="number" id="gatherings" placeholder="Family Gatherings (₹)" />
+        <input type="number" id="movies" placeholder="Movies (₹‚¹)" />
+        <input type="number" id="parties" placeholder="Parties (₹‚¹)" />
+        <input type="number" id="gatherings" placeholder="Family Gatherings (₹‚¹)" />
         <button onclick="showChart()">Show Chart</button>
         <button onclick="saveData()">Save Data</button>
         <button onclick="showTable()">Show Table</button>
@@ -213,10 +212,10 @@
                 <tfoot>
                     <tr>
                         <td style="padding: 12px; font-weight: bold;">Total</td>
-                        <td id="totalMovies" style="padding: 12px;">₹0</td>
-                        <td id="totalParties" style="padding: 12px;">₹0</td>
-                        <td id="totalGatherings" style="padding: 12px;">₹0</td>
-                        <td id="grandTotal" style="padding: 12px; font-weight: bold;">₹0</td>
+                        <td id="totalMovies" style="padding: 12px;">₹‚¹0</td>
+                        <td id="totalParties" style="padding: 12px;">₹‚¹0</td>
+                        <td id="totalGatherings" style="padding: 12px;">₹‚¹0</td>
+                        <td id="grandTotal" style="padding: 12px; font-weight: bold;">₹‚¹0</td>
                     </tr>
                 </tfoot>
             </table>
@@ -228,7 +227,12 @@
                 const today = new Date();
                 const month = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
                 document.getElementById('expenseMonth').value = month;
-                updateTable();
+                
+                // Hide table initially
+                const tableContainer = document.querySelector('.table-container');
+                if (tableContainer) {
+                    tableContainer.style.display = 'none';
+                }
             });
 
             // Update data when month changes
@@ -254,6 +258,22 @@
 
                 expenses.sort((a, b) => new Date(b.date) - new Date(a.date));
 
+                // Check if there's no data
+                if (expenses.length === 0) {
+                    const noDataRow = document.createElement('tr');
+                    noDataRow.innerHTML = `
+                        <td colspan="5" style="padding: 20px; text-align: center; color: var(--muted); font-style: italic;">No data available. Add expenses and click "Show Table" to see them here.</td>
+                    `;
+                    tableBody.appendChild(noDataRow);
+                    
+                    // Reset totals
+                    document.getElementById('totalMovies').textContent = '₹‚¹0';
+                    document.getElementById('totalParties').textContent = '₹‚¹0';
+                    document.getElementById('totalGatherings').textContent = '₹‚¹0';
+                    document.getElementById('grandTotal').textContent = '₹‚¹0';
+                    return;
+                }
+
                 let totalMovies = 0, totalParties = 0, totalGatherings = 0;
 
                 expenses.forEach(expense => {
@@ -263,10 +283,10 @@
                         <td style="padding: 12px; border-bottom: 1px solid #e6eef8; cursor: pointer;" onclick="loadExpense('${expense.date}')">
                             ${expense.date}
                         </td>
-                        <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹${expense.movies || 0}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹${expense.parties || 0}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹${expense.gatherings || 0}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹${total}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹‚¹${expense.movies || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹‚¹${expense.parties || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹‚¹${expense.gatherings || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e6eef8;">₹‚¹${total}</td>
                     `;
 
                     tableBody.appendChild(row);
@@ -276,10 +296,10 @@
                     totalGatherings += expense.gatherings || 0;
                 });
 
-                document.getElementById('totalMovies').textContent = `₹${totalMovies}`;
-                document.getElementById('totalParties').textContent = `₹${totalParties}`;
-                document.getElementById('totalGatherings').textContent = `₹${totalGatherings}`;
-                document.getElementById('grandTotal').textContent = `₹${totalMovies + totalParties + totalGatherings}`;
+                document.getElementById('totalMovies').textContent = `₹‚¹${totalMovies}`;
+                document.getElementById('totalParties').textContent = `₹‚¹${totalParties}`;
+                document.getElementById('totalGatherings').textContent = `₹‚¹${totalGatherings}`;
+                document.getElementById('grandTotal').textContent = `₹‚¹${totalMovies + totalParties + totalGatherings}`;
             }
 
             function loadExpense(date) {
@@ -301,7 +321,7 @@
                 const total = movies + parties + gatherings;
 
                 // Update UI
-                document.getElementById('summary').innerHTML = `<h3>Total Entertainment Expenses: ₹${total}</h3>`;
+                document.getElementById('summary').innerHTML = `<h3>Total Entertainment Expenses: ₹‚¹${total}</h3>`;
 
                 // Create pie chart for current data
                 const ctx = document.getElementById('entertainmentChart').getContext('2d');
@@ -360,6 +380,13 @@
             }
 
             function showTable() {
+                // Get the table container
+                const tableContainer = document.querySelector('.table-container');
+                if (!tableContainer) return;
+                
+                // Make table visible
+                tableContainer.style.display = 'block';
+                
                 // Update UI
                 updateTable();
             }
@@ -440,7 +467,7 @@
                                 beginAtZero: true,
                                 ticks: {
                                     callback: function(value) {
-                                        return '₹' + value;
+                                        return '₹‚¹' + value;
                                     }
                                 }
                             }
@@ -449,7 +476,7 @@
                             tooltip: {
                                 callbacks: {
                                     label: function(context) {
-                                        return `${context.dataset.label}: ₹${context.raw}`;
+                                        return `${context.dataset.label}: ₹‚¹${context.raw}`;
                                     }
                                 }
                             },
@@ -470,7 +497,7 @@
                 localStorage.setItem('theme', newTheme);
                 
                 const toggleBtn = document.querySelector('.theme-toggle');
-                toggleBtn.textContent = newTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+                toggleBtn.textContent = newTheme === 'dark' ? '₹˜€ï¸ Light Mode' : 'ðŸŒ™ Dark Mode';
             }
 
             // Load saved theme
@@ -478,7 +505,7 @@
             document.documentElement.setAttribute('data-theme', savedTheme);
             const toggleBtn = document.querySelector('.theme-toggle');
             if (toggleBtn) {
-                toggleBtn.textContent = savedTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+                toggleBtn.textContent = savedTheme === 'dark' ? '₹˜€ï¸ Light Mode' : 'ðŸŒ™ Dark Mode';
             }
 
             function clearAllData() {
