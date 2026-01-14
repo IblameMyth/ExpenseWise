@@ -3,9 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Travel</title>
+    <title>Travel - ExpenseWise</title>
   <link rel="stylesheet" href="styles.css">
-  <script src="expense-utils.js"></script>
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  
+  <!-- Firebase Configuration -->
+  <script src="firebase-config.js"></script>
+  <script src="firebase-expense-utils.js"></script>
+  
   <style>
     :root{
       --bg:#f8fafc;
@@ -122,27 +131,22 @@
     <label for="expenseMonth">Select Month: </label>
     <input type="month" id="expenseMonth" style="padding: 10px; border-radius: 10px; border: 1px solid #e6eef8;" />
   </div>
-  <input type="number" id="auto" placeholder="Auto (₹‚¹)" />
-  <input type="number" id="bus" placeholder="Bus (₹‚¹)" />
-  <input type="number" id="metro" placeholder="Metro (₹‚¹)" />
-  <input type="number" id="petrol" placeholder="Petrol (₹‚¹)" />
+  <input type="number" id="auto" placeholder="Auto" />
+  <input type="number" id="bus" placeholder="Bus" />
+  <input type="number" id="metro" placeholder="Metro" />
+  <input type="number" id="petrol" placeholder="Petrol" />
   <button onclick="showChart()">Show Chart</button>
   <button onclick="saveData()">Save Data</button>
-  <button onclick="showTable()">Show Table</button>
+  <button id="toggleTableBtn" onclick="toggleTableVisibility()">Show Table</button>
   <button onclick="clearAllData()" style="background: linear-gradient(90deg, #dc2626, #ef4444); margin-left: 10px;">Clear All Data</button>
   <div id="summary"></div>
-  
-  <div class="chart-wrapper" style="max-width: 500px; margin: 18px auto;">
-    <h3>Current Expense Breakdown</h3>
-    <canvas id="travelChart"></canvas>
-  </div>
   
   <div class="chart-wrapper" style="max-width: 900px; margin: 18px auto;">
     <h3>Monthly Trends</h3>
     <canvas id="monthlyChart"></canvas>
   </div>
 
-  <div class="table-container" style="margin-top: 20px;">
+  <div class="table-container" id="expenseTableContainer" style="margin-top: 20px; display: none;">
     <table class="expense-table" style="width: 100%; border-collapse: collapse;">
       <thead>
         <tr>
@@ -169,13 +173,25 @@
   </div>
 
   <script>
-    // Enhanced user-specific data management for travel expenses (simplified)
+    // Enhanced user-specific data management for travel expenses - Use Firebase authenticated user
     function getCurrentUser() {
-      // Return a default user since authentication is removed
+      // Check if Firebase user is authenticated
+      if (window.firebaseAuth && window.firebaseAuth.currentUser) {
+        const fbUser = window.firebaseAuth.currentUser;
+        return {
+          username: fbUser.email ? fbUser.email.split('@')[0] : 'user',
+          userId: fbUser.uid,
+          fullName: fbUser.displayName || fbUser.email || 'ExpenseWise User',
+          email: fbUser.email
+        };
+      }
+      
+      // Fallback for guest users
+      const guestId = window.getCurrentUserId ? window.getCurrentUserId() : 'guest_user';
       return {
-        username: 'user',
-        userId: 'default_user',
-        fullName: 'ExpenseWise User'
+        username: 'guest',
+        userId: guestId,
+        fullName: 'Guest User'
       };
     }
 
@@ -440,9 +456,22 @@
       }
     }
 
+    function toggleTableVisibility() {
+      const tableContainer = document.getElementById('expenseTableContainer');
+      const btn = document.getElementById('toggleTableBtn');
+      if (tableContainer.style.display === 'none') {
+        tableContainer.style.display = 'block';
+        btn.textContent = 'Hide Table';
+        updateTable();
+      } else {
+        tableContainer.style.display = 'none';
+        btn.textContent = 'Show Table';
+      }
+    }
+
     function showTable() {
       // Get the table container
-      const tableContainer = document.querySelector('.table-container');
+      const tableContainer = document.getElementById('expenseTableContainer');
       if (!tableContainer) return;
       
       // Make table visible

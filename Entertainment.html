@@ -169,7 +169,11 @@
             <img src="images/logo.png" alt="ExpenseWise Logo" class="site-logo">
             <h1>ExpenseWise</h1>
         </div>
-        <button class="theme-toggle" onclick="toggleTheme()">ðŸŒ™ Dark Mode</button>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <button onclick="window.location.href='welcome.html'" style="background: var(--accent); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px;">🏠 Home</button>
+            <button onclick="window.location.href='expense_manager_system.html'" style="background: var(--primary); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px;">📊 Dashboard</button>
+            <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
+        </div>
     </header>
     <main>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -178,19 +182,14 @@
             <label for="expenseMonth">Select Month: </label>
             <input type="month" id="expenseMonth" style="padding: 10px; border-radius: 10px; border: 1px solid #e6eef8; background: var(--card); color: var(--text);" />
         </div>
-        <input type="number" id="movies" placeholder="Movies (₹‚¹)" />
-        <input type="number" id="parties" placeholder="Parties (₹‚¹)" />
-        <input type="number" id="gatherings" placeholder="Family Gatherings (₹‚¹)" />
+        <input type="number" id="movies" placeholder="Movies" />
+        <input type="number" id="parties" placeholder="Parties" />
+        <input type="number" id="gatherings" placeholder="Family Gatherings" />
         <button onclick="showChart()">Show Chart</button>
         <button onclick="saveData()">Save Data</button>
         <button onclick="showTable()">Show Table</button>
         <button onclick="clearAllData()" style="background: linear-gradient(90deg, #dc2626, #ef4444); margin-left: 10px;">Clear All Data</button>
         <div id="summary"></div>
-        
-        <div class="chart-wrapper" style="max-width: 500px; margin: 18px auto;">
-            <h3>Current Entertainment Breakdown</h3>
-            <canvas id="entertainmentChart"></canvas>
-        </div>
         
         <div class="chart-wrapper" style="max-width: 900px; margin: 18px auto;">
             <h3>Monthly Trends</h3>
@@ -497,7 +496,7 @@
                 localStorage.setItem('theme', newTheme);
                 
                 const toggleBtn = document.querySelector('.theme-toggle');
-                toggleBtn.textContent = newTheme === 'dark' ? '₹˜€ï¸ Light Mode' : 'ðŸŒ™ Dark Mode';
+                toggleBtn.textContent = newTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
             }
 
             // Load saved theme
@@ -505,7 +504,7 @@
             document.documentElement.setAttribute('data-theme', savedTheme);
             const toggleBtn = document.querySelector('.theme-toggle');
             if (toggleBtn) {
-                toggleBtn.textContent = savedTheme === 'dark' ? '₹˜€ï¸ Light Mode' : 'ðŸŒ™ Dark Mode';
+                toggleBtn.textContent = savedTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
             }
 
             function clearAllData() {
@@ -547,8 +546,7 @@
                 }
             }
 
-            // Initialize table and expose functions
-            updateTable();
+            // Initialize chart but not table - table only shows when user clicks "Show Data"
             updateMonthlyChart();
             window.showChart = showChart;
             window.loadExpense = loadExpense;

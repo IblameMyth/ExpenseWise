@@ -172,26 +172,21 @@
     <label for="expenseMonth">Select Month: </label>
     <input type="month" id="expenseMonth" style="padding: 10px; border-radius: 10px; border: 1px solid #e6eef8;" />
   </div>
-  <input type="number" id="groceries" placeholder="Groceries (₹‚¹)" />
-  <input type="number" id="drinks" placeholder="Drinks (₹‚¹)" />
-  <input type="number" id="dining" placeholder="Dining Out (₹‚¹)" />
+  <input type="number" id="groceries" placeholder="Groceries" />
+  <input type="number" id="drinks" placeholder="Drinks" />
+  <input type="number" id="dining" placeholder="Dining Out" />
   <button onclick="showChart()">Show Chart</button>
   <button onclick="saveData()">Save Data</button>
-  <button onclick="showTable()">Show Table</button>
+  <button id="toggleTableBtn" onclick="toggleTableVisibility()">Show Table</button>
   <button onclick="clearAllData()" style="background: linear-gradient(90deg, #dc2626, #ef4444); margin-left: 10px;">Clear All Data</button>
   <div id="summary"></div>
-  
-  <div class="chart-wrapper" style="max-width: 500px; margin: 18px auto;">
-    <h3>Current Expense Breakdown</h3>
-    <canvas id="foodChart"></canvas>
-  </div>
   
   <div class="chart-wrapper" style="max-width: 900px; margin: 18px auto;">
     <h3>Monthly Trends</h3>
     <canvas id="monthlyChart"></canvas>
   </div>
   
-  <div class="table-container" style="margin-top: 20px;">
+  <div class="table-container" id="expenseTableContainer" style="margin-top: 20px; display: none;">
     <table class="expense-table" style="width: 100%; border-collapse: collapse;">
       <thead>
         <tr>
@@ -216,13 +211,25 @@
   </div>
 
   <script>
-    // User-specific data management for food expenses (simplified)
+    // User-specific data management for food expenses - Use Firebase authenticated user
     function getCurrentUser() {
-      // Return a default user since authentication is removed
+      // Check if Firebase user is authenticated
+      if (window.firebaseAuth && window.firebaseAuth.currentUser) {
+        const fbUser = window.firebaseAuth.currentUser;
+        return {
+          username: fbUser.email ? fbUser.email.split('@')[0] : 'user',
+          userId: fbUser.uid,
+          fullName: fbUser.displayName || fbUser.email || 'ExpenseWise User',
+          email: fbUser.email
+        };
+      }
+      
+      // Fallback for guest users
+      const guestId = window.getCurrentUserId ? window.getCurrentUserId() : 'guest_user';
       return {
-        username: 'user',
-        userId: 'default_user',
-        fullName: 'ExpenseWise User'
+        username: 'guest',
+        userId: guestId,
+        fullName: 'Guest User'
       };
     }
 
@@ -408,9 +415,22 @@
       }
     }
 
+    function toggleTableVisibility() {
+      const tableContainer = document.getElementById('expenseTableContainer');
+      const btn = document.getElementById('toggleTableBtn');
+      if (tableContainer.style.display === 'none') {
+        tableContainer.style.display = 'block';
+        btn.textContent = 'Hide Table';
+        updateTable();
+      } else {
+        tableContainer.style.display = 'none';
+        btn.textContent = 'Show Table';
+      }
+    }
+
     function showTable() {
       // Get the table container
-      const tableContainer = document.querySelector('.table-container');
+      const tableContainer = document.getElementById('expenseTableContainer');
       if (!tableContainer) return;
       
       // Make table visible
@@ -618,6 +638,14 @@
         document.getElementById('drinks').value = '';
         document.getElementById('dining').value = '';
         
+        // Hide table after clearing
+        const tableContainer = document.getElementById('expenseTableContainer');
+        const btn = document.getElementById('toggleTableBtn');
+        if (tableContainer) {
+          tableContainer.style.display = 'none';
+          if (btn) btn.textContent = 'Show Table';
+        }
+        
         // Update UI
         updateTable();
         showChart();
@@ -627,8 +655,8 @@
       }
     }
 
-    // Initialize table and expose functions
-    updateTable();
+    // Don't auto-show table on load - wait for user action
+    // updateTable(); // REMOVED - user must click "Show Table"
     window.showChart = showChart;
     window.loadExpense = loadExpense;
 
@@ -653,7 +681,7 @@
     }
 
     // Clear all food expense data
-    function clearAllData() {
+    function clearAllDataLegacy() {
       if (confirm('Are you sure you want to clear all food expense data? This cannot be undone.')) {
         // Get all keys from localStorage
         const keys = Object.keys(localStorage);
@@ -678,6 +706,14 @@
           window.monthlyChartInstance = null;
         }
         
+        // Hide table after clearing
+        const tableContainer = document.getElementById('expenseTableContainer');
+        const btn = document.getElementById('toggleTableBtn');
+        if (tableContainer) {
+          tableContainer.style.display = 'none';
+          if (btn) btn.textContent = 'Show Table';
+        }
+        
         // Clear summary
         document.getElementById('summary').innerHTML = '';
         
@@ -688,9 +724,9 @@
       }
     }
 
-    // Initialize table and expose functions
-    updateTable();
-    updateMonthlyChart();
+    // Don't auto-show table or charts on load - wait for user action
+    // updateTable(); // REMOVED - user must click "Show Table"
+    // updateMonthlyChart(); // REMOVED - will load when needed
     window.showChart = showChart;
     window.loadExpense = loadExpense;
     window.clearAllData = clearAllData;
