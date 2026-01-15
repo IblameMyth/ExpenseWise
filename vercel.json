@@ -1,53 +1,12 @@
 {
   "version": 2,
   "public": true,
-  "buildCommand": "echo 'No build required - Pure frontend'",
+  "buildCommand": "",
   "outputDirectory": ".",
-  "env": {
-    "VERCEL_ANALYTICS_ID": "@optional"
-  },
   "rewrites": [
     {
       "source": "/",
       "destination": "/index.html"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/:path*",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=3600, must-revalidate"
-        }
-      ]
-    },
-    {
-      "source": "/images/:path*",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "/:path*\\.js",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "/:path*\\.css",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
     }
   ],
   "cleanUrls": true,
