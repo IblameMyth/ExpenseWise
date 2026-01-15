@@ -1,0 +1,12 @@
+.git
+.gitignore
+.gitattributes
+.vscode
+node_modules
+*.md
+.env.local
+.env.*.local
+FIREBASE_SECURITY_RULES.json
+*.log
+.DS_Store
+Thumbs.db
