@@ -36,7 +36,7 @@ try {
 let currentUser = null;
 
 // Google Sign-In with account selection
-function signInWithGoogle(forceAccountSelection = false) {
+async function signInWithGoogle(forceAccountSelection = false) {
   const provider = new firebase.auth.GoogleAuthProvider();
   
   // Force account selection popup (allows choosing different account)
@@ -45,22 +45,36 @@ function signInWithGoogle(forceAccountSelection = false) {
       prompt: 'select_account'
     });
   }
-  
-  return auth.signInWithPopup(provider)
-    .then((result) => {
-      currentUser = result.user;
-      console.log('✓ Signed in with Google:', result.user.email);
-      saveAccountToHistory(result.user);
-      updateUIForUser(result.user);
-      return result.user;
-    })
-    .catch((error) => {
-      console.error('Google Sign-In error:', error);
-      if (error.code !== 'auth/popup-closed-by-user') {
-        alert('Failed to sign in with Google: ' + error.message);
+
+  try {
+    const result = await auth.signInWithPopup(provider);
+    currentUser = result.user;
+    console.log('✓ Signed in with Google:', result.user.email);
+    saveAccountToHistory(result.user);
+    updateUIForUser(result.user);
+    return result.user;
+  } catch (error) {
+    console.error('Google Sign-In error:', error);
+
+    // When Chrome blocks third-party cookies or the domain is not whitelisted, Firebase reports auth/internal-error.
+    // Fall back to redirect-based sign-in which is more tolerant of these restrictions.
+    if (error.code === 'auth/internal-error' || error.code === 'auth/popup-blocked') {
+      try {
+        console.warn('Popup failed, falling back to redirect-based Google sign-in...');
+        await auth.signInWithRedirect(provider);
+        return; // Redirect will navigate away
+      } catch (redirectError) {
+        console.error('Google Sign-In redirect error:', redirectError);
+        console.log('');
+        throw redirectError;
       }
-      throw error;
-    });
+    }
+
+    if (error.code !== 'auth/popup-closed-by-user') {
+      console.log('Failed to sign in with Google: ' + error.message);
+    }
+    throw error;
+  }
 }
 
 // Switch to a different Google account
@@ -157,6 +171,9 @@ function updateUIForUser(user) {
           </div>
         </div>
         <div class="user-actions">
+          <button onclick="window.location.href='categories.html#future'" class="menu-item-btn" style="width:100%; text-align:left; padding:12px; background:transparent; border:none; cursor:pointer; font-size:14px; color:var(--text); transition:background 0.2s;" onmouseover="this.style.background='rgba(37,99,235,0.05)'" onmouseout="this.style.background='transparent'">
+            📅 Future Expenses
+          </button>
           <button onclick="switchAccount()" class="switch-account-btn">
             🔄 Switch Account
           </button>
@@ -214,6 +231,29 @@ function showRecentAccounts() {
 // Listen for auth state changes
 function initFirebaseAuth() {
   return new Promise((resolve) => {
+    let resolved = false;
+    const finish = (user) => {
+      if (!resolved) {
+        resolved = true;
+        resolve(user);
+      }
+    };
+
+    // Handle redirect-based sign-in results (after signInWithRedirect)
+    auth.getRedirectResult()
+      .then((result) => {
+        if (result && result.user) {
+          currentUser = result.user;
+          console.log('✓ Redirect sign-in complete for:', result.user.email);
+          saveAccountToHistory(result.user);
+          updateUIForUser(result.user);
+          finish(result.user);
+        }
+      })
+      .catch((error) => {
+        console.error('Redirect sign-in error:', error);
+      });
+
     auth.onAuthStateChanged((user) => {
       currentUser = user;
       
@@ -226,11 +266,11 @@ function initFirebaseAuth() {
         console.log('✓ User authenticated:', user.email);
         console.log('✓ User ID:', user.uid);
         updateUIForUser(user);
-        resolve(user);
+        finish(user);
       } else {
         console.log('⚠ No user signed in');
         updateUIForUser(null);
-        resolve(null);
+        finish(null);
       }
     });
   });

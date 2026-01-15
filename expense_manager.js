@@ -10,7 +10,7 @@ function autoCalculateAndSave() {
     // Save to localStorage with user-specific key
     const user = getCurrentUser();
     if (!user) {
-      alert('Please log in to save expenses');
+      console.log('Please log in to save expenses');
       return;
     }
 
@@ -40,6 +40,14 @@ window.autoCalculateAndSave = autoCalculateAndSave;
 
 // Set today's date and load data when page loads
 window.addEventListener('load', function() {
+  // Initialize theme
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  const toggleBtn = document.querySelector('.theme-toggle');
+  if (toggleBtn) {
+    toggleBtn.textContent = savedTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+  }
+  
   const today = new Date();
   const year = today.getFullYear();
   const month = String(today.getMonth() + 1).padStart(2, '0');
@@ -70,20 +78,23 @@ window.addEventListener('load', function() {
 });
 
 // Update calculations when date changes
-document.getElementById('budgetDate').addEventListener('change', function() {
-  const savedData = localStorage.getItem(`expense_${this.value}`);
-  if (savedData) {
-    const data = JSON.parse(savedData);
-    document.getElementById('food').value = data.food || '';
-    document.getElementById('travel').value = data.travel || '';
-    document.getElementById('misc').value = data.misc || '';
-  } else {
-    document.getElementById('food').value = '';
-    document.getElementById('travel').value = '';
-    document.getElementById('misc').value = '';
-  }
-  autoCalculateAndSave();
-});
+const budgetDateElement = document.getElementById('budgetDate');
+if (budgetDateElement) {
+  budgetDateElement.addEventListener('change', function() {
+    const savedData = localStorage.getItem(`expense_${this.value}`);
+    if (savedData) {
+      const data = JSON.parse(savedData);
+      document.getElementById('food').value = data.food || '';
+      document.getElementById('travel').value = data.travel || '';
+      document.getElementById('misc').value = data.misc || '';
+    } else {
+      document.getElementById('food').value = '';
+      document.getElementById('travel').value = '';
+      document.getElementById('misc').value = '';
+    }
+    autoCalculateAndSave();
+  });
+}
 
 // Add Budget button wiring
 document.addEventListener('DOMContentLoaded', function(){
@@ -132,6 +143,8 @@ function getUserExpenseKey(date) {
 
 // Function to load daily budget entries table near the form
 function loadMonthlyData() {
+  // Table disabled by user request
+  return;
   const currentUser = getCurrentUser();
   if (!currentUser) return; // No user logged in
 
@@ -203,15 +216,17 @@ function loadMonthlyData() {
   container.appendChild(table);
 }
 
-// Future expenses form handler
-document.getElementById('futureForm').addEventListener('submit', function (e) {
+// Future expenses form handler (only if the form exists on this page)
+const futureForm = document.getElementById('futureForm');
+if (futureForm) {
+futureForm.addEventListener('submit', function (e) {
   e.preventDefault();
   const nameInput = document.getElementById('expenseName');
   const name = nameInput.value;
   
   // Validate that the name contains only letters and spaces
   if (!/^[A-Za-z\s]+$/.test(name)) {
-    alert('Please enter only letters and spaces for the expense name');
+    console.log('Please enter only letters and spaces for the expense name');
     return;
   }
   
@@ -239,6 +254,7 @@ document.getElementById('futureForm').addEventListener('submit', function (e) {
 
   this.reset();
 });
+}
 
 // Clear all application data from both Firebase and localStorage
 async function clearAllData() {
@@ -278,7 +294,8 @@ async function clearAllData() {
       key.startsWith('travel') ||
       key.startsWith('entertainment') ||
       key.startsWith('emi') ||
-      key.startsWith('vacation')
+      key.startsWith('vacation') ||
+      key.startsWith('EXPENSE_USER_') // daily budget storage keys
     )) {
       keysToRemove.push(key);
     }
@@ -295,6 +312,10 @@ async function clearAllData() {
   const futureList = document.getElementById('futureList');
   if (futureList) futureList.innerHTML = '';
 
+  // Clear the rendered daily budget table immediately
+  const dailyTableContainer = document.getElementById('daily-budget-table-container');
+  if (dailyTableContainer) dailyTableContainer.innerHTML = '';
+
   // Try to refresh any tables if functions exist
   if (typeof loadMonthlyData === 'function') {
     try { loadMonthlyData(); } catch (e) { /* ignore */ }
@@ -303,18 +324,9 @@ async function clearAllData() {
     try { updateTable(); } catch (e) { /* ignore */ }
   }
   
-  // Hide the expenses table after clearing
-  const expensesContainer = document.getElementById('all-expenses-container');
-  const toggleBtn = document.getElementById('toggleAllExpenses');
-  if (expensesContainer) {
-    expensesContainer.style.display = 'none';
-    expensesContainer.innerHTML = '';
-  }
-  if (toggleBtn) {
-    toggleBtn.textContent = 'Show All Expenses (by Month)';
-  }
+  // All Expenses section removed
 
-  alert(`Successfully cleared ${totalDeleted + keysToRemove.length} saved records from cloud and local storage.`);
+  console.log(`Successfully cleared ${totalDeleted + keysToRemove.length} saved records from cloud and local storage.`);
 }
 
 // Delete a specific expense entry
@@ -324,17 +336,17 @@ async function deleteExpense(expenseType, monthKey) {
   try {
     const deleted = await window.ExpenseUtils.delete(expenseType, monthKey);
     if (deleted) {
-      alert(`Deleted ${expenseType} expense for ${monthKey}`);
+      console.log(`Deleted ${expenseType} expense for ${monthKey}`);
       // Refresh the display
       if (typeof buildCombinedTable === 'function') {
         buildCombinedTable();
       }
     } else {
-      alert('Failed to delete expense');
+      console.log('Failed to delete expense');
     }
   } catch (error) {
     console.error('Delete error:', error);
-    alert('Error deleting expense');
+    console.log('Error deleting expense');
   }
 }
 
@@ -351,24 +363,16 @@ async function deleteMonthData(monthKey) {
       if (deleted) deletedCount++;
     }
     
-    alert(`Deleted ${deletedCount} expense categories for ${monthKey}`);
+    console.log(`Deleted ${deletedCount} expense categories for ${monthKey}`);
     // Rebuild and refresh the display
     if (typeof buildCombinedTable === 'function') {
       buildCombinedTable();
     }
     
-    // If no data left, hide the table
-    setTimeout(() => {
-      const container = document.getElementById('all-expenses-container');
-      const toggleBtn = document.getElementById('toggleAllExpenses');
-      if (container && container.textContent.includes('No expense data found')) {
-        container.style.display = 'none';
-        if (toggleBtn) toggleBtn.textContent = 'Show All Expenses (by Month)';
-      }
-    }, 500);
+    // All Expenses section removed
   } catch (error) {
     console.error('Delete month error:', error);
-    alert('Error deleting month data');
+    console.log('Error deleting month data');
   }
 }
 
@@ -377,45 +381,8 @@ window.clearAllData = clearAllData;
 window.deleteExpense = deleteExpense;
 window.deleteMonthData = deleteMonthData;
 
-// Ensure the All Expenses UI wrapper (heading + button + container) exists
-function ensureAllExpensesWrapper() {
-  let wrapper = document.getElementById('all-expenses-wrapper');
-  if (!wrapper) {
-    wrapper = document.createElement('div');
-    wrapper.id = 'all-expenses-wrapper';
+// All Expenses section removed - feature not needed
 
-    const headingBar = document.createElement('div');
-    headingBar.style.display = 'flex';
-    headingBar.style.justifyContent = 'space-between';
-    headingBar.style.alignItems = 'center';
-    headingBar.style.marginTop = '18px';
-
-    const heading = document.createElement('h3');
-    heading.id = 'all-expenses-heading';
-    heading.textContent = 'All Expenses (by Month)';
-
-    const btn = document.createElement('button');
-    btn.id = 'toggleAllExpenses';
-    btn.className = 'btn';
-    btn.type = 'button';
-    btn.textContent = 'Show All Expenses (by Month)';
-
-    headingBar.appendChild(heading);
-    headingBar.appendChild(btn);
-
-    const container = document.createElement('div');
-    container.id = 'all-expenses-container';
-    container.className = 'table-container';
-    container.style.display = 'none'; // hidden until shown
-
-    wrapper.appendChild(headingBar);
-    wrapper.appendChild(container);
-
-    const mainEl = document.querySelector('main');
-    mainEl.appendChild(wrapper);
-  }
-  return wrapper;
-}
 
 // Build a combined monthly expenses table across all categories (called on demand)
 function buildCombinedTable() {
@@ -628,162 +595,169 @@ function buildCombinedTable() {
   container.style.display = '';
 }
 
-// Setup show/hide button just above the table
-window.addEventListener('load', function() {
-  // Ensure UI and then wire the button
-  ensureAllExpensesWrapper();
-  const btn = document.getElementById('toggleAllExpenses');
-  const container = document.getElementById('all-expenses-container');
-  if (!btn || !container) {
-    console.log('Button or container not found');
-    return;
-  }
-  btn.addEventListener('click', function(){
-    if (container.style.display === 'none' || container.style.display === '') {
-      // Build fresh and show
-      try { buildCombinedTable(); } catch (e) { console.error(e); }
-      container.style.display = 'block';
-      this.textContent = 'Hide All Expenses';
-    } else {
-      container.style.display = 'none';
-      this.textContent = 'Show All Expenses (by Month)';
-    }
-  });
-  
-  // Keep table hidden by default - user must click to show
-  container.style.display = 'none';
-  btn.textContent = 'Show All Expenses (by Month)';
-});
+// All Expenses section removed - feature no longer needed
 
 // Budget Overview Ring Progress
 (function(){
-  const circumference = 2 * Math.PI * 50; // r=50
-  const progressCircle = document.querySelector('#budgetRing .progress');
-  const percentLabel = document.getElementById('budgetPercent');
-  const spentEl = document.getElementById('budgetSpent');
-  const totalEl = document.getElementById('budgetTotal');
-  const statusEl = document.getElementById('budgetStatus');
-  
-  // Get user-specific budget key
-  function getBudgetKey() {
-    const user = getCurrentUser();
-    return user ? `monthlyBudget_${user.userId}` : 'monthlyBudget_guest';
-  }
-  
-  let total = parseInt(localStorage.getItem(getBudgetKey()) || '40000', 10) || 40000;
-  totalEl.textContent = total;
+  function initBudgetUI() {
+    const circumference = 2 * Math.PI * 50; // r=50
+    const progressCircle = document.querySelector('#budgetRing .progress');
+    const percentLabel = document.getElementById('budgetPercent');
+    const spentEl = document.getElementById('budgetSpent');
+    const totalEl = document.getElementById('budgetTotal');
+    const statusEl = document.getElementById('budgetStatus');
 
-  // Calculate actual spent amount from all expenses
-  function calculateActualSpent() {
-    const currentUser = getCurrentUser();
-    if (!currentUser) {
-      statusEl.textContent = 'Please sign in to view expenses';
-      return 0;
-    }
-    
-    const currentUserId = currentUser.userId;
-    let totalSpent = 0;
-    let expenseCount = 0;
-    
-    // Get current month
-    const now = new Date();
-    const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-    
-    // Scan all localStorage for current user's expenses
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (!key) continue;
-      
-      // Check if this key belongs to current user and current month
-      const isUserKey = key.includes(currentUserId);
-      const isCurrentMonth = key.includes(currentMonth);
-      
-      if (isUserKey && isCurrentMonth) {
-        try {
-          const data = JSON.parse(localStorage.getItem(key));
-          
-          // Handle different expense types
-          if (data.total) {
-            totalSpent += parseFloat(data.total) || 0;
-            expenseCount++;
-          } else {
-            // Sum individual fields for category expenses
-            const sum = (parseFloat(data.groceries) || 0) +
-                       (parseFloat(data.drinks) || 0) +
-                       (parseFloat(data.dining) || 0) +
-                       (parseFloat(data.auto) || 0) +
-                       (parseFloat(data.bus) || 0) +
-                       (parseFloat(data.metro) || 0) +
-                       (parseFloat(data.petrol) || 0) +
-                       (parseFloat(data.home) || 0) +
-                       (parseFloat(data.car) || 0) +
-                       (parseFloat(data.edu) || 0) +
-                       (parseFloat(data.personal) || 0) +
-                       (parseFloat(data.movies) || 0) +
-                       (parseFloat(data.parties) || 0) +
-                       (parseFloat(data.gatherings) || 0) +
-                       (parseFloat(data.tickets) || 0) +
-                       (parseFloat(data.hostel) || 0) +
-                       (parseFloat(data.food) || 0) +
-                       (parseFloat(data.traveling) || 0);
-            
-            if (sum > 0) {
-              totalSpent += sum;
-              expenseCount++;
-            }
-          }
-        } catch (e) {
-          // Skip invalid data
-        }
-      }
-    }
-    
-    // Update status message
-    if (expenseCount === 0) {
-      statusEl.textContent = 'No expenses recorded yet';
-    } else {
-      statusEl.textContent = `${expenseCount} expense${expenseCount > 1 ? 's' : ''} this month`;
-    }
-    
-    return Math.round(totalSpent);
-  }
-
-  function updateRing(){
-    const spent = calculateActualSpent();
-    spentEl.textContent = spent;
-    
-    const pct = Math.min(spent / total, 1);
-    const offset = circumference * (1 - pct);
-    progressCircle.style.strokeDasharray = circumference;
-    progressCircle.style.strokeDashoffset = offset;
-    percentLabel.textContent = Math.round(pct * 100) + '%';
-  }
-
-  // Refresh button to recalculate from actual data
-  document.getElementById('refreshBudgetBtn').addEventListener('click', () => {
-    updateRing();
-  });
-
-  // Set Monthly Budget handler
-  const setBtn = document.getElementById('setBudgetBtn');
-  setBtn.addEventListener('click', () => {
-    const current = total;
-    const input = prompt('Enter monthly budget (₹):', String(current));
-    if (input === null) return; // cancelled
-    const val = Math.floor(Number(input));
-    if (!isFinite(val) || val <= 0) {
-      alert('Please enter a valid positive number.');
+    // If budget UI is not on this page, skip init gracefully
+    if (!progressCircle || !percentLabel || !spentEl || !totalEl || !statusEl) {
       return;
     }
-    total = val;
-    localStorage.setItem(getBudgetKey(), String(total));
+    
+    // Get user-specific budget key
+    function getBudgetKey() {
+      const user = getCurrentUser();
+      return user ? `monthlyBudget_${user.userId}` : 'monthlyBudget_guest';
+    }
+    
+    let total = parseInt(localStorage.getItem(getBudgetKey()) || '0', 10) || 0;
     totalEl.textContent = total;
-    updateRing();
-  });
 
-  // Initial update and auto-refresh every 2 seconds
-  updateRing();
-  setInterval(updateRing, 2000);
+    // Calculate actual spent amount from all expenses
+    function calculateActualSpent() {
+      const currentUser = getCurrentUser();
+      if (!currentUser) {
+        statusEl.textContent = 'Please sign in to view expenses';
+        return 0;
+      }
+      
+      const currentUserId = currentUser.userId;
+      let totalSpent = 0;
+      let expenseCount = 0;
+      
+      // Get current month
+      const now = new Date();
+      const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      
+      // Scan all localStorage for current user's expenses
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key) continue;
+        
+        // Check if this key belongs to current user and current month
+        const isUserKey = key.includes(currentUserId);
+        const isCurrentMonth = key.includes(currentMonth);
+        
+        if (isUserKey && isCurrentMonth) {
+          try {
+            const data = JSON.parse(localStorage.getItem(key));
+            
+            // Handle different expense types
+            if (data.total) {
+              totalSpent += parseFloat(data.total) || 0;
+              expenseCount++;
+            } else {
+              // Sum individual fields for category expenses
+              const sum = (parseFloat(data.groceries) || 0) +
+                         (parseFloat(data.drinks) || 0) +
+                         (parseFloat(data.dining) || 0) +
+                         (parseFloat(data.auto) || 0) +
+                         (parseFloat(data.bus) || 0) +
+                         (parseFloat(data.metro) || 0) +
+                         (parseFloat(data.petrol) || 0) +
+                         (parseFloat(data.home) || 0) +
+                         (parseFloat(data.car) || 0) +
+                         (parseFloat(data.edu) || 0) +
+                         (parseFloat(data.personal) || 0) +
+                         (parseFloat(data.movies) || 0) +
+                         (parseFloat(data.parties) || 0) +
+                         (parseFloat(data.gatherings) || 0) +
+                         (parseFloat(data.tickets) || 0) +
+                         (parseFloat(data.hostel) || 0) +
+                         (parseFloat(data.food) || 0) +
+                         (parseFloat(data.traveling) || 0);
+              
+              if (sum > 0) {
+                totalSpent += sum;
+                expenseCount++;
+              }
+            }
+          } catch (e) {
+            // Skip invalid data
+          }
+        }
+      }
+      
+      // Update status message
+      if (expenseCount === 0) {
+        statusEl.textContent = 'No expenses recorded yet';
+      } else {
+        statusEl.textContent = `${expenseCount} expense${expenseCount > 1 ? 's' : ''} this month`;
+      }
+      
+      return Math.round(totalSpent);
+    }
+
+    function updateRing(){
+      const spent = calculateActualSpent();
+      spentEl.textContent = spent;
+      
+      const pct = Math.min(spent / total, 1);
+      const offset = circumference * (1 - pct);
+      progressCircle.style.strokeDasharray = circumference;
+      progressCircle.style.strokeDashoffset = offset;
+      percentLabel.textContent = Math.round(pct * 100) + '%';
+    }
+
+    // Show/Hide Monthly Budget section
+    const budgetSection = document.getElementById('budgetSection');
+    const showBtn = document.getElementById('showBudgetBtn');
+    if (showBtn && budgetSection) {
+      const showSection = () => {
+        budgetSection.style.display = 'block';
+        updateRing();
+        showBtn.textContent = 'Hide Monthly Budget';
+      };
+
+      showBtn.addEventListener('click', () => {
+        const isHidden = budgetSection.style.display === 'none' || budgetSection.style.display === '';
+        if (isHidden) {
+          showSection();
+        } else {
+          budgetSection.style.display = 'none';
+          showBtn.textContent = 'Show Monthly Budget';
+        }
+      });
+    }
+
+    // Set Monthly Budget handler
+    const setBtn = document.getElementById('setBudgetBtn');
+    if (setBtn) {
+      setBtn.addEventListener('click', () => {
+        const current = total;
+        const input = prompt('Enter monthly budget (₹):', String(current));
+        if (input === null) return; // cancelled
+        const val = Math.floor(Number(input));
+        if (!isFinite(val) || val <= 0) {
+          console.log('Please enter a valid positive number.');
+          return;
+        }
+        total = val;
+        localStorage.setItem(getBudgetKey(), String(total));
+        totalEl.textContent = total;
+        updateRing();
+      });
+    }
+
+    // Initial update and auto-refresh every 2 seconds
+    updateRing();
+    setInterval(updateRing, 2000);
+  }
+
+  // Ensure DOM is ready before init
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initBudgetUI);
+  } else {
+    initBudgetUI();
+  }
 })();
 
 // Automatic Features - Authentication removed

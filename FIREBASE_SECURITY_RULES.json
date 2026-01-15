@@ -1,0 +1,20 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "auth.uid === $uid",
+        ".write": "auth.uid === $uid",
+        "expenses": {
+          ".indexOn": ["date", "updatedAt"],
+          "$type": {
+            "$month": {
+              ".validate": "newData.hasChildren(['date']) || true"
+            }
+          }
+        }
+      }
+    },
+    ".read": false,
+    ".write": false
+  }
+}

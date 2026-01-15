@@ -1,0 +1,35 @@
+{
+  "name": "expensewise",
+  "version": "1.0.0",
+  "description": "Smart expense management application with Firebase backend",
+  "main": "index.html",
+  "scripts": {
+    "start": "Open with Live Server",
+    "build": "No build required - Pure frontend",
+    "deploy": "Deploy to Firebase hosting"
+  },
+  "keywords": [
+    "expense",
+    "budget",
+    "tracker",
+    "firebase",
+    "finance"
+  ],
+  "author": "ExpenseWise Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/Code.laddha.git"
+  },
+  "homepage": "https://github.com/yourusername/Code.laddha#readme",
+  "devDependencies": {},
+  "dependencies": {
+    "firebase": "^9.22.0"
+  },
+  "firebase": {
+    "projectId": "xpensewise-fe3d8",
+    "authDomain": "xpensewise-fe3d8.firebaseapp.com",
+    "databaseURL": "https://xpensewise-fe3d8-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "storageBucket": "xpensewise-fe3d8.firebasestorage.app"
+  }
+}

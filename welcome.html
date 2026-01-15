@@ -15,6 +15,26 @@
             --card: rgba(30, 41, 59, 0.9);
             --glass-bg: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.3));
             --glass-border: rgba(255, 255, 255, 0.2);
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        [data-theme="light"] {
+            --bg: #f1f5f9;
+            --text: #0f172a;
+            --muted: #64748b;
+            --card: rgba(255, 255, 255, 0.95);
+            --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.4));
+            --glass-border: rgba(0, 0, 0, 0.1);
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --text: #ffffff;
+            --muted: #e2e8f0;
+            --card: rgba(30, 41, 59, 0.9);
+            --glass-bg: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.3));
+            --glass-border: rgba(255, 255, 255, 0.2);
         }
 
         * {
@@ -25,7 +45,7 @@
 
         body {
             font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--bg-gradient);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -59,36 +79,21 @@
         }
 
         .logo {
-            font-size: 3.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #ffffff, #f0f9ff);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--text);
             margin-bottom: 1rem;
-            animation: glow 2s ease-in-out infinite alternate;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 1rem;
+            letter-spacing: 1px;
         }
 
         .logo-img {
-            width: 46px;
-            height: 46px;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
-            animation: logoGlow 2s ease-in-out infinite alternate;
-        }
-
-        @keyframes logoGlow {
-            from {
-                filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 10px rgba(59, 130, 246, 0.3));
-            }
-            to {
-                filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 20px rgba(59, 130, 246, 0.5)) drop-shadow(0 0 30px rgba(16, 185, 129, 0.3));
-            }
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
         }
 
         @keyframes glow {
@@ -212,6 +217,27 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
         }
 
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(0, 0, 0, 0.5);
+            transform: translateY(-2px);
+        }
+
         .stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -245,9 +271,21 @@
 
         .footer-text {
             margin-top: 3rem;
-            color: var(--muted) !important;
+            color: var(--text) !important;
             font-size: 0.9rem;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+            opacity: 0.8;
+        }
+        
+        .footer-text a {
+            color: var(--primary);
+            text-decoration: none;
+            margin: 0 10px;
+            transition: opacity 0.3s ease;
+        }
+        
+        .footer-text a:hover {
+            opacity: 0.7;
+            text-decoration: underline;
         }
 
         @media (max-width: 768px) {
@@ -333,9 +371,56 @@
                 opacity: 1;
             }
         }
+
+        /* Particle animation for mouse move effects */
+        @keyframes particleFloat {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1) translateZ(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--tx, 0px), -50px) scale(0) translateZ(0);
+            }
+        }
+
+        /* Animation performance optimizations */
+        * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .welcome-container,
+        .feature-card,
+        .btn,
+        .floating-circle {
+            transform: translateZ(0);
+            will-change: auto;
+            backface-visibility: hidden;
+        }
+
+        .floating-circle {
+            will-change: transform;
+        }
+
+        .feature-card {
+            will-change: transform, background, box-shadow;
+        }
+
+        .btn {
+            will-change: transform, box-shadow;
+        }
     </style>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="firebase-config.js"></script>
 </head>
 <body>
+    <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
+    
     <div class="floating-elements">
         <div class="floating-circle"></div>
         <div class="floating-circle"></div>
@@ -344,8 +429,8 @@
 
     <div class="welcome-container">
         <div class="logo">
-            <img src="images/new-logo.svg" alt="ExpenseWise Logo" class="logo-img">
-            ExpenseWise
+            <img src="images/logo.png" alt="ExpenseWise Logo" class="logo-img">
+            <span>ExpenseWise</span>
         </div>
         <div class="tagline">Smart Expense Management for Modern Life</div>
 
@@ -380,7 +465,7 @@
             </div>
             <div class="stat-item">
                 <div class="stat-number">6</div>
-                <div class="stat-label">Categories</div>
+                <div class="stat-label">Expense Categories</div>
             </div>
             <div class="stat-item">
                 <div class="stat-number">24/7</div>
@@ -390,9 +475,20 @@
 
         <div class="cta-section">
             <h2 style="margin-bottom: 1rem; color: var(--text);">Ready to Take Control of Your Finances?</h2>
-            <p style="color: var(--muted); margin-bottom: 2rem;">Join thousands of users who trust ExpenseWise to manage their expenses</p>
+            <p style="color: var(--muted); margin-bottom: 1.5rem;">Sign in with Google to enable data isolation across devices</p>
+            
+            <!-- User Status & Sign In-->
+            <div id="authStatus" style="margin-bottom: 1.5rem; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 10px; border: 1px solid rgba(255,255,255,0.2);">
+                <span style="color: #f59e0b;">⏳ Loading...</span>
+            </div>
             
             <div class="cta-buttons">
+                <button id="signInBtn" onclick="handleSignIn()" class="btn btn-primary" style="display:none;">
+                    🔵 Sign In with Google
+                </button>
+                <button id="signOutBtn" onclick="handleSignOut()" class="btn" style="display:none; background: #dc2626;">
+                    📴 Sign Out
+                </button>
                 <a href="expense_manager_system.html" class="btn btn-primary">
                     🚀 Get Started Now
                 </a>
@@ -402,10 +498,73 @@
         <div class="footer-text">
             <p>✨ Start managing your expenses smartly today!</p>
             <p style="margin-top: 1rem; font-size: 0.8rem;">Secure • Fast • Reliable • Free</p>
+            <p style="margin-top: 1rem;">
+                <a href="about.html">📊 About</a> | 
+                <a href="contact.html">📧 Contact</a>
+            </p>
         </div>
     </div>
 
     <script>
+        // Theme Management
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeButton();
+        }
+
+        function updateThemeButton() {
+            const btn = document.querySelector('.theme-toggle');
+            const current = document.documentElement.getAttribute('data-theme');
+            if (btn) {
+                btn.textContent = current === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+            }
+        }
+
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeButton();
+        }
+
+        // Firebase Auth State Management
+        async function handleSignIn() {
+            try {
+                await signInWithGoogle(true);
+                updateAuthUI();
+            } catch (error) {
+                console.error('Sign in error:', error);
+            }
+        }
+
+        async function handleSignOut() {
+            try {
+                await signOut();
+                updateAuthUI();
+            } catch (error) {
+                console.error('Sign out error:', error);
+            }
+        }
+
+        function updateAuthUI() {
+            const authStatus = document.getElementById('authStatus');
+            const signInBtn = document.getElementById('signInBtn');
+            const signOutBtn = document.getElementById('signOutBtn');
+            const user = window.firebaseAuth ? window.firebaseAuth.currentUser : null;
+
+            if (user) {
+                authStatus.innerHTML = `<span style="color: #10b981;">🔵 Signed in as: <strong>${user.email}</strong></span>`;
+                signInBtn.style.display = 'none';
+                signOutBtn.style.display = 'inline-flex';
+            } else {
+                authStatus.innerHTML = '<span style="color: #f59e0b;">👤 Guest Mode - Sign in for data isolation</span>';
+                signInBtn.style.display = 'inline-flex';
+                signOutBtn.style.display = 'none';
+            }
+        }
+
         // Add smooth scrolling and animations
         function scrollToFeatures() {
             document.querySelector('.features').scrollIntoView({ 
@@ -414,7 +573,23 @@
         }
 
         // Add some interactive animations
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Initialize theme
+            initTheme();
+            
+            // Initialize Firebase Auth
+            if (window.firebaseAuth) {
+                try {
+                    if (typeof initFirebaseAuth !== 'undefined') {
+                        await initFirebaseAuth();
+                    }
+                    window.firebaseAuth.onAuthStateChanged(updateAuthUI);
+                } catch (error) {
+                    console.error('Auth init error:', error);
+                    document.getElementById('authStatus').innerHTML = '<span style="color: #dc2626;">❌ Auth Error</span>';
+                }
+            }
+            
             const featureCards = document.querySelectorAll('.feature-card');
             
             featureCards.forEach((card, index) => {
@@ -443,6 +618,8 @@
 
         function createParticle(x, y) {
             const particle = document.createElement('div');
+            const tx = Math.random() * 100 - 50;
+            
             particle.style.cssText = `
                 position: fixed;
                 left: ${x}px;
@@ -453,6 +630,8 @@
                 border-radius: 50%;
                 pointer-events: none;
                 z-index: 1000;
+                will-change: transform, opacity;
+                --tx: ${tx}px;
                 animation: particleFloat 2s ease-out forwards;
             `;
             

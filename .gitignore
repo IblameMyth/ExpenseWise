@@ -1,0 +1,60 @@
+# Git ignore file for ExpenseWise
+
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# IDE/Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Build/Output files
+dist/
+build/
+*.min.js
+*.min.css
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# Firebase
+.firebase/
+.firebaserc
+firebase-debug.log
+
+# Temporary files
+*.tmp
+*.temp
+.cache
+
+# Node
+node_modules/
+
+# Testing
+coverage/
+.nyc_output/
+
+# Local development
+local.json
+secrets.json

@@ -1,20 +1,262 @@
 :root {
-  --bg: #f8fafc;
-  --card: #ffffff;
-  --muted: #6b7280;
-  --text: #0f172a;
-  --primary: #2563eb;
-  --accent: #0ea5a4;
-  --radius: 12px;
-  --shadow: 0 8px 26px rgba(15, 23, 42, 0.06);
+  --bg: #0f172a;
+  --card: rgba(30, 41, 59, 0.9);
+  --muted: #e2e8f0;
+  --text: #ffffff;
+  --primary: #3b82f6;
+  --accent: #10b981;
+  --radius: 16px;
+  --shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
   --container: 1100px;
   --gap: 14px;
-  /* Gradient colors */
+  /* Glassmorphism colors */
+  --glass-bg: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.3));
+  --glass-border: rgba(255, 255, 255, 0.2);
   --gradient-start: rgba(255, 255, 255, 0.9);
   --gradient-end: rgba(255, 255, 255, 0.7);
   --card-border: rgba(255, 255, 255, 0.2);
-  /* background image (unsplash) — feel free to replace with your own image file */
-  --bg-img: url('https://images.unsplash.com/photo-1542223616-1e7b2d2b02d9?auto=format&fit=crop&w=1500&q=80');
+  /* Welcome page background gradient */
+  --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  /* Animation color scheme */
+  --color-indigo: #6366f1;
+  --color-pink: #ec4899;
+  --color-green: #10b981;
+  --color-amber: #f59e0b;
+  --color-red: #ef4444;
+  --color-slate: #64748b;
+}
+
+/* ===== KEYFRAME ANIMATIONS ===== */
+
+/* 1. Page Load Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 2. Button Animations */
+@keyframes buttonHover {
+  to {
+    transform: scale(1.05);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+  }
+}
+
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* 3. Form Input Animations */
+@keyframes inputFocus {
+  to {
+    border-color: var(--color-indigo);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
+}
+
+@keyframes underlineExpand {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes slideUpMessage {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 4. Card & Container Animations */
+@keyframes cardLift {
+  to {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  }
+}
+
+@keyframes tabFadeSwitch {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* 5. Table & Data Animations */
+@keyframes tableRowSlide {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes progressFill {
+  from {
+    width: 0;
+  }
+  to {
+    width: var(--progress-width, 100%);
+  }
+}
+
+/* 6. Modal & Overlay Animations */
+@keyframes backdropFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.5;
+  }
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 7. Chart Animations */
+@keyframes chartBarGrow {
+  from {
+    transform: scaleY(0);
+    transform-origin: bottom;
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes chartLineRun {
+  from {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* 8. Text Animations */
+@keyframes textReveal {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 9. Navigation Animations */
+@keyframes menuSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes hamburgerTransform {
+  to {
+    transform: rotate(90deg);
+  }
+}
+
+/* 10. Loading & Transition States */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes circleProgress {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Light mode variables */
+[data-theme="light"] {
+  --bg: #f1f5f9;
+  --card: rgba(255, 255, 255, 0.95);
+  --muted: #64748b;
+  --text: #0f172a;
+  --gradient-start: rgba(255, 255, 255, 0.95);
+  --gradient-end: rgba(248, 250, 252, 0.9);
+  --card-border: rgba(0, 0, 0, 0.1);
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.4));
+  --glass-border: rgba(0, 0, 0, 0.1);
 }
 
 /* Dark mode variables */
@@ -29,6 +271,27 @@
   --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
+/* Animation performance optimization */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Enable GPU acceleration for animations */
+main,
+main > div,
+button,
+input,
+.feature-card,
+.tab-btn,
+.expense-table tr,
+header {
+  transform: translateZ(0);
+  will-change: auto;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
 /* reset (keeps header/main/footer in the same DOM order) */
 * {
   box-sizing: border-box
@@ -40,30 +303,31 @@ body {
 }
 
 html {
-  background: var(--bg);
+  background: var(--bg-gradient);
 }
 
 [data-theme="dark"] html {
-  background: #0f172a;
+  background: var(--bg-gradient);
 }
 
 body {
   margin: 0;
-  font-family: Inter, 'Segoe UI', Roboto, system-ui, -apple-system, 'Helvetica Neue', Arial;
-  background: var(--bg);
+  font-family: 'Inter', 'Segoe UI', Roboto, system-ui, -apple-system, 'Helvetica Neue', Arial;
+  background: var(--bg-gradient);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   padding: 28px;
-  background-image: linear-gradient(rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.86)), var(--bg-img);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   display: block;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
 [data-theme="dark"] body {
-  background-image: linear-gradient(rgba(15,23,42,0.9), rgba(15,23,42,0.9)), var(--bg-img);
+  background: var(--bg-gradient);
 }
 
 main {
@@ -71,22 +335,25 @@ main {
   margin: 0 auto;
   min-height: 72vh;
   padding: 28px;
-  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--card-border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
+  animation: slideInDown 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: auto;
+  transform: translateZ(0);
 }
 
 /* Card styling for content sections */
 main > div {
-  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+  background: rgba(0, 0, 0, 0.3);
   border-radius: var(--radius);
   padding: 20px;
   margin-bottom: 20px;
-  box-shadow: var(--shadow);
-  border: 1px solid var(--card-border);
-  backdrop-filter: blur(5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(10px);
 }
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 header {
@@ -94,18 +361,22 @@ header {
   align-items: center;
   justify-content: space-between;
   gap: var(--gap);
-  background: linear-gradient(135deg, #ffffff, #f8fafc);
-  color: #0f172a;
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--text);
   padding: 18px 22px;
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
   margin-bottom: 20px;
-  border: 1px solid rgba(2, 6, 23, 0.08);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 12px;
+  z-index: 5000;
 }
 
 [data-theme="dark"] header {
-  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-  border: 1px solid var(--card-border);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--glass-border);
   color: var(--text);
 }
 
@@ -121,10 +392,12 @@ header h1 {
   font-family: 'Poppins', sans-serif;
   font-weight: 600;
   letter-spacing: 0.5px;
-  background: linear-gradient(90deg, var(--accent), var(--primary));
+  background: linear-gradient(90deg, #ffffff, #f0f9ff);
   -webkit-background-clip: text;
   background-clip: text;
-  color: transparent;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
 }
 
 .theme-toggle {
@@ -178,27 +451,32 @@ main h2 a:hover {
   filter: brightness(1.03)
 }
 
-main h2 a[href="food.html"] {
+main h2 a[href="categories.html"] {
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  border-color: rgba(255, 255, 255, 0.12)
+}
+
+main h2 a[href="categories.html#food"] {
   background: linear-gradient(90deg, #ef4444, #fb923c);
   border-color: rgba(255, 255, 255, 0.12)
 }
 
-main h2 a[href="Travel.html"] {
+main h2 a[href="categories.html#travel"] {
   background: linear-gradient(90deg, #06b6d4, #2563eb);
   border-color: rgba(255, 255, 255, 0.12)
 }
 
-main h2 a[href="Entertainment.html"] {
+main h2 a[href="categories.html#entertainment"] {
   background: linear-gradient(90deg, #8b5cf6, #ec4899);
   border-color: rgba(255, 255, 255, 0.12)
 }
 
-main h2 a[href="EMI.html"] {
+main h2 a[href="categories.html#emi"] {
   background: linear-gradient(90deg, #10b981, #059669);
   border-color: rgba(255, 255, 255, 0.12)
 }
 
-main h2 a[href="Vacation.html"] {
+main h2 a[href="categories.html#vacation"] {
   background: linear-gradient(90deg, #f59e0b, #f97316);
   border-color: rgba(255, 255, 255, 0.12)
 }
@@ -216,65 +494,80 @@ input[type="number"],
 input[type="text"] {
   padding: 12px 16px;
   border-radius: var(--radius);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
   min-width: 160px;
   font-size: 0.95rem;
   color: var(--text);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateZ(0);
+  will-change: border-color, box-shadow, transform;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 [data-theme="dark"] input[type="date"],
 [data-theme="dark"] input[type="number"],
 [data-theme="dark"] input[type="text"],
 [data-theme="dark"] input[type="month"] {
-  background: rgba(30, 41, 59, 0.8);
-  border: 1px solid rgba(100, 116, 139, 0.3);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--glass-border);
   color: var(--text);
 }
 
 input:focus {
   outline: none;
-  border-color: var(--accent);
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 8px 24px rgba(14, 165, 164, 0.12);
+  border-color: var(--primary);
+  background: rgba(0, 0, 0, 0.4);
+  animation: inputFocus 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
 }
 
 [data-theme="dark"] input:focus {
-  background: rgba(30, 41, 59, 0.9);
-  border-color: var(--accent);
+  background: rgba(0, 0, 0, 0.4);
+  border-color: var(--primary);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
 }
 
 button {
   padding: 12px 20px;
   border-radius: var(--radius);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--glass-border);
   background: linear-gradient(135deg, var(--primary), var(--accent));
   color: #fff;
   font-weight: 600;
   font-family: 'Poppins', sans-serif;
   cursor: pointer;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.15);
-  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform: translateZ(0);
+  will-change: transform, box-shadow;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 button:hover {
+  animation: buttonHover 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  box-shadow: 0 12px 25px rgba(59, 130, 246, 0.4);
   transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(37, 99, 235, 0.25);
-  background: linear-gradient(135deg, var(--accent), var(--primary));
+}
+
+button:active {
+  transform: scale(0.98);
 }
 
 /* Add smooth transitions for cards */
 main > div {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+  animation: slideInDown 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateZ(0);
+  will-change: transform, box-shadow;
 }
 
 main > div:hover {
-  transform: translateY(-3px);
+  animation: cardLift 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
@@ -286,14 +579,31 @@ main > div:hover {
 }
 
 #dailySummary p {
-  background: var(--card);
+  background: rgba(0, 0, 0, 0.3);
   padding: 12px;
   border-radius: 10px;
-  border: 1px solid var(--card-border);
-  box-shadow: var(--shadow);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
   display: flex;
   justify-content: space-between;
-  align-items: center
+  align-items: center;
+  animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+  transform: translateZ(0);
+  color: var(--text);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+}
+
+#dailySummary p:nth-child(1) { animation-delay: 0.1s; }
+#dailySummary p:nth-child(2) { animation-delay: 0.2s; }
+#dailySummary p:nth-child(3) { animation-delay: 0.3s; }
+#dailySummary p:nth-child(4) { animation-delay: 0.4s; }
+#dailySummary p:nth-child(5) { animation-delay: 0.5s; }
+#dailySummary p:nth-child(6) { animation-delay: 0.6s; }
+#dailySummary p:nth-child(7) { animation-delay: 0.7s; }
+#dailySummary p:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 #futureList {
@@ -313,7 +623,21 @@ main > div:hover {
   box-shadow: var(--shadow);
   display: flex;
   justify-content: space-between;
-  align-items: center
+  align-items: center;
+  animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+  transform: translateZ(0);
+  transition: all 0.3s ease;
+}
+
+#futureList li:nth-child(1) { animation-delay: 0.05s; }
+#futureList li:nth-child(2) { animation-delay: 0.1s; }
+#futureList li:nth-child(3) { animation-delay: 0.15s; }
+#futureList li:nth-child(4) { animation-delay: 0.2s; }
+#futureList li:nth-child(5) { animation-delay: 0.25s; }
+
+#futureList li:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
 }
 
 main h3,
@@ -327,8 +651,21 @@ footer {
   margin-top: 36px;
   padding: 18px 12px;
   background: transparent;
-  color: var(--muted);
-  text-align: center
+  color: var(--text);
+  text-align: center;
+  opacity: 0.8;
+}
+
+footer a {
+  color: var(--primary);
+  text-decoration: none;
+  margin: 0 10px;
+  transition: opacity 0.3s ease;
+}
+
+footer a:hover {
+  opacity: 0.7;
+  text-decoration: underline;
 }
 
 @media (max-width:860px) {
@@ -378,36 +715,46 @@ footer {
 .expense-table {
   width: 100%;
   margin-top: 20px;
-  background: var(--card);
+  background: rgba(0, 0, 0, 0.3);
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
   border-collapse: collapse;
   overflow: hidden;
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(10px);
 }
 
 .expense-table th,
 .expense-table td {
   padding: 12px;
   text-align: left;
-  border-bottom: 1px solid var(--card-border);
+  border-bottom: 1px solid var(--glass-border);
+  color: var(--text);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 [data-theme="dark"] .expense-table tr:hover {
-  background-color: rgba(100, 116, 139, 0.1);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 [data-theme="dark"] .expense-table tfoot td {
-  background-color: rgba(100, 116, 139, 0.1);
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .expense-table th {
-  background: linear-gradient(90deg, var(--accent), var(--primary));
+  background: linear-gradient(90deg, var(--primary), var(--accent));
   color: white;
   font-weight: 600;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .expense-table tr:hover {
-  background-color: rgba(2, 6, 23, 0.02);
+  background-color: rgba(255, 255, 255, 0.1);
+  animation: tableRowSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.expense-table tr {
+  transition: background-color 0.3s ease;
 }
 
 .expense-table tfoot td {
@@ -423,25 +770,32 @@ footer {
 
 /* Compact container for budget overview */
 .container-compact {
-  background: var(--gradient-start);
+  background: var(--glass-bg);
   border-radius: var(--radius);
-  padding: 20px;
+  padding: 22px 24px;
   margin-top: 20px;
   box-shadow: var(--shadow);
-  border: 1px solid var(--card-border);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(18px);
+  display: grid;
+  gap: 14px;
 }
 
 .progress-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 12px;
+  gap: 16px;
+  padding: 12px 14px;
+  border-radius: calc(var(--radius) - 4px);
+  background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  border: 1px solid var(--glass-border);
 }
 
 .ring {
   position: relative;
-  width: 60px;
-  height: 60px;
+  width: 120px;
+  height: 120px;
 }
 
 .ring .bg {
@@ -454,7 +808,10 @@ footer {
   fill: none;
   stroke: url(#grad);
   stroke-width: 10;
-  transition: stroke-dashoffset 0.5s ease;
+  animation: circleProgress 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  transform-origin: 50% 50%;
+  transform: translateZ(0);
+  will-change: stroke-dashoffset;
 }
 
 .label {
@@ -462,9 +819,27 @@ footer {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: 1rem;
+  font-weight: 600;
   color: var(--text);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+}
+
+.budget-meta {
+  display: grid;
+  gap: 4px;
+  color: var(--text);
+}
+
+.budget-meta p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.budget-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .btn {
@@ -475,10 +850,13 @@ footer {
   color: #fff;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform: translateZ(0);
+  will-change: transform, box-shadow;
 }
 
 .btn:hover {
+  animation: buttonHover 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   background: linear-gradient(135deg, var(--accent), var(--primary));
 }
 
@@ -607,6 +985,7 @@ footer {
 /* User Menu Dropdown Styles */
 .user-menu-container {
   position: relative;
+  z-index: 6000; /* keep dropdown above blurred cards */
 }
 
 .user-menu-button {
@@ -633,7 +1012,7 @@ footer {
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   min-width: 280px;
-  z-index: 1000;
+  z-index: 7000; /* ensure overlay is above headers and cards */
   opacity: 0;
   visibility: hidden;
   transform: translateY(-10px);
@@ -719,4 +1098,76 @@ footer {
 
 .sign-out-btn:hover {
   opacity: 0.9;
+}
+
+/* ===== ANIMATION UTILITIES ===== */
+
+/* Mobile animation optimizations */
+@media (max-width: 768px) {
+  button:hover {
+    animation-duration: 0.225s;
+  }
+  
+  input:focus {
+    animation-duration: 0.225s;
+  }
+  
+  main > div {
+    animation-duration: 0.375s;
+  }
+  
+  #dailySummary p {
+    animation-duration: 0.375s;
+  }
+  
+  #futureList li {
+    animation-duration: 0.225s;
+  }
+}
+
+/* Accessibility - Prefers Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  button:hover {
+    animation: none;
+    background: linear-gradient(135deg, var(--accent), var(--primary));
+  }
+  
+  input:focus {
+    animation: none;
+    border-color: var(--accent);
+  }
+  
+  main > div {
+    animation: none;
+  }
+  
+  main > div:hover {
+    animation: none;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  }
+  
+  #dailySummary p {
+    animation: none;
+  }
+  
+  #futureList li {
+    animation: none;
+  }
+}
+
+/* Hardware acceleration for smooth 60fps animations */
+button,
+input,
+main > div,
+#dailySummary p,
+#futureList li,
+.ring .progress {
+  backface-visibility: hidden;
+  perspective: 1000px;
 }

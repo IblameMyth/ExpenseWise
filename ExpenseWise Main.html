@@ -18,7 +18,10 @@
   
   <!-- Firebase Configuration -->
   <script src="firebase-config.js"></script>
-  <script src="firebase-expense-utils.js"></script>
+  
+  <!-- Unified Services -->
+  <script src="js/database-service.js"></script>
+  <script src="js/app-service.js"></script>
   
   <!-- Expense Manager Scripts -->
   <script src="expense_manager.js"></script>
@@ -72,15 +75,10 @@
       </div>
     </div>
   </header>
-    </div>
-  </header>
+
   <main id="main-content">
     <h2>
-      <span><a href="food.html" target="_blank">Food</a></span>
-      <span><a href="Travel.html" target="_blank">Travel</a></span>
-      <span><a href="Entertainment.html" target="_blank">Entertainment</a></span>
-      <span><a href="EMI.html" target="_blank">EMI</a></span>
-      <span><a href="Vacation.html" target="_blank">Vacations</a></span>
+      <span><a href="categories.html">📁 All Expense Categories</a></span>
     </h2>
 
     <h3>Daily Budget</h3>
@@ -95,56 +93,50 @@
         </form>
         <div id="dailySummary"></div>
       </div>
-      <div id="daily-budget-table-container" class="table-container"></div>
     </div>
     <div style="margin-top:10px; text-align:center;">
       <button onclick="clearAllData()" style="background: linear-gradient(90deg, #dc2626, #ef4444); padding:10px 14px; border-radius:10px; border:none; color:#fff; cursor:pointer;">Clear All Data</button>
     </div>
 
-    <h4>Future Expenses</h4>
-    <form id="futureForm">
-      <input type="text" id="expenseName" placeholder="Expense Name" pattern="[A-Za-z\s]+" title="Please enter only letters and spaces" required />
-      <input type="number" id="expenseAmount" placeholder="Amount (₹)" required />
-      <input type="date" id="expenseDate" required />
-      <button type="submit">Add Future Expense</button>
-    </form>
-    <ul id="futureList"></ul>
+    <div style="margin-top:10px; text-align:center;">
+      <button id="showBudgetBtn" class="btn" type="button">Show Monthly Budget</button>
+    </div>
 
-    <div class="container-compact">
-  <h2>Budget Overview</h2>
-  <div class="progress-card">
-    <div class="ring" id="budgetRing">
-      <svg width="120" height="120">
-        <defs>
-          <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#825CFF"/>
-            <stop offset="100%" stop-color="#22d3ee"/>
-          </linearGradient>
-        </defs>
-        <circle class="bg" cx="60" cy="60" r="50"></circle>
-        <circle class="progress" cx="60" cy="60" r="50"
-                stroke-dasharray="314"
-                stroke-dashoffset="314"></circle>
-      </svg>
-      <div class="label" id="budgetPercent">0%</div>
+    <div class="container-compact" id="budgetSection" style="display:none;">
+      <h2 style="margin:0;">Budget Overview</h2>
+      <div class="progress-card">
+        <div class="ring" id="budgetRing">
+          <svg width="120" height="120">
+            <defs>
+              <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#825CFF"/>
+                <stop offset="100%" stop-color="#22d3ee"/>
+              </linearGradient>
+            </defs>
+            <circle class="bg" cx="60" cy="60" r="50"></circle>
+            <circle class="progress" cx="60" cy="60" r="50"
+                    stroke-dasharray="314"
+                    stroke-dashoffset="314"></circle>
+          </svg>
+          <div class="label" id="budgetPercent">0%</div>
+        </div>
+        <div class="budget-meta">
+          <p><strong>Monthly Budget:</strong> ₹<span id="budgetTotal">0</span></p>
+          <p><strong>Spent:</strong> ₹<span id="budgetSpent">0</span></p>
+          <p id="budgetStatus" style="font-size:12px;">No expenses recorded yet</p>
+        </div>
+      </div>
+      <div class="budget-actions">
+        <button class="btn" id="setBudgetBtn" type="button">Set Monthly Budget</button>
+      </div>
     </div>
-    <div>
-      <p style="margin:4px 0;font-weight:600;color:#825CFF">Monthly Budget: ₹<span id="budgetTotal">40000</span></p>
-      <p style="margin:4px 0;">Spent: ₹<span id="budgetSpent">0</span></p>
-      <p style="margin:4px 0;font-size:12px;color:var(--muted);" id="budgetStatus">No expenses recorded yet</p>
-    </div>
-  </div>
-  <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
-    <button class="btn" id="setBudgetBtn" type="button">Set Monthly Budget</button>
-    <button class="btn" id="refreshBudgetBtn" type="button" style="background:#10b981;">🔄 Refresh</button>
-  </div>
-</div>
 
   </main>
 
   <footer>
-    Beware of little expenses. A small leak will sink a great ship.Thank You
+    Beware of little expenses . A small leak will sink a great ship . Thank You for Choosing Us<br>
+    <a href="about.html">📊 About</a> | 
+    <a href="contact.html">📧 Contact</a>
   </footer>
 </body>
-
 </html>
