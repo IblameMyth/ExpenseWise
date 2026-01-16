@@ -36,6 +36,12 @@ try {
 // Current user state
 let currentUser = null;
 
+// Detect mobile device
+function isMobileDevice() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+    || window.innerWidth < 768;
+}
+
 // Google Sign-In with account selection and Remember Me support
 async function signInWithGoogle(forceAccountSelection = false) {
   // Check Remember Me preference before signing in
@@ -61,6 +67,22 @@ async function signInWithGoogle(forceAccountSelection = false) {
     });
   }
 
+  // Use redirect flow on mobile devices, popup on desktop
+  const useMobile = isMobileDevice();
+  
+  if (useMobile) {
+    console.log('Mobile device detected - using redirect flow');
+    try {
+      await auth.signInWithRedirect(provider);
+      // Page will reload after redirect, result handled in getRedirectResult
+      return;
+    } catch (error) {
+      console.error('Google Sign-In redirect error:', error);
+      throw error;
+    }
+  }
+
+  // Desktop: Use popup flow
   try {
     const result = await auth.signInWithPopup(provider);
     currentUser = result.user;
@@ -262,11 +284,25 @@ function initFirebaseAuth() {
           console.log('✓ Redirect sign-in complete for:', result.user.email);
           saveAccountToHistory(result.user);
           updateUIForUser(result.user);
+          
+          // Apply Remember Me preference after redirect
+          const rememberMe = localStorage.getItem('rememberMe') !== 'false';
+          const persistence = rememberMe 
+            ? firebase.auth.Auth.Persistence.LOCAL 
+            : firebase.auth.Auth.Persistence.SESSION;
+          auth.setPersistence(persistence).catch(err => 
+            console.error('Error setting persistence after redirect:', err)
+          );
+          
           finish(result.user);
         }
       })
       .catch((error) => {
         console.error('Redirect sign-in error:', error);
+        // Show error to user
+        if (error.code !== 'auth/popup-closed-by-user') {
+          alert('Sign-in failed: ' + (error.message || 'Please try again'));
+        }
       });
 
     auth.onAuthStateChanged((user) => {
