@@ -281,16 +281,35 @@ function initFirebaseAuth() {
   return new Promise((resolve) => {
     let resolved = false;
     let redirectHandled = false;
+    let authStateListenerActive = false;
     
     const finish = (user) => {
       if (!resolved) {
         resolved = true;
+        console.log('🏁 Auth init finished with user:', user ? user.email : 'null');
         resolve(user);
       }
     };
 
+    // Set a timeout to prevent infinite loading (10 seconds max)
+    const authTimeout = setTimeout(() => {
+      if (!resolved) {
+        console.error('⏱️ Auth init timeout - checking current user directly');
+        const currentAuthUser = auth.currentUser;
+        if (currentAuthUser) {
+          console.log('✅ Timeout reached but found user:', currentAuthUser.email);
+          currentUser = currentAuthUser;
+          updateUIForUser(currentAuthUser);
+          finish(currentAuthUser);
+        } else {
+          console.log('⏱️ Timeout reached - no user found');
+          updateUIForUser(null);
+          finish(null);
+        }
+      }
+    }, 10000);
+
     // Handle redirect-based sign-in results (after signInWithRedirect)
-    // This must complete BEFORE onAuthStateChanged processes
     console.log('🔍 Checking for redirect result...');
     
     auth.getRedirectResult()
@@ -316,39 +335,28 @@ function initFirebaseAuth() {
           auth.setPersistence(persistence)
             .then(() => {
               console.log('✓ Persistence set after redirect');
+              clearTimeout(authTimeout);
               updateUIForUser(result.user);
               finish(result.user);
             })
             .catch(err => {
               console.error('Error setting persistence after redirect:', err);
+              clearTimeout(authTimeout);
               updateUIForUser(result.user);
               finish(result.user);
             });
-        } else if (wasRedirectPending) {
-          // Redirect was pending but no result - possible error
-          console.error('⚠ Redirect was pending but no user result received');
-          const currentAuthUser = auth.currentUser;
-          if (currentAuthUser) {
-            console.log('✓ But found existing user session:', currentAuthUser.email);
-            currentUser = currentAuthUser;
-            updateUIForUser(currentAuthUser);
-            finish(currentAuthUser);
-          } else {
-            updateUIForUser(null);
-            finish(null);
-          }
         } else {
+          console.log('ℹ No redirect result, checking current auth state...');
           // No redirect result, check current auth state
-          console.log('ℹ No redirect result');
           const currentAuthUser = auth.currentUser;
           if (currentAuthUser) {
             console.log('✓ Existing user session found:', currentAuthUser.email);
             currentUser = currentAuthUser;
+            clearTimeout(authTimeout);
             updateUIForUser(currentAuthUser);
             finish(currentAuthUser);
-          } else {
-            console.log('ℹ No existing session');
           }
+          // If no current user, wait for onAuthStateChanged
         }
       })
       .catch((error) => {
@@ -358,24 +366,52 @@ function initFirebaseAuth() {
         console.error('Error code:', error.code);
         console.error('Error message:', error.message);
         
-        // Show error to user
+        // Still try to get current user
+        const currentAuthUser = auth.currentUser;
+        if (currentAuthUser) {
+          console.log('⚠ Error during redirect but user is authenticated:', currentAuthUser.email);
+          currentUser = currentAuthUser;
+          clearTimeout(authTimeout);
+          updateUIForUser(currentAuthUser);
+          finish(currentAuthUser);
+          return;
+        }
+        
+        // Show error to user only for real errors
         if (error.code !== 'auth/popup-closed-by-user' && 
             error.code !== 'auth/cancelled-popup-request' &&
             error.code !== 'auth/user-cancelled') {
+          console.error('Showing error alert to user');
           alert('Sign-in failed: ' + (error.message || 'Please try again.\n\nMake sure you have a stable internet connection.'));
         }
-        
-        updateUIForUser(null);
-        finish(null);
       });
 
     // Listen for auth state changes
     auth.onAuthStateChanged((user) => {
-      // Wait for redirect to be handled first
+      console.log('👁️ Auth state changed:', user ? user.email : 'null');
+      
+      if (!authStateListenerActive) {
+        authStateListenerActive = true;
+        console.log('✓ Auth state listener activated');
+      }
+      
+      // Wait for redirect to be handled first (or 500ms timeout)
       if (!redirectHandled) {
+        console.log('⏳ Redirect not yet handled, waiting...');
+        setTimeout(() => {
+          if (!redirectHandled) {
+            console.warn('⏳ Redirect took too long, processing auth state now');
+            redirectHandled = true;
+            processAuthState(user);
+          }
+        }, 500);
         return;
       }
       
+      processAuthState(user);
+    });
+    
+    function processAuthState(user) {
       currentUser = user;
       
       // Clear cache when user changes
@@ -384,15 +420,21 @@ function initFirebaseAuth() {
       }
       
       if (user) {
-        console.log('✓ Auth state changed - User authenticated:', user.email);
+        console.log('✅ Auth state: User authenticated -', user.email);
+        console.log('✅ User UID:', user.uid);
+        clearTimeout(authTimeout);
         updateUIForUser(user);
         finish(user);
       } else {
-        console.log('⚠ Auth state changed - No user signed in');
-        updateUIForUser(null);
-        finish(null);
+        console.log('⚠️ Auth state: No user signed in');
+        // Don't finish immediately, give redirect a chance
+        if (redirectHandled) {
+          clearTimeout(authTimeout);
+          updateUIForUser(null);
+          finish(null);
+        }
       }
-    });
+    }
   });
 }
 
@@ -411,6 +453,24 @@ function getOrCreateUserId() {
   return userId;
 }
 
+// Force check current auth state (call this if loading seems stuck)
+function forceCheckAuthState() {
+  console.log('🔄 Force checking auth state...');
+  const currentAuthUser = auth.currentUser;
+  
+  if (currentAuthUser) {
+    console.log('✅ Force check found user:', currentAuthUser.email);
+    currentUser = currentAuthUser;
+    updateUIForUser(currentAuthUser);
+    return currentAuthUser;
+  } else {
+    console.log('⚠️ Force check found no user');
+    currentUser = null;
+    updateUIForUser(null);
+    return null;
+  }
+}
+
 // Export Firebase instances
 window.firebaseApp = app;
 window.firebaseDB = db;
@@ -422,6 +482,7 @@ window.signOut = signOut;
 window.switchAccount = switchAccount;
 window.updateUIForUser = updateUIForUser;
 window.getRecentAccounts = getRecentAccounts;
+window.forceCheckAuthState = forceCheckAuthState;
 
 // Note: SESSION persistence automatically logs out when browser closes
 // No need for beforeunload/visibilitychange handlers as they interfere with navigation
