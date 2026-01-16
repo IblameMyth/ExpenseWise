@@ -1,9 +1,9 @@
 // Function to auto-calculate and save data
 function autoCalculateAndSave() {
-  const food = parseFloat(document.getElementById('food').value) || 0;
+  const household = parseFloat(document.getElementById('household').value) || 0;
   const travel = parseFloat(document.getElementById('travel').value) || 0;
   const misc = parseFloat(document.getElementById('misc').value) || 0;
-  const total = food + travel + misc;
+  const total = household + travel + misc;
   const date = document.getElementById('budgetDate').value;
 
   if (date) {  // Only save if date is selected
@@ -16,7 +16,7 @@ function autoCalculateAndSave() {
 
     const expenseData = {
       date: date,
-      food: food,
+      household: household,
       travel: travel,
       misc: misc,
       total: total
@@ -65,7 +65,7 @@ window.addEventListener('load', function() {
       const savedData = localStorage.getItem(userExpenseKey);
       if (savedData) {
         const data = JSON.parse(savedData);
-        document.getElementById('food').value = data.food || '';
+        document.getElementById('household').value = data.household || '';
         document.getElementById('travel').value = data.travel || '';
         document.getElementById('misc').value = data.misc || '';
         document.getElementById('dailySummary').innerHTML = `<p><strong>${data.date}</strong> - Total: ₹${data.total}</p>`;
@@ -84,11 +84,11 @@ if (budgetDateElement) {
     const savedData = localStorage.getItem(`expense_${this.value}`);
     if (savedData) {
       const data = JSON.parse(savedData);
-      document.getElementById('food').value = data.food || '';
+      document.getElementById('household').value = data.household || '';
       document.getElementById('travel').value = data.travel || '';
       document.getElementById('misc').value = data.misc || '';
     } else {
-      document.getElementById('food').value = '';
+      document.getElementById('household').value = '';
       document.getElementById('travel').value = '';
       document.getElementById('misc').value = '';
     }
@@ -156,7 +156,7 @@ function loadMonthlyData() {
   thead.innerHTML = `
     <tr>
       <th>Date</th>
-      <th>Food</th>
+      <th>Household</th>
       <th>Travel</th>
       <th>Misc</th>
       <th>Total</th>
@@ -178,7 +178,7 @@ function loadMonthlyData() {
         const row = document.createElement('tr');
         row.innerHTML = `
           <td>${data.date}</td>
-          <td>₹${data.food}</td>
+          <td>₹${data.household}</td>
           <td>₹${data.travel}</td>
           <td>₹${data.misc}</td>
           <td>₹${data.total}</td>
@@ -266,7 +266,7 @@ async function clearAllData() {
   if (window.isFirebaseAvailable && window.isFirebaseAvailable()) {
     try {
       const userId = window.getCurrentUserId();
-      const expenseTypes = ['food', 'travel', 'vacation', 'entertainment', 'emi', 'daily'];
+      const expenseTypes = ['household', 'travel', 'vacation', 'entertainment', 'emi', 'daily'];
       
       for (const type of expenseTypes) {
         const count = await window.ExpenseUtils.clearAll(type);
@@ -290,7 +290,7 @@ async function clearAllData() {
       key.includes('budget') ||
       key.includes('futureExpenses') ||
       key.startsWith('USER_') ||
-      key.startsWith('food') ||
+      key.startsWith('household') ||
       key.startsWith('travel') ||
       key.startsWith('entertainment') ||
       key.startsWith('emi') ||
@@ -352,10 +352,10 @@ async function deleteExpense(expenseType, monthKey) {
 
 // Delete all expenses for a specific month
 async function deleteMonthData(monthKey) {
-  if (!confirm(`Delete ALL expenses for ${monthKey}? This will remove Food, Travel, EMI, Entertainment, and Vacation data for this month.`)) return;
+  if (!confirm(`Delete ALL expenses for ${monthKey}? This will remove Household, Travel, EMI, Entertainment, and Vacation data for this month.`)) return;
   
   try {
-    const expenseTypes = ['food', 'travel', 'emi', 'entertainment', 'vacation'];
+    const expenseTypes = ['household', 'travel', 'emi', 'entertainment', 'vacation'];
     let deletedCount = 0;
     
     for (const type of expenseTypes) {
@@ -381,6 +381,192 @@ window.clearAllData = clearAllData;
 window.deleteExpense = deleteExpense;
 window.deleteMonthData = deleteMonthData;
 
+// Show/Hide Clear Monthly Data Options
+function showClearMonthOptions() {
+  const section = document.getElementById('clearMonthSection');
+  if (section) {
+    section.style.display = 'block';
+    // Set to current month by default
+    const monthSelector = document.getElementById('clearMonthSelector');
+    if (monthSelector) {
+      const today = new Date();
+      const month = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
+      monthSelector.value = month;
+    }
+  }
+}
+
+function hideClearMonthOptions() {
+  const section = document.getElementById('clearMonthSection');
+  if (section) {
+    section.style.display = 'none';
+  }
+}
+
+// Clear all data for a specific month
+async function clearMonthlyData() {
+  const monthSelector = document.getElementById('clearMonthSelector');
+  const selectedMonth = monthSelector.value;
+  
+  if (!selectedMonth) {
+    console.log('Please select a month to clear');
+    return;
+  }
+  
+  const user = getCurrentUser();
+  if (!user) {
+    console.log('Please sign in to clear monthly data');
+    return;
+  }
+  
+  let deletedCount = 0;
+  const keysToDelete = [];
+  
+  // Find all daily budget keys for this month
+  // Daily budget keys look like: EXPENSE_USER_email_uid_2026-01-15
+  const userPrefix = `EXPENSE_USER_${user.email}_${user.userId}`;
+  
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key) continue;
+    
+    // Only target daily budget entries for this user and month
+    if (key.startsWith(userPrefix) && key.includes(selectedMonth)) {
+      keysToDelete.push(key);
+    }
+  }
+  
+  // Delete the keys
+  keysToDelete.forEach(key => {
+    localStorage.removeItem(key);
+    deletedCount++;
+  });
+  
+  // Hide the section
+  hideClearMonthOptions();
+  
+  // Clear the daily budget table
+  const dailyTableContainer = document.getElementById('daily-budget-table-container');
+  if (dailyTableContainer) {
+    dailyTableContainer.innerHTML = '';
+  }
+  
+  // Refresh the monthly data table
+  if (typeof loadMonthlyData === 'function') {
+    try { loadMonthlyData(); } catch (e) { /* ignore */ }
+  }
+  
+  console.log(`✓ Cleared ${deletedCount} daily budget records for ${selectedMonth}`);
+}
+
+// Expose to global scope
+window.showClearMonthOptions = showClearMonthOptions;
+window.hideClearMonthOptions = hideClearMonthOptions;
+window.clearMonthlyData = clearMonthlyData;
+
+// Load monthly budget data for a specific month
+function loadMonthlyBudgetData() {
+  const monthSelector = document.getElementById('monthSelector');
+  const selectedMonth = monthSelector.value;
+  
+  if (!selectedMonth) {
+    console.log('Please select a month');
+    return;
+  }
+  
+  // Check if viewing current month or historical month
+  const today = new Date();
+  const currentMonth = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
+  const isCurrentMonth = (selectedMonth === currentMonth);
+  window.isViewingSpecificMonth = !isCurrentMonth; // Only lock if NOT current month
+  
+  console.log(`Month: ${selectedMonth}, Current: ${currentMonth}, IsLocked: ${window.isViewingSpecificMonth}`);
+  
+  const user = getCurrentUser();
+  if (!user) {
+    console.log('Please sign in to view monthly data');
+    return;
+  }
+  
+  // Get budget for this month
+  const budgetKey = `monthlyBudget_${user.userId}_${selectedMonth}`;
+  const legacyBudgetKey = `monthlyBudget_${user.userId}`;
+  const budgetValue = parseInt(localStorage.getItem(budgetKey) || localStorage.getItem(legacyBudgetKey) || '0', 10);
+  
+  // Calculate spent for this month
+  let totalSpent = 0;
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key) continue;
+    
+    if (key.includes(user.userId) && key.includes(selectedMonth)) {
+      try {
+        const data = JSON.parse(localStorage.getItem(key));
+        if (data.total) {
+          totalSpent += parseFloat(data.total) || 0;
+        } else {
+          const sum = (parseFloat(data.groceries) || 0) +
+                     (parseFloat(data.householdSupplies) || 0) +
+                     (parseFloat(data.personal) || 0) +
+                     (parseFloat(data.drinks) || 0) +
+                     (parseFloat(data.dining) || 0) +
+                     (parseFloat(data.movies) || 0) +
+                     (parseFloat(data.subscriptions) || 0) +
+                     (parseFloat(data.miscellaneous) || 0) +
+                     (parseFloat(data.fuel) || 0) +
+                     (parseFloat(data.taxi) || 0) +
+                     (parseFloat(data.bus) || 0) +
+                     (parseFloat(data.accommodation) || 0) +
+                     (parseFloat(data.flights) || 0) +
+                     (parseFloat(data.activities) || 0) +
+                     (parseFloat(data.carLoan) || 0) +
+                     (parseFloat(data.homeLoan) || 0) +
+                     (parseFloat(data.personalLoan) || 0) +
+                     (parseFloat(data.otherLoans) || 0);
+          if (sum > 0) totalSpent += sum;
+        }
+      } catch (e) {
+        // Skip invalid data
+      }
+    }
+  }
+  
+  // Update UI
+  document.getElementById('budgetTotal').textContent = budgetValue;
+  document.getElementById('budgetSpent').textContent = Math.round(totalSpent);
+  
+  const savings = Math.max(budgetValue - totalSpent, 0);
+  const savingsPct = budgetValue > 0 ? Math.round((savings / budgetValue) * 100) : 0;
+  document.getElementById('budgetSavings').textContent = Math.round(savings);
+  document.getElementById('savingsPercent').textContent = `(${savingsPct}%)`;
+  
+  // Update progress ring
+  const spent = Math.round(totalSpent);
+  const pct = Math.min(spent / budgetValue, 1);
+  const circumference = 2 * Math.PI * 50;
+  const offset = circumference * (1 - pct);
+  const progressCircle = document.querySelector('#budgetRing .progress');
+  if (progressCircle) {
+    progressCircle.style.strokeDasharray = circumference;
+    progressCircle.style.strokeDashoffset = offset;
+  }
+  document.getElementById('budgetPercent').textContent = Math.round(pct * 100) + '%';
+  
+  const statusEl = document.getElementById('budgetStatus');
+  if (statusEl) {
+    if (isCurrentMonth) {
+      statusEl.textContent = `${selectedMonth} (LIVE) - Saved: ₹${Math.round(savings)} | Spent: ₹${spent} of ₹${budgetValue}`;
+    } else {
+      statusEl.textContent = `${selectedMonth} (Historical) - Saved: ₹${Math.round(savings)} | Spent: ₹${spent} of ₹${budgetValue}`;
+    }
+  }
+  
+  console.log(`✓ Loaded ${selectedMonth} budget data - Budget: ₹${budgetValue}, Spent: ₹${spent}, Savings: ₹${savings}`);
+}
+
+// Expose to global scope
+window.loadMonthlyBudgetData = loadMonthlyBudgetData;
+
 // All Expenses section removed - feature not needed
 
 
@@ -403,19 +589,19 @@ function buildCombinedTable() {
 
   // Category prefixes to look for in localStorage
   const categoryPrefixes = {
-    food: 'foodExpenses_',
+    household: 'householdExpenses_',
     travel: 'travelExpenses_',
     emi: 'emiExpenses_',
     entertainment: 'entertainmentExpenses_',
     vacation: 'vacationExpenses_'
   };
 
-  // Aggregate map: { 'YYYY-MM': {food:0,travel:0,emi:0,entertainment:0,vacation:0} }
+  // Aggregate map: { 'YYYY-MM': {household:0,travel:0,emi:0,entertainment:0,vacation:0} }
   const monthly = {};
 
   const ensureMonth = (m) => {
     if (!monthly[m]) {
-      monthly[m] = { food: 0, travel: 0, emi: 0, entertainment: 0, vacation: 0 };
+      monthly[m] = { household: 0, travel: 0, emi: 0, entertainment: 0, vacation: 0 };
     }
     return monthly[m];
   };
@@ -447,9 +633,9 @@ function buildCombinedTable() {
     
     // Also check for user-namespaced keys (new format from expense-utils.js)
     if (!isUserKey) {
-      // Check for keys like: USER_email_uid_EXPENSES_FOOD_2026-01
+      // Check for keys like: USER_email_uid_EXPENSES_HOUSEHOLD_2026-01
       if (key.includes(currentUserId) || key.includes(`USER_`) && key.includes('_EXPENSES_')) {
-        if (key.includes('_FOOD_')) category = 'food';
+        if (key.includes('_HOUSEHOLD_')) category = 'household';
         else if (key.includes('_TRAVEL_')) category = 'travel';
         else if (key.includes('_EMI_')) category = 'emi';
         else if (key.includes('_ENTERTAINMENT_')) category = 'entertainment';
@@ -486,9 +672,9 @@ function buildCombinedTable() {
 
     // Sum category totals by their fields
     switch (category) {
-      case 'food': {
-        const total = safeNum(data.groceries) + safeNum(data.drinks) + safeNum(data.dining) + safeNum(data.total);
-        bucket.food += total; break;
+      case 'household': {
+        const total = safeNum(data.groceries) + safeNum(data.householdSupplies) + safeNum(data.personal) + safeNum(data.total);
+        bucket.household += total; break;
       }
       case 'travel': {
         const total = safeNum(data.auto) + safeNum(data.bus) + safeNum(data.metro) + safeNum(data.petrol) + safeNum(data.total);
@@ -519,7 +705,7 @@ function buildCombinedTable() {
   thead.innerHTML = `
     <tr>
       <th>Month</th>
-      <th>Food</th>
+      <th>Household</th>
       <th>Travel</th>
       <th>EMI</th>
       <th>Entertainment</th>
@@ -532,19 +718,19 @@ function buildCombinedTable() {
   const tbody = document.createElement('tbody');
   const months = Object.keys(monthly).sort().reverse(); // newest first
 
-  let grandAll = { food:0, travel:0, emi:0, entertainment:0, vacation:0 };
+  let grandAll = { household:0, travel:0, emi:0, entertainment:0, vacation:0 };
   const rupee = (n) => `₹${n}`;
 
   for (const m of months) {
     const row = document.createElement('tr');
-    const f = Math.round(monthly[m].food);
+    const f = Math.round(monthly[m].household);
     const t = Math.round(monthly[m].travel);
     const e = Math.round(monthly[m].emi);
     const en = Math.round(monthly[m].entertainment);
     const v = Math.round(monthly[m].vacation);
     const total = f + t + e + en + v;
 
-    grandAll.food += f; grandAll.travel += t; grandAll.emi += e; grandAll.entertainment += en; grandAll.vacation += v;
+    grandAll.household += f; grandAll.travel += t; grandAll.emi += e; grandAll.entertainment += en; grandAll.vacation += v;
 
     row.innerHTML = `
       <td>${m}</td>
@@ -562,11 +748,11 @@ function buildCombinedTable() {
 
   // Footer totals across all months
   const tfoot = document.createElement('tfoot');
-  const allTotal = grandAll.food + grandAll.travel + grandAll.emi + grandAll.entertainment + grandAll.vacation;
+  const allTotal = grandAll.household + grandAll.travel + grandAll.emi + grandAll.entertainment + grandAll.vacation;
   tfoot.innerHTML = `
     <tr>
       <td>All-time Total</td>
-      <td>${rupee(grandAll.food)}</td>
+      <td>${rupee(grandAll.household)}</td>
       <td>${rupee(grandAll.travel)}</td>
       <td>${rupee(grandAll.emi)}</td>
       <td>${rupee(grandAll.entertainment)}</td>
@@ -599,6 +785,10 @@ function buildCombinedTable() {
 
 // Budget Overview Ring Progress
 (function(){
+  // Global flag to control auto-updates
+  window.isViewingSpecificMonth = false;
+  let autoUpdateInterval = null;
+  
   function initBudgetUI() {
     const circumference = 2 * Math.PI * 50; // r=50
     const progressCircle = document.querySelector('#budgetRing .progress');
@@ -657,6 +847,8 @@ function buildCombinedTable() {
             } else {
               // Sum individual fields for category expenses
               const sum = (parseFloat(data.groceries) || 0) +
+                         (parseFloat(data.householdSupplies) || 0) +
+                         (parseFloat(data.personal) || 0) +
                          (parseFloat(data.drinks) || 0) +
                          (parseFloat(data.dining) || 0) +
                          (parseFloat(data.auto) || 0) +
@@ -666,7 +858,6 @@ function buildCombinedTable() {
                          (parseFloat(data.home) || 0) +
                          (parseFloat(data.car) || 0) +
                          (parseFloat(data.edu) || 0) +
-                         (parseFloat(data.personal) || 0) +
                          (parseFloat(data.movies) || 0) +
                          (parseFloat(data.parties) || 0) +
                          (parseFloat(data.gatherings) || 0) +
@@ -697,8 +888,25 @@ function buildCombinedTable() {
     }
 
     function updateRing(){
+      // Don't auto-update if user is viewing a specific month
+      if (window.isViewingSpecificMonth) {
+        return;
+      }
+      
       const spent = calculateActualSpent();
       spentEl.textContent = spent;
+      
+      // Calculate savings
+      const savings = Math.max(total - spent, 0);
+      const savingsEl = document.getElementById('budgetSavings');
+      const savingsPercentEl = document.getElementById('savingsPercent');
+      if (savingsEl) {
+        savingsEl.textContent = savings;
+        const savingsPct = total > 0 ? Math.round((savings / total) * 100) : 0;
+        if (savingsPercentEl) {
+          savingsPercentEl.textContent = `(${savingsPct}%)`;
+        }
+      }
       
       const pct = Math.min(spent / total, 1);
       const offset = circumference * (1 - pct);
@@ -713,8 +921,17 @@ function buildCombinedTable() {
     if (showBtn && budgetSection) {
       const showSection = () => {
         budgetSection.style.display = 'block';
+        window.isViewingSpecificMonth = false; // Reset flag when showing budget
         updateRing();
         showBtn.textContent = 'Hide Monthly Budget';
+        
+        // Set month selector to current month
+        const monthSelector = document.getElementById('monthSelector');
+        if (monthSelector && !monthSelector.value) {
+          const today = new Date();
+          const month = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
+          monthSelector.value = month;
+        }
       };
 
       showBtn.addEventListener('click', () => {
@@ -747,9 +964,16 @@ function buildCombinedTable() {
       });
     }
 
-    // Initial update and auto-refresh every 2 seconds
+    // Initial update and auto-refresh every 2 seconds only if not viewing specific month
     updateRing();
-    setInterval(updateRing, 2000);
+    if (autoUpdateInterval) {
+      clearInterval(autoUpdateInterval);
+    }
+    autoUpdateInterval = setInterval(() => {
+      if (!window.isViewingSpecificMonth) {
+        updateRing();
+      }
+    }, 2000);
   }
 
   // Ensure DOM is ready before init

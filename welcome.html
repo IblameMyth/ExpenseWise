@@ -482,8 +482,17 @@
                 <span style="color: #f59e0b;">⏳ Loading...</span>
             </div>
             
+            <!-- Remember Me Checkbox for Welcome Page -->
+            <div id="rememberMeSection" style="display:none; margin-bottom: 1rem; text-align:left; max-width:300px; margin-left:auto; margin-right:auto;">
+              <label style="display:flex; align-items:center; gap:8px; color:var(--text); cursor:pointer;">
+                <input type="checkbox" id="rememberMeCheckboxWelcome" checked style="width:18px; height:18px; cursor:pointer;">
+                <span style="font-size:14px;">Remember me (Stay signed in)</span>
+              </label>
+              <p style="font-size:12px; color:var(--muted); margin:6px 0 0 26px;">Uncheck to sign out when you close the browser</p>
+            </div>
+            
             <div class="cta-buttons">
-                <button id="signInBtn" onclick="handleSignIn()" class="btn btn-primary" style="display:none;">
+                <button id="signInBtn" onclick="handleSignInWelcome()" class="btn btn-primary" style="display:none;">
                     🔵 Sign In with Google
                 </button>
                 <button id="signOutBtn" onclick="handleSignOut()" class="btn" style="display:none; background: #dc2626;">
@@ -530,13 +539,20 @@
         }
 
         // Firebase Auth State Management
-        async function handleSignIn() {
+        async function handleSignInWelcome() {
             try {
+                const rememberMe = document.getElementById('rememberMeCheckboxWelcome').checked;
+                localStorage.setItem('rememberMe', rememberMe.toString());
                 await signInWithGoogle(true);
                 updateAuthUI();
             } catch (error) {
                 console.error('Sign in error:', error);
             }
+        }
+        
+        // Legacy function for compatibility
+        async function handleSignIn() {
+            await handleSignInWelcome();
         }
 
         async function handleSignOut() {
@@ -552,16 +568,26 @@
             const authStatus = document.getElementById('authStatus');
             const signInBtn = document.getElementById('signInBtn');
             const signOutBtn = document.getElementById('signOutBtn');
+            const rememberMeSection = document.getElementById('rememberMeSection');
             const user = window.firebaseAuth ? window.firebaseAuth.currentUser : null;
 
             if (user) {
                 authStatus.innerHTML = `<span style="color: #10b981;">🔵 Signed in as: <strong>${user.email}</strong></span>`;
                 signInBtn.style.display = 'none';
                 signOutBtn.style.display = 'inline-flex';
+                if (rememberMeSection) rememberMeSection.style.display = 'none';
             } else {
                 authStatus.innerHTML = '<span style="color: #f59e0b;">👤 Guest Mode - Sign in for data isolation</span>';
                 signInBtn.style.display = 'inline-flex';
                 signOutBtn.style.display = 'none';
+                if (rememberMeSection) rememberMeSection.style.display = 'block';
+                
+                // Initialize checkbox from localStorage
+                const rememberMe = localStorage.getItem('rememberMe');
+                const checkbox = document.getElementById('rememberMeCheckboxWelcome');
+                if (checkbox && rememberMe !== null) {
+                  checkbox.checked = rememberMe === 'true';
+                }
             }
         }
 

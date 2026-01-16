@@ -25,6 +25,26 @@
   
   <!-- Expense Manager Scripts -->
   <script src="expense_manager.js"></script>
+  
+  <!-- Remember Me Handler -->
+  <script>
+    function handleSignInClick() {
+      const rememberMe = document.getElementById('rememberMeCheckbox').checked;
+      localStorage.setItem('rememberMe', rememberMe.toString());
+      signInWithGoogle(true);
+    }
+    
+    // Initialize Remember Me checkbox from localStorage
+    window.addEventListener('DOMContentLoaded', function() {
+      const rememberMe = localStorage.getItem('rememberMe');
+      if (rememberMe !== null) {
+        const checkbox = document.getElementById('rememberMeCheckbox');
+        if (checkbox) {
+          checkbox.checked = rememberMe === 'true';
+        }
+      }
+    });
+  </script>
 </head>
 
 <body>
@@ -35,7 +55,16 @@
       <h2 style="margin:0 0 12px 0; color:var(--text);">Welcome to ExpenseWise</h2>
       <p style="color:var(--muted); margin-bottom:32px;">Sign in to sync your expenses across all devices</p>
       
-      <button onclick="signInWithGoogle(true)" style="width:100%; display:flex; align-items:center; justify-content:center; gap:12px; padding:14px 24px; background:#fff; color:#333; border:2px solid #ddd; border-radius:10px; cursor:pointer; font-size:16px; font-weight:600; transition:all 0.3s;">
+      <!-- Remember Me Checkbox -->
+      <div style="margin-bottom:20px; text-align:left;">
+        <label style="display:flex; align-items:center; gap:8px; color:var(--text); cursor:pointer;">
+          <input type="checkbox" id="rememberMeCheckbox" checked style="width:18px; height:18px; cursor:pointer;">
+          <span style="font-size:14px;">Remember me (Stay signed in)</span>
+        </label>
+        <p style="font-size:12px; color:var(--muted); margin:6px 0 0 26px;">Uncheck to sign out when you close the browser</p>
+      </div>
+      
+      <button onclick="handleSignInClick()" style="width:100%; display:flex; align-items:center; justify-content:center; gap:12px; padding:14px 24px; background:#fff; color:#333; border:2px solid #ddd; border-radius:10px; cursor:pointer; font-size:16px; font-weight:600; transition:all 0.3s;">
         <svg width="20" height="20" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
           <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -86,7 +115,7 @@
       <div class="daily-budget-pane">
         <form id="dailyBudgetForm">
           <input type="date" id="budgetDate" required />
-          <input type="number" id="food" placeholder="Food (₹)" oninput="autoCalculateAndSave()" />
+          <input type="number" id="household" placeholder="Household (₹)" oninput="autoCalculateAndSave()" />
           <input type="number" id="travel" placeholder="Travel (₹)" oninput="autoCalculateAndSave()" />
           <input type="number" id="misc" placeholder="Miscellaneous (₹)" oninput="autoCalculateAndSave()" />
           <button type="button" id="addDailyBudgetBtn" class="btn" style="margin-left:8px;">Add Budget</button>
@@ -94,8 +123,20 @@
         <div id="dailySummary"></div>
       </div>
     </div>
-    <div style="margin-top:10px; text-align:center;">
-      <button onclick="clearAllData()" style="background: linear-gradient(90deg, #dc2626, #ef4444); padding:10px 14px; border-radius:10px; border:none; color:#fff; cursor:pointer;">Clear All Data</button>
+    <div style="margin-top:10px; text-align:center; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+      <button onclick="showClearMonthOptions()" style="background: linear-gradient(90deg, #f59e0b, #f97316); padding:10px 14px; border-radius:10px; border:none; color:#fff; cursor:pointer; font-weight: 600;">Clear Monthly Data</button>
+      <button onclick="clearAllData()" style="background: linear-gradient(90deg, #dc2626, #ef4444); padding:10px 14px; border-radius:10px; border:none; color:#fff; cursor:pointer; font-weight: 600;">Clear All Data</button>
+    </div>
+
+    <!-- Clear Monthly Data Section -->
+    <div id="clearMonthSection" style="display: none; margin-top: 16px; padding: 20px; background: rgba(0, 0, 0, 0.3); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2);">
+      <h3 style="margin: 0 0 16px 0; text-align: center; color: #f59e0b;">🗑️ Clear Monthly Data</h3>
+      <div style="display: flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap;">
+        <label for="clearMonthSelector" style="font-weight: 600; font-size: 14px;">Select Month:</label>
+        <input type="month" id="clearMonthSelector" style="padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(0, 0, 0, 0.3); color: white; font-size: 14px; cursor: pointer;" />
+        <button onclick="clearMonthlyData()" style="padding: 8px 16px; border-radius: 8px; background: linear-gradient(90deg, #dc2626, #ef4444); color: white; border: none; cursor: pointer; font-size: 14px; font-weight: 600;">Delete Month Data</button>
+        <button onclick="hideClearMonthOptions()" style="padding: 8px 16px; border-radius: 8px; background: rgba(100, 116, 139, 0.5); color: white; border: none; cursor: pointer; font-size: 14px; font-weight: 600;">Cancel</button>
+      </div>
     </div>
 
     <div style="margin-top:10px; text-align:center;">
@@ -104,6 +145,14 @@
 
     <div class="container-compact" id="budgetSection" style="display:none;">
       <h2 style="margin:0;">Budget Overview</h2>
+      
+      <!-- Month Selector -->
+      <div style="margin-bottom: 16px; display: flex; gap: 12px; align-items: center;">
+        <label for="monthSelector" style="font-weight: 600; font-size: 14px;">View Month:</label>
+        <input type="month" id="monthSelector" style="padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(0, 0, 0, 0.3); color: white; font-size: 14px; cursor: pointer;" />
+        <button onclick="loadMonthlyBudgetData()" style="padding: 8px 16px; border-radius: 8px; background: linear-gradient(90deg, #3b82f6, #10b981); color: white; border: none; cursor: pointer; font-size: 14px; font-weight: 600;">Load</button>
+      </div>
+      
       <div class="progress-card">
         <div class="ring" id="budgetRing">
           <svg width="120" height="120">
@@ -123,6 +172,7 @@
         <div class="budget-meta">
           <p><strong>Monthly Budget:</strong> ₹<span id="budgetTotal">0</span></p>
           <p><strong>Spent:</strong> ₹<span id="budgetSpent">0</span></p>
+          <p><strong>Savings:</strong> ₹<span id="budgetSavings">0</span> <span id="savingsPercent" style="color: #10b981; font-size: 12px;">(0%)</span></p>
           <p id="budgetStatus" style="font-size:12px;">No expenses recorded yet</p>
         </div>
       </div>

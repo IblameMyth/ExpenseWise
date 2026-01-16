@@ -18,10 +18,11 @@ try {
   db = firebase.database();
   auth = firebase.auth();
   
-  // Set auth persistence to SESSION - sign out when browser/tab closes
-  auth.setPersistence(firebase.auth.Auth.Persistence.SESSION)
+  // Default to LOCAL persistence (keep user signed in across browser sessions)
+  // This will be changed to SESSION if user unchecks "Remember Me"
+  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
     .then(() => {
-      console.log('✓ Firebase auth persistence set to SESSION');
+      console.log('✓ Firebase auth persistence set to LOCAL (Remember Me enabled by default)');
     })
     .catch((error) => {
       console.error('Error setting persistence:', error);
@@ -35,8 +36,22 @@ try {
 // Current user state
 let currentUser = null;
 
-// Google Sign-In with account selection
+// Google Sign-In with account selection and Remember Me support
 async function signInWithGoogle(forceAccountSelection = false) {
+  // Check Remember Me preference before signing in
+  const rememberMe = localStorage.getItem('rememberMe') !== 'false'; // Default to true
+  const persistence = rememberMe 
+    ? firebase.auth.Auth.Persistence.LOCAL   // Keep signed in across sessions
+    : firebase.auth.Auth.Persistence.SESSION; // Sign out when browser closes
+  
+  try {
+    // Set persistence before signing in
+    await auth.setPersistence(persistence);
+    console.log(`✓ Auth persistence set to ${rememberMe ? 'LOCAL (Remember Me)' : 'SESSION (Sign out on close)'}`);
+  } catch (error) {
+    console.error('Error setting persistence:', error);
+  }
+  
   const provider = new firebase.auth.GoogleAuthProvider();
   
   // Force account selection popup (allows choosing different account)

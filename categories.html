@@ -306,7 +306,7 @@
         
         <!-- Category Tabs -->
         <div class="category-tabs">
-            <button class="tab-btn active" onclick="switchCategory('food', this)">🍔 Food</button>
+            <button class="tab-btn active" onclick="switchCategory('household', this)">🏠 Household</button>
             <button class="tab-btn" onclick="switchCategory('travel', this)">✈️ Travel</button>
             <button class="tab-btn" onclick="switchCategory('entertainment', this)">🎬 Entertainment</button>
             <button class="tab-btn" onclick="switchCategory('emi', this)">💳 EMI</button>
@@ -314,32 +314,46 @@
             <button class="tab-btn" onclick="switchCategory('future', this)">📅 Future Expenses</button>
         </div>
 
-        <!-- FOOD CATEGORY -->
-        <div id="food" class="category-content active">
-            <h3>🍔 Food Expenses</h3>
+        <!-- HOUSEHOLD CATEGORY -->
+        <div id="household" class="category-content active">
+            <h3>🏠 Household Expenses</h3>
             <div style="margin-bottom: 20px;">
-                <label for="foodMonth">Select Month: </label>
-                <input type="month" id="foodMonth" style="padding: 10px; border-radius: 10px; border: 1px solid #e6eef8;" />
+                <label for="householdMonth">Select Month: </label>
+                <input type="month" id="householdMonth" style="padding: 10px; border-radius: 10px; border: 1px solid #e6eef8;" />
             </div>
             <input type="number" id="groceries" placeholder="Groceries" />
-            <input type="number" id="drinks" placeholder="Drinks" />
-            <input type="number" id="dining" placeholder="Dining Out" />
-            <button onclick="saveFoodData()">Save Data</button>
-            <button id="toggleFoodTableBtn" onclick="toggleFoodTableVisibility()">Show Table</button>
-            <button onclick="clearFoodData()" style="background: linear-gradient(90deg, #dc2626, #ef4444); margin-left: 10px;">Clear All</button>
-            <div id="foodSummary"></div>
-            <div class="table-container" id="foodTableContainer" style="display: none;">
+            <input type="number" id="householdSupplies" placeholder="Household Supplies" />
+            <input type="number" id="personal" placeholder="Personal" />
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; margin-bottom: 15px;">
+              <button onclick="saveHouseholdData()">Save Data</button>
+              <button id="toggleHouseholdTableBtn" onclick="toggleHouseholdTableVisibility()">Show Table</button>
+              <button onclick="clearHouseholdData()" style="background: linear-gradient(90deg, #dc2626, #ef4444);">Clear All Data</button>
+              <button onclick="toggleHouseholdMonthlyOptions()" style="background: linear-gradient(90deg, #f59e0b, #f97316);">Clear Monthly Data</button>
+            </div>
+            
+            <!-- Household Clear Monthly Data Section -->
+            <div id="householdMonthlyOptions" style="display:none; margin-top:15px; padding:12px; background:rgba(255,255,255,0.05); border-radius:8px;">
+              <div style="margin-bottom:10px;">
+                <label>Select Month to Clear: </label>
+                <input type="month" id="householdClearMonth" style="padding: 8px; border-radius: 6px; border: 1px solid #e6eef8;" />
+              </div>
+              <button onclick="clearHouseholdMonthlyData()" style="background: #dc2626; padding:8px 12px; border-radius:6px; border:none; color:white; cursor:pointer; margin-right:8px;">Delete Month Data</button>
+              <button onclick="toggleHouseholdMonthlyOptions()" style="background: #64748b; padding:8px 12px; border-radius:6px; border:none; color:white; cursor:pointer;">Cancel</button>
+            </div>
+            
+            <div id="householdSummary"></div>
+            <div class="table-container" id="householdTableContainer" style="display: none;">
                 <table class="expense-table" style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr>
                             <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e6eef8;">Date</th>
                             <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e6eef8;">Groceries</th>
-                            <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e6eef8;">Drinks</th>
-                            <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e6eef8;">Dining</th>
+                            <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e6eef8;">Household Supplies</th>
+                            <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e6eef8;">Personal</th>
                             <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e6eef8;">Total</th>
                         </tr>
                     </thead>
-                    <tbody id="foodTableBody"></tbody>
+                    <tbody id="householdTableBody"></tbody>
                 </table>
             </div>
         </div>
@@ -354,9 +368,23 @@
             <input type="number" id="fuel" placeholder="Fuel" />
             <input type="number" id="taxi" placeholder="Taxi/Auto" />
             <input type="number" id="bus" placeholder="Bus/Train" />
-            <button onclick="saveTravelData()">Save Data</button>
-            <button id="toggleTravelTableBtn" onclick="toggleTravelTableVisibility()">Show Table</button>
-            <button onclick="clearTravelData()" style="background: linear-gradient(90deg, #dc2626, #ef4444); margin-left: 10px;">Clear All</button>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; margin-bottom: 15px;">
+              <button onclick="saveTravelData()">Save Data</button>
+              <button id="toggleTravelTableBtn" onclick="toggleTravelTableVisibility()">Show Table</button>
+              <button onclick="clearTravelData()" style="background: linear-gradient(90deg, #dc2626, #ef4444);">Clear All Data</button>
+              <button onclick="toggleTravelMonthlyOptions()" style="background: linear-gradient(90deg, #f59e0b, #f97316);">Clear Monthly Data</button>
+            </div>
+            
+            <!-- Travel Clear Monthly Data Section -->
+            <div id="travelMonthlyOptions" style="display:none; margin-top:15px; padding:12px; background:rgba(255,255,255,0.05); border-radius:8px;">
+              <div style="margin-bottom:10px;">
+                <label>Select Month to Clear: </label>
+                <input type="month" id="travelClearMonth" style="padding: 8px; border-radius: 6px; border: 1px solid #e6eef8;" />
+              </div>
+              <button onclick="clearTravelMonthlyData()" style="background: #dc2626; padding:8px 12px; border-radius:6px; border:none; color:white; cursor:pointer; margin-right:8px;">Delete Month Data</button>
+              <button onclick="toggleTravelMonthlyOptions()" style="background: #64748b; padding:8px 12px; border-radius:6px; border:none; color:white; cursor:pointer;">Cancel</button>
+            </div>
+            
             <div id="travelSummary"></div>
             <div class="table-container" id="travelTableContainer" style="display: none;">
                 <table class="expense-table" style="width: 100%; border-collapse: collapse;">
@@ -382,11 +410,27 @@
                 <input type="month" id="entertainmentMonth" style="padding: 10px; border-radius: 10px; border: 1px solid #e6eef8;" />
             </div>
             <input type="number" id="movies" placeholder="Movies" />
+            <input type="number" id="drinks" placeholder="Drinks" />
+            <input type="number" id="dining" placeholder="Dining Out" />
             <input type="number" id="subscriptions" placeholder="Subscriptions" />
             <input type="number" id="miscellaneous" placeholder="Miscellaneous" />
-            <button onclick="saveEntertainmentData()">Save Data</button>
-            <button id="toggleEntertainmentTableBtn" onclick="toggleEntertainmentTableVisibility()">Show Table</button>
-            <button onclick="clearEntertainmentData()" style="background: linear-gradient(90deg, #dc2626, #ef4444); margin-left: 10px;">Clear All</button>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; margin-bottom: 15px;">
+              <button onclick="saveEntertainmentData()">Save Data</button>
+              <button id="toggleEntertainmentTableBtn" onclick="toggleEntertainmentTableVisibility()">Show Table</button>
+              <button onclick="clearEntertainmentData()" style="background: linear-gradient(90deg, #dc2626, #ef4444);">Clear All Data</button>
+              <button onclick="toggleEntertainmentMonthlyOptions()" style="background: linear-gradient(90deg, #f59e0b, #f97316);">Clear Monthly Data</button>
+            </div>
+            
+            <!-- Entertainment Clear Monthly Data Section -->
+            <div id="entertainmentMonthlyOptions" style="display:none; margin-top:15px; padding:12px; background:rgba(255,255,255,0.05); border-radius:8px;">
+              <div style="margin-bottom:10px;">
+                <label>Select Month to Clear: </label>
+                <input type="month" id="entertainmentClearMonth" style="padding: 8px; border-radius: 6px; border: 1px solid #e6eef8;" />
+              </div>
+              <button onclick="clearEntertainmentMonthlyData()" style="background: #dc2626; padding:8px 12px; border-radius:6px; border:none; color:white; cursor:pointer; margin-right:8px;">Delete Month Data</button>
+              <button onclick="toggleEntertainmentMonthlyOptions()" style="background: #64748b; padding:8px 12px; border-radius:6px; border:none; color:white; cursor:pointer;">Cancel</button>
+            </div>
+            
             <div id="entertainmentSummary"></div>
             <div class="table-container" id="entertainmentTableContainer" style="display: none;">
                 <table class="expense-table" style="width: 100%; border-collapse: collapse;">
@@ -394,6 +438,8 @@
                         <tr>
                             <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e6eef8;">Date</th>
                             <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e6eef8;">Movies</th>
+                            <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e6eef8;">Drinks</th>
+                            <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e6eef8;">Dining Out</th>
                             <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e6eef8;">Subscriptions</th>
                             <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e6eef8;">Miscellaneous</th>
                             <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e6eef8;">Total</th>
@@ -415,9 +461,23 @@
             <input type="number" id="homeLoan" placeholder="Home Loan" />
             <input type="number" id="personalLoan" placeholder="Personal Loan" />
             <input type="number" id="otherLoans" placeholder="Other Loans" />
-            <button onclick="saveEmiData()">Save Data</button>
-            <button id="toggleEmiTableBtn" onclick="toggleEmiTableVisibility()">Show Table</button>
-            <button onclick="clearEmiData()" style="background: linear-gradient(90deg, #dc2626, #ef4444); margin-left: 10px;">Clear All</button>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; margin-bottom: 15px;">
+              <button onclick="saveEmiData()">Save Data</button>
+              <button id="toggleEmiTableBtn" onclick="toggleEmiTableVisibility()">Show Table</button>
+              <button onclick="clearEmiData()" style="background: linear-gradient(90deg, #dc2626, #ef4444);">Clear All Data</button>
+              <button onclick="toggleEmiMonthlyOptions()" style="background: linear-gradient(90deg, #f59e0b, #f97316);">Clear Monthly Data</button>
+            </div>
+            
+            <!-- EMI Clear Monthly Data Section -->
+            <div id="emiMonthlyOptions" style="display:none; margin-top:15px; padding:12px; background:rgba(255,255,255,0.05); border-radius:8px;">
+              <div style="margin-bottom:10px;">
+                <label>Select Month to Clear: </label>
+                <input type="month" id="emiClearMonth" style="padding: 8px; border-radius: 6px; border: 1px solid #e6eef8;" />
+              </div>
+              <button onclick="clearEmiMonthlyData()" style="background: #dc2626; padding:8px 12px; border-radius:6px; border:none; color:white; cursor:pointer; margin-right:8px;">Delete Month Data</button>
+              <button onclick="toggleEmiMonthlyOptions()" style="background: #64748b; padding:8px 12px; border-radius:6px; border:none; color:white; cursor:pointer;">Cancel</button>
+            </div>
+            
             <div id="emiSummary"></div>
             <div class="table-container" id="emiTableContainer" style="display: none;">
                 <table class="expense-table" style="width: 100%; border-collapse: collapse;">
@@ -446,9 +506,23 @@
             <input type="number" id="accommodation" placeholder="Accommodation" />
             <input type="number" id="flights" placeholder="Flights / Train / Bus" />
             <input type="number" id="activities" placeholder="Activities" />
-            <button onclick="saveVacationData()">Save Data</button>
-            <button id="toggleVacationTableBtn" onclick="toggleVacationTableVisibility()">Show Table</button>
-            <button onclick="clearVacationData()" style="background: linear-gradient(90deg, #dc2626, #ef4444); margin-left: 10px;">Clear All</button>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; margin-bottom: 15px;">
+              <button onclick="saveVacationData()">Save Data</button>
+              <button id="toggleVacationTableBtn" onclick="toggleVacationTableVisibility()">Show Table</button>
+              <button onclick="clearVacationData()" style="background: linear-gradient(90deg, #dc2626, #ef4444);">Clear All Data</button>
+              <button onclick="toggleVacationMonthlyOptions()" style="background: linear-gradient(90deg, #f59e0b, #f97316);">Clear Monthly Data</button>
+            </div>
+            
+            <!-- Vacation Clear Monthly Data Section -->
+            <div id="vacationMonthlyOptions" style="display:none; margin-top:15px; padding:12px; background:rgba(255,255,255,0.05); border-radius:8px;">
+              <div style="margin-bottom:10px;">
+                <label>Select Month to Clear: </label>
+                <input type="month" id="vacationClearMonth" style="padding: 8px; border-radius: 6px; border: 1px solid #e6eef8;" />
+              </div>
+              <button onclick="clearVacationMonthlyData()" style="background: #dc2626; padding:8px 12px; border-radius:6px; border:none; color:white; cursor:pointer; margin-right:8px;">Delete Month Data</button>
+              <button onclick="toggleVacationMonthlyOptions()" style="background: #64748b; padding:8px 12px; border-radius:6px; border:none; color:white; cursor:pointer;">Cancel</button>
+            </div>
+            
             <div id="vacationSummary"></div>
             <div class="table-container" id="vacationTableContainer" style="display: none;">
                 <table class="expense-table" style="width: 100%; border-collapse: collapse;">
@@ -653,7 +727,7 @@
             const today = new Date();
             const month = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
             
-            document.getElementById('foodMonth').value = month;
+            document.getElementById('householdMonth').value = month;
             document.getElementById('travelMonth').value = month;
             document.getElementById('entertainmentMonth').value = month;
             document.getElementById('emiMonth').value = month;
@@ -661,7 +735,7 @@
             
             // Handle URL hash navigation (e.g., categories.html#future)
             const hash = window.location.hash.substring(1);
-            if (hash && ['food', 'travel', 'entertainment', 'emi', 'vacation', 'future'].includes(hash)) {
+            if (hash && ['household', 'travel', 'entertainment', 'emi', 'vacation', 'future'].includes(hash)) {
                 // Find and click the correct tab
                 const tabs = document.querySelectorAll('.tab-btn');
                 tabs.forEach(tab => {
@@ -774,12 +848,12 @@
         }
 
         // ============= FOOD FUNCTIONS =============
-        async function saveFoodData() {
+        async function saveHouseholdData() {
             const groceries = parseFloat(document.getElementById('groceries').value) || 0;
-            const drinks = parseFloat(document.getElementById('drinks').value) || 0;
-            const dining = parseFloat(document.getElementById('dining').value) || 0;
-            const month = document.getElementById('foodMonth').value;
-            const total = groceries + drinks + dining;
+            const householdSupplies = parseFloat(document.getElementById('householdSupplies').value) || 0;
+            const personal = parseFloat(document.getElementById('personal').value) || 0;
+            const month = document.getElementById('householdMonth').value;
+            const total = groceries + householdSupplies + personal;
 
             if (!month) {
                 console.log('Please select a month');
@@ -792,36 +866,36 @@
             }
 
             try {
-                const expenseData = { groceries, drinks, dining, total, date: month };
+                const expenseData = { groceries, householdSupplies, personal, total, date: month };
                 
                 // Use ExpenseService if available
                 if (typeof ExpenseService !== 'undefined' && ExpenseService.save) {
-                    await ExpenseService.save('food', month, expenseData);
+                    await ExpenseService.save('household', month, expenseData);
                 } else {
                     // Fallback to localStorage (aligned with ExpenseService.saveLocal keying)
                     const userId = getCurrentUserId ? getCurrentUserId() : 'guest_' + Date.now();
-                    const key = `expense_${userId}_food_${month}`;
+                    const key = `expense_${userId}_household_${month}`;
                     localStorage.setItem(key, JSON.stringify(expenseData));
                 }
                 
-                document.getElementById('foodSummary').innerHTML = `<p><strong>${month}</strong> - Total: ₹${total}</p>`;
+                document.getElementById('householdSummary').innerHTML = `<p><strong>${month}</strong> - Total: ₹${total}</p>`;
                 document.getElementById('groceries').value = '';
-                document.getElementById('drinks').value = '';
-                document.getElementById('dining').value = '';
-                console.log('✓ Food expenses saved');
-                loadFoodTable(); // Refresh table
+                document.getElementById('householdSupplies').value = '';
+                document.getElementById('personal').value = '';
+                console.log('✓ Household expenses saved');
+                loadHouseholdTable(); // Refresh table
             } catch (error) {
-                console.error('Error saving food data:', error);
+                console.error('Error saving household data:', error);
                 console.log('Error saving data. Please try again.');
             }
         }
 
-        async function loadFoodTable() {
-            const tbody = document.getElementById('foodTableBody');
+        async function loadHouseholdTable() {
+            const tbody = document.getElementById('householdTableBody');
             tbody.innerHTML = '';
             
             try {
-                const rows = await fetchAllExpenseData('food');
+                const rows = await fetchAllExpenseData('household');
                 if (rows.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:10px;">No data saved yet</td></tr>';
                     return;
@@ -831,33 +905,33 @@
                     row.innerHTML = `
                         <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">${data.date}</td>
                         <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">₹${data.groceries || 0}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">₹${data.drinks || 0}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">₹${data.dining || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">₹${data.householdSupplies || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">₹${data.personal || 0}</td>
                         <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); font-weight: bold;">₹${data.total || 0}</td>
                     `;
                 });
             } catch (error) {
-                console.error('Error loading food table:', error);
+                console.error('Error loading household table:', error);
                 tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:10px;">Error loading data</td></tr>';
             }
         }
 
-        async function clearFoodData() {
+        async function clearHouseholdData() {
             try {
-                await ExpenseService.clearAll('food');
-                console.log('✓ All food data cleared');
-                document.getElementById('foodTableContainer').style.display = 'none';
-                document.getElementById('foodTableBody').innerHTML = '';
+                await ExpenseService.clearAll('household');
+                console.log('✓ All household data cleared');
+                document.getElementById('householdTableContainer').style.display = 'none';
+                document.getElementById('householdTableBody').innerHTML = '';
             } catch (error) {
-                console.error('Error clearing food data:', error);
+                console.error('Error clearing household data:', error);
                 console.log('Error clearing data');
             }
         }
 
-        async function toggleFoodTableVisibility() {
-            const container = document.getElementById('foodTableContainer');
+        async function toggleHouseholdTableVisibility() {
+            const container = document.getElementById('householdTableContainer');
             if (container.style.display === 'none') {
-                await loadFoodTable();
+                await loadHouseholdTable();
                 container.style.display = 'block';
             } else {
                 container.style.display = 'none';
@@ -956,10 +1030,12 @@
         // ============= ENTERTAINMENT FUNCTIONS =============
         async function saveEntertainmentData() {
             const movies = parseFloat(document.getElementById('movies').value) || 0;
+            const drinks = parseFloat(document.getElementById('drinks').value) || 0;
+            const dining = parseFloat(document.getElementById('dining').value) || 0;
             const subscriptions = parseFloat(document.getElementById('subscriptions').value) || 0;
             const miscellaneous = parseFloat(document.getElementById('miscellaneous').value) || 0;
             const month = document.getElementById('entertainmentMonth').value;
-            const total = movies + subscriptions + miscellaneous;
+            const total = movies + drinks + dining + subscriptions + miscellaneous;
 
             if (!month) {
                 console.log('Please select a month');
@@ -972,7 +1048,7 @@
             }
 
             try {
-                const expenseData = { movies, subscriptions, miscellaneous, total, date: month };
+                const expenseData = { movies, drinks, dining, subscriptions, miscellaneous, total, date: month };
                 
                 if (typeof ExpenseService !== 'undefined' && ExpenseService.save) {
                     await ExpenseService.save('entertainment', month, expenseData);
@@ -984,6 +1060,8 @@
                 
                 document.getElementById('entertainmentSummary').innerHTML = `<p><strong>${month}</strong> - Total: ₹${total}</p>`;
                 document.getElementById('movies').value = '';
+                document.getElementById('drinks').value = '';
+                document.getElementById('dining').value = '';
                 document.getElementById('subscriptions').value = '';
                 document.getElementById('miscellaneous').value = '';
                 console.log('✓ Entertainment expenses saved');
@@ -1001,6 +1079,8 @@
                 document.getElementById('entertainmentTableContainer').style.display = 'none';
                 document.getElementById('entertainmentTableBody').innerHTML = '';
                 document.getElementById('movies').value = '';
+                document.getElementById('drinks').value = '';
+                document.getElementById('dining').value = '';
                 document.getElementById('subscriptions').value = '';
                 document.getElementById('miscellaneous').value = '';
             } catch (error) {
@@ -1016,23 +1096,24 @@
             try {
                 const rows = await fetchAllExpenseData('entertainment');
                 if (rows.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:10px;">No data saved yet</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:10px;">No data saved yet</td></tr>';
                     return;
                 }
                 rows.forEach((data) => {
-                    const miscValue = data ? (data.miscellaneous ?? data.gaming ?? 0) : 0;
                     const row = tbody.insertRow();
                     row.innerHTML = `
                         <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">${data.date}</td>
                         <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">₹${data.movies || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">₹${data.drinks || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">₹${data.dining || 0}</td>
                         <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">₹${data.subscriptions || 0}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">₹${miscValue}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">₹${data.miscellaneous || 0}</td>
                         <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); font-weight: bold;">₹${data.total || 0}</td>
                     `;
                 });
             } catch (error) {
                 console.error('Error loading entertainment table:', error);
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:10px;">Error loading data</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:10px;">Error loading data</td></tr>';
             }
         }
 
@@ -1233,6 +1314,192 @@
                 container.style.display = 'block';
             } else {
                 container.style.display = 'none';
+            }
+        }
+
+        // ============= CLEAR MONTHLY DATA FUNCTIONS =============
+        // HOUSEHOLD
+        function toggleHouseholdMonthlyOptions() {
+            const div = document.getElementById('householdMonthlyOptions');
+            div.style.display = div.style.display === 'none' ? 'block' : 'none';
+        }
+
+        async function clearHouseholdMonthlyData() {
+            const monthSelector = document.getElementById('householdClearMonth');
+            const selectedMonth = monthSelector.value;
+            
+            if (!selectedMonth) {
+                console.log('Please select a month to clear');
+                return;
+            }
+            
+            try {
+                const userId = getCurrentUserId();
+                const prefix = `expense_${userId}_household_`;
+                let deletedCount = 0;
+                
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key && key.startsWith(prefix) && key.includes(selectedMonth)) {
+                        localStorage.removeItem(key);
+                        deletedCount++;
+                    }
+                }
+                
+                console.log(`✓ Cleared ${deletedCount} household entries for ${selectedMonth}`);
+                toggleHouseholdMonthlyOptions();
+                loadHouseholdTable();
+            } catch (error) {
+                console.error('Error clearing monthly data:', error);
+                console.log('Error clearing data');
+            }
+        }
+
+        // TRAVEL
+        function toggleTravelMonthlyOptions() {
+            const div = document.getElementById('travelMonthlyOptions');
+            div.style.display = div.style.display === 'none' ? 'block' : 'none';
+        }
+
+        async function clearTravelMonthlyData() {
+            const monthSelector = document.getElementById('travelClearMonth');
+            const selectedMonth = monthSelector.value;
+            
+            if (!selectedMonth) {
+                console.log('Please select a month to clear');
+                return;
+            }
+            
+            try {
+                const userId = getCurrentUserId();
+                const prefix = `expense_${userId}_travel_`;
+                let deletedCount = 0;
+                
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key && key.startsWith(prefix) && key.includes(selectedMonth)) {
+                        localStorage.removeItem(key);
+                        deletedCount++;
+                    }
+                }
+                
+                console.log(`✓ Cleared ${deletedCount} travel entries for ${selectedMonth}`);
+                toggleTravelMonthlyOptions();
+                loadTravelTable();
+            } catch (error) {
+                console.error('Error clearing monthly data:', error);
+                console.log('Error clearing data');
+            }
+        }
+
+        // ENTERTAINMENT
+        function toggleEntertainmentMonthlyOptions() {
+            const div = document.getElementById('entertainmentMonthlyOptions');
+            div.style.display = div.style.display === 'none' ? 'block' : 'none';
+        }
+
+        async function clearEntertainmentMonthlyData() {
+            const monthSelector = document.getElementById('entertainmentClearMonth');
+            const selectedMonth = monthSelector.value;
+            
+            if (!selectedMonth) {
+                console.log('Please select a month to clear');
+                return;
+            }
+            
+            try {
+                const userId = getCurrentUserId();
+                const prefix = `expense_${userId}_entertainment_`;
+                let deletedCount = 0;
+                
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key && key.startsWith(prefix) && key.includes(selectedMonth)) {
+                        localStorage.removeItem(key);
+                        deletedCount++;
+                    }
+                }
+                
+                console.log(`✓ Cleared ${deletedCount} entertainment entries for ${selectedMonth}`);
+                toggleEntertainmentMonthlyOptions();
+                loadEntertainmentTable();
+            } catch (error) {
+                console.error('Error clearing monthly data:', error);
+                console.log('Error clearing data');
+            }
+        }
+
+        // EMI
+        function toggleEmiMonthlyOptions() {
+            const div = document.getElementById('emiMonthlyOptions');
+            div.style.display = div.style.display === 'none' ? 'block' : 'none';
+        }
+
+        async function clearEmiMonthlyData() {
+            const monthSelector = document.getElementById('emiClearMonth');
+            const selectedMonth = monthSelector.value;
+            
+            if (!selectedMonth) {
+                console.log('Please select a month to clear');
+                return;
+            }
+            
+            try {
+                const userId = getCurrentUserId();
+                const prefix = `expense_${userId}_emi_`;
+                let deletedCount = 0;
+                
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key && key.startsWith(prefix) && key.includes(selectedMonth)) {
+                        localStorage.removeItem(key);
+                        deletedCount++;
+                    }
+                }
+                
+                console.log(`✓ Cleared ${deletedCount} EMI entries for ${selectedMonth}`);
+                toggleEmiMonthlyOptions();
+                loadEmiTable();
+            } catch (error) {
+                console.error('Error clearing monthly data:', error);
+                console.log('Error clearing data');
+            }
+        }
+
+        // VACATION
+        function toggleVacationMonthlyOptions() {
+            const div = document.getElementById('vacationMonthlyOptions');
+            div.style.display = div.style.display === 'none' ? 'block' : 'none';
+        }
+
+        async function clearVacationMonthlyData() {
+            const monthSelector = document.getElementById('vacationClearMonth');
+            const selectedMonth = monthSelector.value;
+            
+            if (!selectedMonth) {
+                console.log('Please select a month to clear');
+                return;
+            }
+            
+            try {
+                const userId = getCurrentUserId();
+                const prefix = `expense_${userId}_vacation_`;
+                let deletedCount = 0;
+                
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key && key.startsWith(prefix) && key.includes(selectedMonth)) {
+                        localStorage.removeItem(key);
+                        deletedCount++;
+                    }
+                }
+                
+                console.log(`✓ Cleared ${deletedCount} vacation entries for ${selectedMonth}`);
+                toggleVacationMonthlyOptions();
+                loadVacationTable();
+            } catch (error) {
+                console.error('Error clearing monthly data:', error);
+                console.log('Error clearing data');
             }
         }
 
