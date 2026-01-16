@@ -36,12 +36,6 @@ try {
 // Current user state
 let currentUser = null;
 
-// Detect mobile device
-function isMobileDevice() {
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
-    || window.innerWidth < 768;
-}
-
 // Google Sign-In with account selection and Remember Me support
 async function signInWithGoogle(forceAccountSelection = false) {
   // Check Remember Me preference before signing in
@@ -50,15 +44,12 @@ async function signInWithGoogle(forceAccountSelection = false) {
     ? firebase.auth.Auth.Persistence.LOCAL   // Keep signed in across sessions
     : firebase.auth.Auth.Persistence.SESSION; // Sign out when browser closes
   
-  console.log(`🔐 Remember Me: ${rememberMe}, Persistence: ${persistence === firebase.auth.Auth.Persistence.LOCAL ? 'LOCAL' : 'SESSION'}`);
-  
   try {
-    // CRITICAL: Set persistence before signing in
+    // Set persistence before signing in
     await auth.setPersistence(persistence);
     console.log(`✓ Auth persistence set to ${rememberMe ? 'LOCAL (Remember Me)' : 'SESSION (Sign out on close)'}`);
   } catch (error) {
     console.error('Error setting persistence:', error);
-    // Continue anyway - persistence error shouldn't block sign-in
   }
   
   const provider = new firebase.auth.GoogleAuthProvider();
@@ -70,29 +61,6 @@ async function signInWithGoogle(forceAccountSelection = false) {
     });
   }
 
-  // Use redirect flow on mobile devices, popup on desktop
-  const useMobile = isMobileDevice();
-  
-  console.log(`📱 Device type: ${useMobile ? 'Mobile (using redirect)' : 'Desktop (using popup)'}`);
-  
-  if (useMobile) {
-    console.log('🔄 Starting redirect-based sign-in...');
-    try {
-      // Store that we're attempting sign-in (for redirect detection)
-      sessionStorage.setItem('authRedirectPending', 'true');
-      await auth.signInWithRedirect(provider);
-      // Page will reload after redirect, result handled in getRedirectResult
-      return;
-    } catch (error) {
-      sessionStorage.removeItem('authRedirectPending');
-      console.error('Google Sign-In redirect error:', error);
-      alert('Sign-in failed: ' + (error.message || 'Please try again'));
-      throw error;
-    }
-  }
-
-  // Desktop: Use popup flow
-  console.log('🪟 Starting popup-based sign-in...');
   try {
     const result = await auth.signInWithPopup(provider);
     currentUser = result.user;
@@ -107,19 +75,18 @@ async function signInWithGoogle(forceAccountSelection = false) {
     // Fall back to redirect-based sign-in which is more tolerant of these restrictions.
     if (error.code === 'auth/internal-error' || error.code === 'auth/popup-blocked') {
       try {
-        console.warn('⚠ Popup failed, falling back to redirect-based Google sign-in...');
-        sessionStorage.setItem('authRedirectPending', 'true');
+        console.warn('Popup failed, falling back to redirect-based Google sign-in...');
         await auth.signInWithRedirect(provider);
         return; // Redirect will navigate away
       } catch (redirectError) {
-        sessionStorage.removeItem('authRedirectPending');
         console.error('Google Sign-In redirect error:', redirectError);
+        console.log('');
         throw redirectError;
       }
     }
 
-    if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
-      alert('Sign-in failed: ' + (error.message || 'Please try again'));
+    if (error.code !== 'auth/popup-closed-by-user') {
+      console.log('Failed to sign in with Google: ' + error.message);
     }
     throw error;
   }
@@ -280,138 +247,29 @@ function showRecentAccounts() {
 function initFirebaseAuth() {
   return new Promise((resolve) => {
     let resolved = false;
-    let redirectHandled = false;
-    let authStateListenerActive = false;
-    
     const finish = (user) => {
       if (!resolved) {
         resolved = true;
-        console.log('🏁 Auth init finished with user:', user ? user.email : 'null');
         resolve(user);
       }
     };
 
-    // Set a timeout to prevent infinite loading (10 seconds max)
-    const authTimeout = setTimeout(() => {
-      if (!resolved) {
-        console.error('⏱️ Auth init timeout - checking current user directly');
-        const currentAuthUser = auth.currentUser;
-        if (currentAuthUser) {
-          console.log('✅ Timeout reached but found user:', currentAuthUser.email);
-          currentUser = currentAuthUser;
-          updateUIForUser(currentAuthUser);
-          finish(currentAuthUser);
-        } else {
-          console.log('⏱️ Timeout reached - no user found');
-          updateUIForUser(null);
-          finish(null);
-        }
-      }
-    }, 10000);
-
     // Handle redirect-based sign-in results (after signInWithRedirect)
-    console.log('🔍 Checking for redirect result...');
-    
     auth.getRedirectResult()
       .then((result) => {
-        redirectHandled = true;
-        const wasRedirectPending = sessionStorage.getItem('authRedirectPending') === 'true';
-        sessionStorage.removeItem('authRedirectPending');
-        
         if (result && result.user) {
           currentUser = result.user;
-          console.log('✅ Redirect sign-in SUCCESS for:', result.user.email);
-          console.log('✅ User UID:', result.user.uid);
+          console.log('✓ Redirect sign-in complete for:', result.user.email);
           saveAccountToHistory(result.user);
-          
-          // Apply Remember Me preference after redirect
-          const rememberMe = localStorage.getItem('rememberMe') !== 'false';
-          const persistence = rememberMe 
-            ? firebase.auth.Auth.Persistence.LOCAL 
-            : firebase.auth.Auth.Persistence.SESSION;
-          
-          console.log(`🔐 Setting persistence to ${persistence === firebase.auth.Auth.Persistence.LOCAL ? 'LOCAL' : 'SESSION'}`);
-          
-          auth.setPersistence(persistence)
-            .then(() => {
-              console.log('✓ Persistence set after redirect');
-              clearTimeout(authTimeout);
-              updateUIForUser(result.user);
-              finish(result.user);
-            })
-            .catch(err => {
-              console.error('Error setting persistence after redirect:', err);
-              clearTimeout(authTimeout);
-              updateUIForUser(result.user);
-              finish(result.user);
-            });
-        } else {
-          console.log('ℹ No redirect result, checking current auth state...');
-          // No redirect result, check current auth state
-          const currentAuthUser = auth.currentUser;
-          if (currentAuthUser) {
-            console.log('✓ Existing user session found:', currentAuthUser.email);
-            currentUser = currentAuthUser;
-            clearTimeout(authTimeout);
-            updateUIForUser(currentAuthUser);
-            finish(currentAuthUser);
-          }
-          // If no current user, wait for onAuthStateChanged
+          updateUIForUser(result.user);
+          finish(result.user);
         }
       })
       .catch((error) => {
-        redirectHandled = true;
-        sessionStorage.removeItem('authRedirectPending');
-        console.error('❌ Redirect sign-in error:', error);
-        console.error('Error code:', error.code);
-        console.error('Error message:', error.message);
-        
-        // Still try to get current user
-        const currentAuthUser = auth.currentUser;
-        if (currentAuthUser) {
-          console.log('⚠ Error during redirect but user is authenticated:', currentAuthUser.email);
-          currentUser = currentAuthUser;
-          clearTimeout(authTimeout);
-          updateUIForUser(currentAuthUser);
-          finish(currentAuthUser);
-          return;
-        }
-        
-        // Show error to user only for real errors
-        if (error.code !== 'auth/popup-closed-by-user' && 
-            error.code !== 'auth/cancelled-popup-request' &&
-            error.code !== 'auth/user-cancelled') {
-          console.error('Showing error alert to user');
-          alert('Sign-in failed: ' + (error.message || 'Please try again.\n\nMake sure you have a stable internet connection.'));
-        }
+        console.error('Redirect sign-in error:', error);
       });
 
-    // Listen for auth state changes
     auth.onAuthStateChanged((user) => {
-      console.log('👁️ Auth state changed:', user ? user.email : 'null');
-      
-      if (!authStateListenerActive) {
-        authStateListenerActive = true;
-        console.log('✓ Auth state listener activated');
-      }
-      
-      // Wait for redirect to be handled first (or 500ms timeout)
-      if (!redirectHandled) {
-        console.log('⏳ Redirect not yet handled, waiting...');
-        setTimeout(() => {
-          if (!redirectHandled) {
-            console.warn('⏳ Redirect took too long, processing auth state now');
-            redirectHandled = true;
-            processAuthState(user);
-          }
-        }, 500);
-        return;
-      }
-      
-      processAuthState(user);
-    });
-    
-    function processAuthState(user) {
       currentUser = user;
       
       // Clear cache when user changes
@@ -420,21 +278,16 @@ function initFirebaseAuth() {
       }
       
       if (user) {
-        console.log('✅ Auth state: User authenticated -', user.email);
-        console.log('✅ User UID:', user.uid);
-        clearTimeout(authTimeout);
+        console.log('✓ User authenticated:', user.email);
+        console.log('✓ User ID:', user.uid);
         updateUIForUser(user);
         finish(user);
       } else {
-        console.log('⚠️ Auth state: No user signed in');
-        // Don't finish immediately, give redirect a chance
-        if (redirectHandled) {
-          clearTimeout(authTimeout);
-          updateUIForUser(null);
-          finish(null);
-        }
+        console.log('⚠ No user signed in');
+        updateUIForUser(null);
+        finish(null);
       }
-    }
+    });
   });
 }
 
@@ -453,24 +306,6 @@ function getOrCreateUserId() {
   return userId;
 }
 
-// Force check current auth state (call this if loading seems stuck)
-function forceCheckAuthState() {
-  console.log('🔄 Force checking auth state...');
-  const currentAuthUser = auth.currentUser;
-  
-  if (currentAuthUser) {
-    console.log('✅ Force check found user:', currentAuthUser.email);
-    currentUser = currentAuthUser;
-    updateUIForUser(currentAuthUser);
-    return currentAuthUser;
-  } else {
-    console.log('⚠️ Force check found no user');
-    currentUser = null;
-    updateUIForUser(null);
-    return null;
-  }
-}
-
 // Export Firebase instances
 window.firebaseApp = app;
 window.firebaseDB = db;
@@ -482,7 +317,6 @@ window.signOut = signOut;
 window.switchAccount = switchAccount;
 window.updateUIForUser = updateUIForUser;
 window.getRecentAccounts = getRecentAccounts;
-window.forceCheckAuthState = forceCheckAuthState;
 
 // Note: SESSION persistence automatically logs out when browser closes
 // No need for beforeunload/visibilitychange handlers as they interfere with navigation
