@@ -86,14 +86,14 @@
   </div>
 
   <header>
-    <div class="header-left">
+    <div class="header-center">
       <img src="images/logo.png" alt="ExpenseWise Logo" class="site-logo">
       <h1>ExpenseWise</h1>
     </div>
-    <div style="display: flex; align-items: center; gap: 12px;">
-      <button onclick="window.location.href='welcome.html'" style="background: var(--accent); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px;">🏠 Home</button>
-      <button onclick="window.location.href='expense_manager_system.html'" style="background: var(--primary); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px;">📊 Dashboard</button>
-      <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
+    <div class="header-buttons">
+      <button onclick="window.location.href='welcome.html'" style="background: var(--accent); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; white-space: nowrap;">🏠 Home</button>
+      <button onclick="window.location.href='expense_manager_system.html'" style="background: var(--primary); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; white-space: nowrap;">📊 Dashboard</button>
+      <button class="theme-toggle" onclick="toggleTheme()" style="white-space: nowrap;">🌙 Dark Mode</button>
       
       <!-- User Menu with Hamburger -->
       <div class="user-menu-container">
@@ -147,9 +147,9 @@
       <h2 style="margin:0;">Budget Overview</h2>
       
       <!-- Month Selector -->
-      <div style="margin-bottom: 16px; display: flex; gap: 12px; align-items: center;">
+      <div style="margin-bottom: 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
         <label for="monthSelector" style="font-weight: 600; font-size: 14px;">View Month:</label>
-        <input type="month" id="monthSelector" style="padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(0, 0, 0, 0.3); color: white; font-size: 14px; cursor: pointer;" />
+        <input type="month" id="monthSelector" style="padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(0, 0, 0, 0.3); color: white; font-size: 14px; cursor: pointer; flex: 1; min-width: 150px;" />
         <button onclick="loadMonthlyBudgetData()" style="padding: 8px 16px; border-radius: 8px; background: linear-gradient(90deg, #3b82f6, #10b981); color: white; border: none; cursor: pointer; font-size: 14px; font-weight: 600;">Load</button>
       </div>
       

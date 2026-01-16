@@ -358,12 +358,13 @@ main > div {
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 header {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--gap);
+  justify-content: center;
+  gap: 12px;
   background: rgba(0, 0, 0, 0.3);
   color: var(--text);
-  padding: 18px 22px;
+  padding: 16px 20px;
   border-radius: var(--radius);
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
   margin-bottom: 20px;
@@ -378,6 +379,34 @@ header {
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid var(--glass-border);
   color: var(--text);
+}
+
+.header-center {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+}
+
+.site-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+}
+
+.header-buttons button {
+  padding: 8px 12px;
+  font-size: 14px;
+  white-space: nowrap;
 }
 
 .header-left {
@@ -1170,4 +1199,411 @@ main > div,
 .ring .progress {
   backface-visibility: hidden;
   perspective: 1000px;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+
+/* Tablets and smaller screens (768px and below) */
+@media (max-width: 768px) {
+  :root {
+    --container: 100%;
+    --gap: 10px;
+  }
+
+  body {
+    padding: 12px;
+  }
+
+  header {
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+
+  header h1 {
+    font-size: 18px;
+  }
+
+  .header-center {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .header-buttons {
+    width: 100%;
+  }
+
+  main {
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+
+  button {
+    padding: 10px 12px;
+    font-size: 13px;
+    min-height: 44px;
+    border-radius: 8px;
+  }
+
+  input, select, textarea {
+    padding: 10px;
+    font-size: 16px;
+    min-height: 44px;
+    border-radius: 8px;
+  }
+
+  .ring {
+    width: 120px;
+    height: 120px;
+  }
+
+  .expense-table {
+    font-size: 12px;
+  }
+
+  .expense-table th,
+  .expense-table td {
+    padding: 8px;
+  }
+
+  .feature-card {
+    padding: 16px;
+  }
+
+  .stat-item {
+    padding: 12px;
+  }
+
+  .daily-budget-pane {
+    padding: 12px;
+  }
+
+  .daily-budget-area {
+    flex-direction: column;
+  }
+}
+
+/* Mobile phones (480px and below) */
+@media (max-width: 480px) {
+  :root {
+    --radius: 10px;
+  }
+
+  body {
+    padding: 8px;
+    font-size: 12px;
+  }
+
+  header {
+    flex-direction: column;
+    padding: 10px 8px;
+    gap: 8px;
+  }
+
+  header h1 {
+    font-size: 16px;
+    margin: 0;
+  }
+
+  .header-center {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .site-logo {
+    width: 36px;
+    height: 36px;
+  }
+
+  .header-buttons {
+    width: 100%;
+    gap: 6px;
+  }
+
+  .header-buttons button {
+    flex: 1;
+    min-width: 70px;
+    padding: 8px;
+    font-size: 11px;
+    white-space: nowrap;
+    margin: 0;
+    min-height: 40px;
+  }
+
+  main {
+    padding: 12px;
+  }
+
+  h2 {
+    font-size: 16px;
+  }
+
+  h3 {
+    font-size: 14px;
+  }
+
+  button {
+    width: 100%;
+    padding: 10px;
+    font-size: 12px;
+    margin-bottom: 6px;
+    min-height: 42px;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    padding: 8px;
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ring {
+    width: 100px;
+    height: 100px;
+  }
+
+  .ring-inner {
+    font-size: 16px;
+  }
+
+  .ring-label {
+    font-size: 10px;
+  }
+
+  .expense-table {
+    display: block;
+    overflow-x: visible;
+    font-size: 13px;
+    width: 100%;
+  }
+
+  .expense-table thead {
+    display: none;
+  }
+  
+  .expense-table tbody {
+    display: block;
+  }
+
+  .expense-table tbody tr {
+    display: block;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    margin-bottom: 16px;
+    padding: 16px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(16, 185, 129, 0.08));
+    border-left: 4px solid rgba(76, 175, 80, 0.8);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .expense-table tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: right;
+    padding: 12px 8px;
+    position: relative;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    min-height: 40px;
+    gap: 16px;
+    font-size: 14px;
+  }
+
+  .expense-table tbody td:before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.95);
+    text-align: left;
+    flex: 0 0 45%;
+    white-space: normal;
+    word-wrap: break-word;
+    font-size: 13px;
+    text-transform: capitalize;
+  }
+
+  .expense-table tbody td:last-child {
+    border-bottom: none;
+  }
+  
+  .expense-table tbody td:first-child {
+    font-weight: 600;
+  }
+
+  .feature-card {
+    padding: 12px;
+  }
+
+  .feature-icon {
+    font-size: 24px;
+  }
+
+  .feature-title {
+    font-size: 13px;
+  }
+
+  .feature-desc {
+    font-size: 11px;
+  }
+
+  .stat-item {
+    padding: 8px;
+  }
+
+  .stat-number {
+    font-size: 18px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+  }
+
+  .daily-budget-pane {
+    padding: 10px;
+  }
+
+  .user-menu-dropdown {
+    right: 0;
+    min-width: 150px;
+  }
+
+  .theme-toggle {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+}
+
+/* Very small phones (320px and below) */
+@media (max-width: 320px) {
+  h1 {
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  h2 {
+    font-size: 13px;
+  }
+
+  h3 {
+    font-size: 12px;
+  }
+
+  button, input, select {
+    font-size: 11px;
+    padding: 6px;
+    white-space: nowrap;
+  }
+
+  .ring {
+    width: 80px;
+    height: 80px;
+  }
+
+  .ring-inner {
+    font-size: 12px;
+  }
+}
+
+/* Tablets landscape (768px to 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  :root {
+    --container: 95%;
+  }
+
+  body {
+    padding: 16px;
+  }
+
+  header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  header h1 {
+    font-size: 1.4rem;
+  }
+
+  .header-center {
+    flex-direction: column;
+  }
+
+  .header-buttons {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  button {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+
+  input {
+    padding: 10px;
+  }
+}
+
+/* Touch device enhancements */
+@media (hover: none) and (pointer: coarse) {
+  button {
+    min-height: 48px;
+    min-width: 48px;
+    padding: 12px 16px;
+  }
+
+  input, select, textarea {
+    min-height: 48px;
+    padding: 12px;
+  }
+
+  a {
+    padding: 8px;
+  }
+}
+
+/* Landscape mode optimizations */
+@media (max-height: 500px) {
+  header {
+    padding: 8px 12px;
+  }
+
+  h1 {
+    font-size: 18px;
+  }
+
+  button {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  input {
+    padding: 6px;
+    font-size: 13px;
+  }
+
+  .ring {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+/* Print friendly */
+@media print {
+  header, button, .theme-toggle, .user-menu-container {
+    display: none;
+  }
+
+  body {
+    background: white;
+    color: black;
+  }
+
+  .expense-table {
+    border: 1px solid black;
+  }
 }

@@ -77,8 +77,51 @@
         }
 
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
-        header{display:flex;align-items:center;justify-content:space-between;background:rgba(0, 0, 0, 0.3);color:var(--text);padding:16px 20px;border-radius:var(--radius);box-shadow:0 15px 30px rgba(0, 0, 0, 0.4);margin-bottom:18px;border:1px solid rgba(255, 255, 255, 0.2);backdrop-filter:blur(10px);text-shadow:0 1px 2px rgba(0, 0, 0, 0.5)}
-        header h1{margin:0;font-size:1.6rem;font-family:'Poppins',sans-serif;font-weight:600;letter-spacing:0.5px;background:linear-gradient(90deg, #ffffff, #f0f9ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 2px 4px rgba(0, 0, 0, 0.5);filter:drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5))}
+        header{
+            display:flex;
+            flex-direction: column;
+            align-items:center;
+            justify-content:center;
+            background:rgba(0, 0, 0, 0.3);
+            color:var(--text);
+            padding:16px 20px;
+            border-radius:var(--radius);
+            box-shadow:0 15px 30px rgba(0, 0, 0, 0.4);
+            margin-bottom:18px;
+            border:1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter:blur(10px);
+            text-shadow:0 1px 2px rgba(0, 0, 0, 0.5);
+            gap: 12px;
+        }
+        header h1{
+            margin:0;
+            font-size:1.6rem;
+            font-family:'Poppins',sans-serif;
+            font-weight:600;
+            letter-spacing:0.5px;
+            background:linear-gradient(90deg, #ffffff, #f0f9ff);
+            -webkit-background-clip:text;
+            background-clip:text;
+            -webkit-text-fill-color:transparent;
+            text-shadow:0 2px 4px rgba(0, 0, 0, 0.5);
+            filter:drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+            text-align: center;
+        }
+
+        header > div {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .site-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            object-fit: contain;
+        }
 
         [data-theme="dark"] header {
             background: rgba(0, 0, 0, 0.3);
@@ -260,6 +303,68 @@
             .category-tabs {
                 flex-direction: column;
             }
+            
+            /* Enhanced table mobile display */
+            .expense-table {
+                display: block;
+                overflow-x: visible;
+                font-size: 13px;
+            }
+            
+            .expense-table thead {
+                display: none;
+            }
+            
+            .expense-table tbody {
+                display: block;
+            }
+            
+            .expense-table tbody tr {
+                display: block;
+                margin-bottom: 20px;
+                padding: 16px;
+                background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(16, 185, 129, 0.1));
+                border-radius: 12px;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-left: 4px solid var(--accent);
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            }
+            
+            .expense-table tbody td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 8px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                gap: 16px;
+                text-align: right;
+                font-size: 14px;
+            }
+            
+            .expense-table tbody td:last-child {
+                border-bottom: none;
+                padding-bottom: 8px;
+            }
+            
+            .expense-table tbody td:first-child {
+                padding-top: 8px;
+            }
+            
+            .expense-table tbody td:before {
+                content: attr(data-label);
+                font-weight: 700;
+                color: rgba(255, 255, 255, 0.95);
+                text-align: left;
+                flex-shrink: 0;
+                width: 45%;
+                font-size: 13px;
+                text-transform: capitalize;
+            }
+            
+            .expense-table tbody td:after {
+                content: '';
+                flex: 1;
+            }
         }
 
         .table-container {
@@ -283,6 +388,126 @@
         footer a:hover{opacity:0.7;text-decoration:underline}
         [data-theme="light"] footer{color:var(--text)}
         [data-theme="dark"] footer{color:var(--text)}
+
+        /* RESPONSIVE DESIGN FOR HEADER */
+        @media (max-width: 1024px) {
+            header {
+                padding: 12px 16px;
+                gap: 10px;
+            }
+            
+            header h1 {
+                font-size: 1.4rem;
+            }
+            
+            header > div:last-child {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                padding: 10px;
+                gap: 8px;
+            }
+            
+            header h1 {
+                font-size: 1.2rem;
+            }
+
+            header > div {
+                width: 100%;
+                justify-content: center;
+            }
+
+            header > div:first-child {
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+            }
+
+            header > div:last-child {
+                gap: 6px;
+            }
+
+            header button {
+                font-size: 12px;
+                padding: 8px 10px;
+                min-width: 90px;
+                white-space: nowrap;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 8px;
+                gap: 6px;
+            }
+            
+            header h1 {
+                font-size: 1rem;
+                margin: 0;
+            }
+
+            .site-logo {
+                width: 32px;
+                height: 32px;
+            }
+
+            header > div:first-child {
+                gap: 6px;
+            }
+
+            header > div:last-child {
+                width: 100%;
+                gap: 4px;
+            }
+
+            header button {
+                font-size: 11px;
+                padding: 6px 8px;
+                min-width: 70px;
+                flex: 1;
+            }
+        }
+
+        @media (max-width: 320px) {
+            header h1 {
+                font-size: 0.9rem;
+            }
+
+            header button {
+                font-size: 10px;
+                padding: 6px;
+                min-width: 60px;
+            }
+
+            .site-logo {
+                width: 28px;
+                height: 28px;
+            }
+        }
+        
+        /* Additional mobile table improvements */
+        @media (max-width: 480px) {
+            .expense-table tbody tr {
+                padding: 14px 12px;
+                margin-bottom: 16px;
+            }
+            
+            .expense-table tbody td {
+                padding: 10px 6px;
+                gap: 12px;
+                font-size: 13px;
+            }
+            
+            .expense-table tbody td:before {
+                width: 40%;
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -903,11 +1128,11 @@
                 rows.forEach((data) => {
                     const row = tbody.insertRow();
                     row.innerHTML = `
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">${data.date}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">₹${data.groceries || 0}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">₹${data.householdSupplies || 0}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">₹${data.personal || 0}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); font-weight: bold;">₹${data.total || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);" data-label="Date">${data.date}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);" data-label="Groceries">₹${data.groceries || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);" data-label="Household Supplies">₹${data.householdSupplies || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);" data-label="Personal">₹${data.personal || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); font-weight: bold;" data-label="Total">₹${data.total || 0}</td>
                     `;
                 });
             } catch (error) {
@@ -992,11 +1217,11 @@
                 rows.forEach((data) => {
                     const row = tbody.insertRow();
                     row.innerHTML = `
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">${data.date}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">₹${data.fuel || 0}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">₹${data.taxi || 0}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">₹${data.bus || 0}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); font-weight: bold;">₹${data.total || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);" data-label="Date">${data.date}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);" data-label="Fuel">₹${data.fuel || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);" data-label="Taxi/Auto">₹${data.taxi || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);" data-label="Bus/Train">₹${data.bus || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); font-weight: bold;" data-label="Total">₹${data.total || 0}</td>
                     `;
                 });
             } catch (error) {
@@ -1102,13 +1327,13 @@
                 rows.forEach((data) => {
                     const row = tbody.insertRow();
                     row.innerHTML = `
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">${data.date}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">₹${data.movies || 0}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">₹${data.drinks || 0}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">₹${data.dining || 0}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">₹${data.subscriptions || 0}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">₹${data.miscellaneous || 0}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); font-weight: bold;">₹${data.total || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);" data-label="Date">${data.date}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);" data-label="Movies">₹${data.movies || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);" data-label="Drinks">₹${data.drinks || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);" data-label="Dining Out">₹${data.dining || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);" data-label="Subscriptions">₹${data.subscriptions || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);" data-label="Miscellaneous">₹${data.miscellaneous || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); font-weight: bold;" data-label="Total">₹${data.total || 0}</td>
                     `;
                 });
             } catch (error) {
@@ -1201,12 +1426,12 @@
                     const otherVal = data ? (data.otherLoans || 0) : 0;
                     const row = tbody.insertRow();
                     row.innerHTML = `
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">${data.date}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">₹${data.carLoan || 0}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">₹${data.homeLoan || 0}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">₹${data.personalLoan || 0}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">₹${otherVal}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); font-weight: bold;">₹${data.total || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);" data-label="Date">${data.date}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);" data-label="Car Loan">₹${data.carLoan || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);" data-label="Home Loan">₹${data.homeLoan || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);" data-label="Personal Loan">₹${data.personalLoan || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);" data-label="Other Loans">₹${otherVal}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); font-weight: bold;" data-label="Total">₹${data.total || 0}</td>
                     `;
                 });
             } catch (error) {
@@ -1290,15 +1515,15 @@
                 }
 
                 rows.forEach((data) => {
-                    const flightsVal = data.flights ?? data.travel ?? 0; // fallback for older keys
-                    const activitiesVal = data.activities ?? data.food ?? data.transport ?? 0; // fallback
+                    const flightsVal = data.flights ?? data.travel ?? 0;
+                    const activitiesVal = data.activities ?? data.food ?? data.transport ?? 0;
                     const row = tbody.insertRow();
                     row.innerHTML = `
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">${data.date}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">₹${data.accommodation || 0}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">₹${flightsVal}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">₹${activitiesVal}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); font-weight: bold;">₹${data.total || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);" data-label="Date">${data.date}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);" data-label="Accommodation">₹${data.accommodation || 0}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);" data-label="Flights/Train/Bus">₹${flightsVal}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);" data-label="Activities">₹${activitiesVal}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); font-weight: bold;" data-label="Total">₹${data.total || 0}</td>
                     `;
                 });
             } catch (error) {
