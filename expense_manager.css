@@ -1281,6 +1281,16 @@ main > div,
   .daily-budget-area {
     flex-direction: column;
   }
+  
+  .progress-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .budget-meta {
+    width: 100%;
+  }
 }
 
 /* Mobile phones (480px and below) */
@@ -1367,12 +1377,39 @@ main > div,
     height: 100px;
   }
 
+  .ring svg {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .label {
+    font-size: 18px;
+    font-weight: 700;
+  }
+
   .ring-inner {
     font-size: 16px;
   }
 
   .ring-label {
     font-size: 10px;
+  }
+  
+  .progress-card {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+  }
+  
+  .budget-meta {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .budget-meta p {
+    font-size: 14px;
+    line-height: 1.6;
   }
 
   .expense-table {
