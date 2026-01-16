@@ -50,12 +50,15 @@ async function signInWithGoogle(forceAccountSelection = false) {
     ? firebase.auth.Auth.Persistence.LOCAL   // Keep signed in across sessions
     : firebase.auth.Auth.Persistence.SESSION; // Sign out when browser closes
   
+  console.log(`🔐 Remember Me: ${rememberMe}, Persistence: ${persistence === firebase.auth.Auth.Persistence.LOCAL ? 'LOCAL' : 'SESSION'}`);
+  
   try {
-    // Set persistence before signing in
+    // CRITICAL: Set persistence before signing in
     await auth.setPersistence(persistence);
     console.log(`✓ Auth persistence set to ${rememberMe ? 'LOCAL (Remember Me)' : 'SESSION (Sign out on close)'}`);
   } catch (error) {
     console.error('Error setting persistence:', error);
+    // Continue anyway - persistence error shouldn't block sign-in
   }
   
   const provider = new firebase.auth.GoogleAuthProvider();
@@ -70,19 +73,26 @@ async function signInWithGoogle(forceAccountSelection = false) {
   // Use redirect flow on mobile devices, popup on desktop
   const useMobile = isMobileDevice();
   
+  console.log(`📱 Device type: ${useMobile ? 'Mobile (using redirect)' : 'Desktop (using popup)'}`);
+  
   if (useMobile) {
-    console.log('Mobile device detected - using redirect flow');
+    console.log('🔄 Starting redirect-based sign-in...');
     try {
+      // Store that we're attempting sign-in (for redirect detection)
+      sessionStorage.setItem('authRedirectPending', 'true');
       await auth.signInWithRedirect(provider);
       // Page will reload after redirect, result handled in getRedirectResult
       return;
     } catch (error) {
+      sessionStorage.removeItem('authRedirectPending');
       console.error('Google Sign-In redirect error:', error);
+      alert('Sign-in failed: ' + (error.message || 'Please try again'));
       throw error;
     }
   }
 
   // Desktop: Use popup flow
+  console.log('🪟 Starting popup-based sign-in...');
   try {
     const result = await auth.signInWithPopup(provider);
     currentUser = result.user;
@@ -97,18 +107,19 @@ async function signInWithGoogle(forceAccountSelection = false) {
     // Fall back to redirect-based sign-in which is more tolerant of these restrictions.
     if (error.code === 'auth/internal-error' || error.code === 'auth/popup-blocked') {
       try {
-        console.warn('Popup failed, falling back to redirect-based Google sign-in...');
+        console.warn('⚠ Popup failed, falling back to redirect-based Google sign-in...');
+        sessionStorage.setItem('authRedirectPending', 'true');
         await auth.signInWithRedirect(provider);
         return; // Redirect will navigate away
       } catch (redirectError) {
+        sessionStorage.removeItem('authRedirectPending');
         console.error('Google Sign-In redirect error:', redirectError);
-        console.log('');
         throw redirectError;
       }
     }
 
-    if (error.code !== 'auth/popup-closed-by-user') {
-      console.log('Failed to sign in with Google: ' + error.message);
+    if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
+      alert('Sign-in failed: ' + (error.message || 'Please try again'));
     }
     throw error;
   }
@@ -269,6 +280,8 @@ function showRecentAccounts() {
 function initFirebaseAuth() {
   return new Promise((resolve) => {
     let resolved = false;
+    let redirectHandled = false;
+    
     const finish = (user) => {
       if (!resolved) {
         resolved = true;
@@ -277,35 +290,92 @@ function initFirebaseAuth() {
     };
 
     // Handle redirect-based sign-in results (after signInWithRedirect)
+    // This must complete BEFORE onAuthStateChanged processes
+    console.log('🔍 Checking for redirect result...');
+    
     auth.getRedirectResult()
       .then((result) => {
+        redirectHandled = true;
+        const wasRedirectPending = sessionStorage.getItem('authRedirectPending') === 'true';
+        sessionStorage.removeItem('authRedirectPending');
+        
         if (result && result.user) {
           currentUser = result.user;
-          console.log('✓ Redirect sign-in complete for:', result.user.email);
+          console.log('✅ Redirect sign-in SUCCESS for:', result.user.email);
+          console.log('✅ User UID:', result.user.uid);
           saveAccountToHistory(result.user);
-          updateUIForUser(result.user);
           
           // Apply Remember Me preference after redirect
           const rememberMe = localStorage.getItem('rememberMe') !== 'false';
           const persistence = rememberMe 
             ? firebase.auth.Auth.Persistence.LOCAL 
             : firebase.auth.Auth.Persistence.SESSION;
-          auth.setPersistence(persistence).catch(err => 
-            console.error('Error setting persistence after redirect:', err)
-          );
           
-          finish(result.user);
+          console.log(`🔐 Setting persistence to ${persistence === firebase.auth.Auth.Persistence.LOCAL ? 'LOCAL' : 'SESSION'}`);
+          
+          auth.setPersistence(persistence)
+            .then(() => {
+              console.log('✓ Persistence set after redirect');
+              updateUIForUser(result.user);
+              finish(result.user);
+            })
+            .catch(err => {
+              console.error('Error setting persistence after redirect:', err);
+              updateUIForUser(result.user);
+              finish(result.user);
+            });
+        } else if (wasRedirectPending) {
+          // Redirect was pending but no result - possible error
+          console.error('⚠ Redirect was pending but no user result received');
+          const currentAuthUser = auth.currentUser;
+          if (currentAuthUser) {
+            console.log('✓ But found existing user session:', currentAuthUser.email);
+            currentUser = currentAuthUser;
+            updateUIForUser(currentAuthUser);
+            finish(currentAuthUser);
+          } else {
+            updateUIForUser(null);
+            finish(null);
+          }
+        } else {
+          // No redirect result, check current auth state
+          console.log('ℹ No redirect result');
+          const currentAuthUser = auth.currentUser;
+          if (currentAuthUser) {
+            console.log('✓ Existing user session found:', currentAuthUser.email);
+            currentUser = currentAuthUser;
+            updateUIForUser(currentAuthUser);
+            finish(currentAuthUser);
+          } else {
+            console.log('ℹ No existing session');
+          }
         }
       })
       .catch((error) => {
-        console.error('Redirect sign-in error:', error);
+        redirectHandled = true;
+        sessionStorage.removeItem('authRedirectPending');
+        console.error('❌ Redirect sign-in error:', error);
+        console.error('Error code:', error.code);
+        console.error('Error message:', error.message);
+        
         // Show error to user
-        if (error.code !== 'auth/popup-closed-by-user') {
-          alert('Sign-in failed: ' + (error.message || 'Please try again'));
+        if (error.code !== 'auth/popup-closed-by-user' && 
+            error.code !== 'auth/cancelled-popup-request' &&
+            error.code !== 'auth/user-cancelled') {
+          alert('Sign-in failed: ' + (error.message || 'Please try again.\n\nMake sure you have a stable internet connection.'));
         }
+        
+        updateUIForUser(null);
+        finish(null);
       });
 
+    // Listen for auth state changes
     auth.onAuthStateChanged((user) => {
+      // Wait for redirect to be handled first
+      if (!redirectHandled) {
+        return;
+      }
+      
       currentUser = user;
       
       // Clear cache when user changes
@@ -314,12 +384,11 @@ function initFirebaseAuth() {
       }
       
       if (user) {
-        console.log('✓ User authenticated:', user.email);
-        console.log('✓ User ID:', user.uid);
+        console.log('✓ Auth state changed - User authenticated:', user.email);
         updateUIForUser(user);
         finish(user);
       } else {
-        console.log('⚠ No user signed in');
+        console.log('⚠ Auth state changed - No user signed in');
         updateUIForUser(null);
         finish(null);
       }
