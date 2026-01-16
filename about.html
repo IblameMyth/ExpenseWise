@@ -115,16 +115,111 @@
         }
 
         @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
             .about-container {
-                padding: 25px;
+                padding: 24px 16px;
+                border-radius: 16px;
+            }
+
+            .about-header {
+                margin-bottom: 30px;
             }
 
             .about-header h1 {
-                font-size: 2rem;
+                font-size: 1.8rem;
+                margin-bottom: 8px;
+            }
+
+            .about-header p {
+                font-size: 1rem;
+            }
+
+            .about-section {
+                margin-bottom: 24px;
+            }
+
+            .about-section h2 {
+                font-size: 1.4rem;
+                margin-bottom: 12px;
+            }
+
+            .about-section p {
+                font-size: 0.95rem;
+                line-height: 1.7;
             }
 
             .features-grid {
                 grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .feature-card {
+                padding: 16px;
+            }
+
+            .feature-card h3 {
+                font-size: 1.1rem;
+                margin-bottom: 8px;
+            }
+
+            .feature-card p {
+                font-size: 0.9rem;
+            }
+
+            .back-btn {
+                padding: 12px 24px;
+                font-size: 14px;
+                width: 100%;
+                max-width: 280px;
+            }
+
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .about-container {
+                padding: 20px 12px;
+            }
+
+            .about-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .about-header p {
+                font-size: 0.9rem;
+            }
+
+            .about-section h2 {
+                font-size: 1.2rem;
+            }
+
+            .about-section p {
+                font-size: 0.85rem;
+            }
+
+            .feature-card {
+                padding: 14px;
+            }
+
+            .feature-card h3 {
+                font-size: 1rem;
+            }
+
+            .feature-card p {
+                font-size: 0.85rem;
+            }
+
+            .back-btn {
+                padding: 10px 20px;
+                font-size: 13px;
             }
         }
     </style>
